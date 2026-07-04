@@ -8,6 +8,7 @@ Live at **[rajaashok.github.io](https://rajaashok.github.io)**
 
 | Post | URL | Published |
 |---|---|---|
+| Don't Memorize 300 Problems. Memorize This Decision Tree. | [/dont-memorize-300-problems](https://rajaashok.github.io/dont-memorize-300-problems) | July 2026 |
 | Your Next Data Center Weighs Three Pounds | [/three-pound-data-center](https://rajaashok.github.io/three-pound-data-center) | July 2026 |
 
 ## Structure

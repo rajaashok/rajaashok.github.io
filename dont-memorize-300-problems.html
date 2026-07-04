@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Don't Memorize 300 Problems. Memorize This Decision Tree. — Raja</title>
+<meta name="description" content="One decision tree that picks the right coding-interview pattern in 60 seconds — then a story-driven walk through every branch, with Python. For students and early-career engineers.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,600;1,700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    background: radial-gradient(ellipse 1200px 800px at 50% -200px, rgba(217,119,6,0.08) 0%, transparent 70%), #f4ebdc;
+    font-family: 'Inter', sans-serif; color: #1f2a1f; font-size: 18px; line-height: 1.65;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 72px 28px 90px; }
+  .prose { max-width: 760px; }
+  .back { margin-bottom: 26px; }
+  .back a { font-family:'JetBrains Mono',monospace; font-size:12.5px; letter-spacing:1.5px; text-decoration:none; color:#7a836f; }
+  .label { font-family:'JetBrains Mono',monospace; font-size:12.5px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#c8612c; margin-bottom:20px; }
+  h1 { font-family:'Playfair Display',serif; font-weight:900; font-size:52px; line-height:1.05; letter-spacing:-1.5px; margin-bottom:22px; }
+  h1 .accent { color:#c8612c; font-style:italic; }
+  .subtitle { font-family:'Playfair Display',serif; font-style:italic; font-size:22px; line-height:1.45; color:#4a5a48; margin-bottom:26px; }
+  .meta { font-family:'JetBrains Mono',monospace; font-size:12.5px; color:#7a836f; letter-spacing:1px; padding-bottom:34px; border-bottom:1px solid rgba(31,42,31,0.15); margin-bottom:42px; }
+  p { margin-bottom: 20px; }
+  .lede { font-size: 20px; }
+  h2 { font-family:'Playfair Display',serif; font-weight:700; font-size:30px; line-height:1.2; letter-spacing:-0.5px; margin:12px 0 20px; }
+  em { color:#3d4d3b; } a { color:#c8612c; }
+  blockquote { font-family:'Playfair Display',serif; font-style:italic; font-size:25px; line-height:1.4; border-left:4px solid #c8612c; padding:6px 0 6px 26px; margin:34px 0; }
+  .callout { background:#fdf3d1; border-left:5px solid #d9a406; border-radius:0 12px 12px 0; padding:22px 28px; margin:32px 0; font-size:17px; }
+  .callout p { margin-bottom:0; }
+  .rep { font-family:'JetBrains Mono',monospace; font-size:12.5px; letter-spacing:0.5px; color:#4a7c59; background:#ece9d8; border-radius:8px; padding:10px 16px; display:block; margin:18px 0 26px; }
+  .rep b { color:#a0552a; letter-spacing:1.5px; }
+  .tabs { position:sticky; top:0; z-index:50; background:rgba(244,235,220,0.95); backdrop-filter:blur(6px);
+    display:flex; flex-wrap:wrap; gap:8px; padding:14px 0; border-bottom:2px solid rgba(31,42,31,0.12); margin-bottom:38px; }
+  .tab-btn { font-family:'JetBrains Mono',monospace; font-size:12.5px; font-weight:600; letter-spacing:1px; padding:9px 15px;
+    border-radius:999px; border:1.5px solid rgba(31,42,31,0.25); background:transparent; color:#3d4d3b; cursor:pointer; transition:all 0.15s ease; }
+  .tab-btn:hover { border-color:#c8612c; color:#c8612c; }
+  .tab-btn.active { background:#1f2a1f; color:#f4ebdc; border-color:#1f2a1f; }
+  .panel { display:none; }
+  .panel.active { display:block; animation:fadein 0.25s ease; }
+  @keyframes fadein { from {opacity:0; transform:translateY(6px);} to {opacity:1; transform:none;} }
+  .treebox { background:#0d120d; border-radius:16px; padding:26px 20px 18px; margin:32px -30px;
+    box-shadow:0 18px 50px rgba(31,42,31,0.35); overflow-x:auto; }
+  @media (max-width: 940px) { .treebox { margin:32px 0; } h1 { font-size:38px; } }
+  .treebox svg { width:100%; height:auto; display:block; min-width:560px; }
+  .treebox.mega svg { min-width:0; }
+  .tree-caption { font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:2px; color:#9aa88f; text-align:center; margin-top:14px; text-transform:uppercase; }
+  .code { background:#0d120d; color:#d8ddc9; border-radius:12px; padding:20px 24px; margin:26px 0;
+    font-family:'JetBrains Mono',monospace; font-size:13.5px; line-height:1.6; overflow-x:auto;
+    border-left:4px solid #c8612c; }
+  .code code { font-family:inherit; }
+  h3.beat { font-family:'Playfair Display',serif; font-size:23px; font-weight:900; margin:34px 0 14px; }
+  h3.beat .k { font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; letter-spacing:2px; color:#a0552a; display:block; margin-bottom:6px; }
+  .cta { background:#1f2a1f; color:#f4ebdc; border-radius:16px; padding:38px 36px; margin-top:56px; }
+  .cta h3 { font-family:'Playfair Display',serif; font-size:26px; font-weight:700; margin-bottom:14px; }
+  .cta p { color:#d8ddc9; font-size:17px; margin-bottom:0; }
+  .cta a { color:#f0b268; font-weight:600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="back"><a href="/">← ALL POSTS</a></div>
+  <div class="label">HackProduct · Interview Prep</div>
+  <h1>Don't Memorize 300 Problems.<br>Memorize <span class="accent">This</span> Decision Tree.</h1>
+  <p class="subtitle">The interview isn't a memory test. It's a classification test — and classification is learnable. One tree, six branches, told as the story of how interviews are actually won.</p>
+  <div class="meta">RAJA · JULY 2026 · MEGA POST · KEEP THIS TAB OPEN</div>
+
+  <div class="prose">
+    <p class="lede">In 2016, I bombed an interview I should have aced.</p>
+    <p>I'd prepped for weeks. Grinded a few hundred problems, notebook full of solutions, confidence full of helium. Then the interviewer shared a problem I'd never seen, and my brain did something cruel: it started flipping through every solution I'd memorized, like a card catalog on fire. <em>Was this like the islands one? The intervals one?</em> Three minutes of silence. He typed something. It wasn't praise.</p>
+    <p>Driving home, the diagnosis arrived, obvious and a little insulting: I had memorized <strong>answers</strong> in a game about recognizing <strong>questions</strong>. The problem he gave me was a sliding window wearing a costume — and I owned three sliding window solutions that I couldn't see through the disguise.</p>
+    <p>Years later, sitting on the other side of the table, I watch candidates make my exact mistake every hiring season. The strong ones aren't the ones who've seen everything. They're the ones who can <em>classify</em> anything — because nearly every interview problem is one of about 25 patterns in a costume, and classification takes a minute once you have the tree.</p>
+    <p>So here's the tree. The full map is on the first tab — screenshot it, print it, tape it over your desk. Then each tab walks one branch like a story: what the trigger words are, why the trick works, where the bodies are buried, and just enough Python to make it stick.</p>
+  </div>
+
+  <div class="tabs" id="tabbar">
+    <button class="tab-btn active" data-tab="overview">★ THE TREE</button>
+    <button class="tab-btn" data-tab="arrays">ARRAYS &amp; STRINGS</button>
+    <button class="tab-btn" data-tab="lists">LINKED LISTS</button>
+    <button class="tab-btn" data-tab="trees">TREES</button>
+    <button class="tab-btn" data-tab="graphs">GRAPHS</button>
+    <button class="tab-btn" data-tab="dp">DP &amp; GREEDY</button>
+    <button class="tab-btn" data-tab="other">EVERYTHING ELSE</button>
+  </div>
+
+<div class="panel active" id="overview">
+
+<div class="prose">
+  <h2>The map I wish someone had handed me in 2016</h2>
+  <p>Here it is — the whole interview game drawn as one tree. Start at the root with what the problem <em>mentions</em>, follow the branch, walk down until a question makes you nod. First "yes" wins. That's your opening move, found in under a minute.</p>
+</div>
+<div class="treebox mega">
+<svg viewBox="0 0 880 1498" xmlns="http://www.w3.org/2000/svg">
+<rect x="280.0" y="8" width="320" height="44" rx="12" fill="#171e17" stroke="#5a6a58" stroke-width="1.5"/>
+<text x="440.0" y="35" font-size="16" fill="#e8e3d2" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >● PROBLEM MENTIONS…</text>
+<line x1="440.0" y1="52" x2="440.0" y2="76" stroke="#3a4a38" stroke-width="2"/>
+<line x1="18" y1="76" x2="18" y2="902" stroke="#3a4a38" stroke-width="2"/>
+<line x1="18" y1="76" x2="737.3333333333333" y2="76" stroke="#3a4a38" stroke-width="2"/>
+<line x1="178.66666666666666" y1="76" x2="178.66666666666666" y2="92" stroke="#3a4a38" stroke-width="2"/>
+<rect x="46.0" y="92" width="265.3333333333333" height="34" rx="10" fill="#0d120d" stroke="#3f7c4a" stroke-width="1.5"/>
+<text x="178.66666666666666" y="114" font-size="13" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >ARRAY / STRING</text>
+<line x1="178.66666666666666" y1="126" x2="178.66666666666666" y2="134" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="178.66666666666666" y="147" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Need fast lookup?</text>
+<text x="178.66666666666666" y="159" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="56.0" y="164" width="245.33333333333331" height="36" rx="8" fill="#121f14" stroke="#3f7c4a" stroke-width="1.5"/>
+<text x="178.66666666666666" y="180" font-size="11.5" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >HashMap</text>
+<text x="178.66666666666666" y="193" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(1) avg</text>
+<line x1="178.66666666666666" y1="204" x2="178.66666666666666" y2="212" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="178.66666666666666" y="225" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Input sorted?</text>
+<text x="178.66666666666666" y="237" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="56.0" y="242" width="245.33333333333331" height="36" rx="8" fill="#121f14" stroke="#3f7c4a" stroke-width="1.5"/>
+<text x="178.66666666666666" y="258" font-size="11.5" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Binary Search</text>
+<text x="178.66666666666666" y="271" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(log n)</text>
+<line x1="178.66666666666666" y1="282" x2="178.66666666666666" y2="290" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="178.66666666666666" y="303" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Contiguous subarray?</text>
+<text x="178.66666666666666" y="315" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="56.0" y="320" width="245.33333333333331" height="36" rx="8" fill="#121f14" stroke="#3f7c4a" stroke-width="1.5"/>
+<text x="178.66666666666666" y="336" font-size="11.5" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Sliding Window</text>
+<text x="178.66666666666666" y="349" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n)</text>
+<line x1="178.66666666666666" y1="360" x2="178.66666666666666" y2="368" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="178.66666666666666" y="381" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Top K / Kth element?</text>
+<text x="178.66666666666666" y="393" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="56.0" y="398" width="245.33333333333331" height="36" rx="8" fill="#121f14" stroke="#3f7c4a" stroke-width="1.5"/>
+<text x="178.66666666666666" y="414" font-size="11.5" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Heap (PQ)</text>
+<text x="178.66666666666666" y="427" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n log k)</text>
+<line x1="178.66666666666666" y1="438" x2="178.66666666666666" y2="446" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="178.66666666666666" y="459" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Range / prefix sums?</text>
+<text x="178.66666666666666" y="471" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="56.0" y="476" width="245.33333333333331" height="36" rx="8" fill="#121f14" stroke="#3f7c4a" stroke-width="1.5"/>
+<text x="178.66666666666666" y="492" font-size="11.5" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Prefix Sum</text>
+<text x="178.66666666666666" y="505" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n)</text>
+<line x1="178.66666666666666" y1="516" x2="178.66666666666666" y2="524" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="178.66666666666666" y="537" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Next greater / smaller?</text>
+<text x="178.66666666666666" y="549" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="56.0" y="554" width="245.33333333333331" height="36" rx="8" fill="#121f14" stroke="#3f7c4a" stroke-width="1.5"/>
+<text x="178.66666666666666" y="570" font-size="11.5" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Monotonic Stack</text>
+<text x="178.66666666666666" y="583" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n)</text>
+<line x1="178.66666666666666" y1="594" x2="178.66666666666666" y2="602" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="178.66666666666666" y="615" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Overlapping intervals?</text>
+<text x="178.66666666666666" y="627" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="56.0" y="632" width="245.33333333333331" height="36" rx="8" fill="#121f14" stroke="#3f7c4a" stroke-width="1.5"/>
+<text x="178.66666666666666" y="648" font-size="11.5" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Merge Intervals</text>
+<text x="178.66666666666666" y="661" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n log n)</text>
+<line x1="178.66666666666666" y1="672" x2="178.66666666666666" y2="680" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="178.66666666666666" y="693" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Pair from both ends?</text>
+<text x="178.66666666666666" y="705" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="56.0" y="710" width="245.33333333333331" height="36" rx="8" fill="#121f14" stroke="#3f7c4a" stroke-width="1.5"/>
+<text x="178.66666666666666" y="726" font-size="11.5" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Two Pointers</text>
+<text x="178.66666666666666" y="739" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n)</text>
+<line x1="178.66666666666666" y1="750" x2="178.66666666666666" y2="758" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="178.66666666666666" y="771" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Need ordered output?</text>
+<text x="178.66666666666666" y="783" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="56.0" y="788" width="245.33333333333331" height="36" rx="8" fill="#121f14" stroke="#3f7c4a" stroke-width="1.5"/>
+<text x="178.66666666666666" y="804" font-size="11.5" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Sort</text>
+<text x="178.66666666666666" y="817" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n log n)</text>
+<text x="178.66666666666666" y="844" font-size="9.5" fill="#6a7565" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" font-style="italic">Still unsure? Brute-force it → the</text>
+<line x1="458.0" y1="76" x2="458.0" y2="92" stroke="#3a4a38" stroke-width="2"/>
+<rect x="325.3333333333333" y="92" width="265.3333333333333" height="34" rx="10" fill="#0d120d" stroke="#6a55a8" stroke-width="1.5"/>
+<text x="458.0" y="114" font-size="13" fill="#b9a0f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >LINKED LIST</text>
+<line x1="458.0" y1="126" x2="458.0" y2="134" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="458.0" y="147" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Cycle or middle node?</text>
+<text x="458.0" y="159" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="335.3333333333333" y="164" width="245.33333333333331" height="36" rx="8" fill="#171225" stroke="#6a55a8" stroke-width="1.5"/>
+<text x="458.0" y="180" font-size="11.5" fill="#b9a0f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Fast &amp; Slow Pointers</text>
+<text x="458.0" y="193" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(1) space</text>
+<line x1="458.0" y1="204" x2="458.0" y2="212" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="458.0" y="225" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Reverse list or part?</text>
+<text x="458.0" y="237" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="335.3333333333333" y="242" width="245.33333333333331" height="36" rx="8" fill="#171225" stroke="#6a55a8" stroke-width="1.5"/>
+<text x="458.0" y="258" font-size="11.5" fill="#b9a0f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >In-place Reversal</text>
+<text x="458.0" y="271" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(1) space</text>
+<line x1="458.0" y1="282" x2="458.0" y2="290" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="458.0" y="303" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Intersection of lists?</text>
+<text x="458.0" y="315" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="335.3333333333333" y="320" width="245.33333333333331" height="36" rx="8" fill="#171225" stroke="#6a55a8" stroke-width="1.5"/>
+<text x="458.0" y="336" font-size="11.5" fill="#b9a0f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Two-Pointer Switch</text>
+<text x="458.0" y="349" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n+m)</text>
+<line x1="458.0" y1="360" x2="458.0" y2="368" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="458.0" y="381" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Merge sorted lists?</text>
+<text x="458.0" y="393" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="335.3333333333333" y="398" width="245.33333333333331" height="36" rx="8" fill="#171225" stroke="#6a55a8" stroke-width="1.5"/>
+<text x="458.0" y="414" font-size="11.5" fill="#b9a0f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Min-Heap Merge</text>
+<text x="458.0" y="427" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(N log k)</text>
+<line x1="458.0" y1="438" x2="458.0" y2="446" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="458.0" y="459" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Reorder / palindrome?</text>
+<text x="458.0" y="471" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="335.3333333333333" y="476" width="245.33333333333331" height="36" rx="8" fill="#171225" stroke="#6a55a8" stroke-width="1.5"/>
+<text x="458.0" y="492" font-size="11.5" fill="#b9a0f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Reverse + Merge</text>
+<text x="458.0" y="505" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(1) space</text>
+<text x="458.0" y="532" font-size="9.5" fill="#6a7565" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" font-style="italic">Still unsure? Simulate with pointe</text>
+<line x1="737.3333333333333" y1="76" x2="737.3333333333333" y2="92" stroke="#3a4a38" stroke-width="2"/>
+<rect x="604.6666666666666" y="92" width="265.3333333333333" height="34" rx="10" fill="#0d120d" stroke="#a8862e" stroke-width="1.5"/>
+<text x="737.3333333333333" y="114" font-size="13" fill="#f0cf6a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >TREE</text>
+<line x1="737.3333333333333" y1="126" x2="737.3333333333333" y2="134" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="737.3333333333333" y="147" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Level by level?</text>
+<text x="737.3333333333333" y="159" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="614.6666666666666" y="164" width="245.33333333333331" height="36" rx="8" fill="#201a0d" stroke="#a8862e" stroke-width="1.5"/>
+<text x="737.3333333333333" y="180" font-size="11.5" fill="#f0cf6a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >BFS (Level Order)</text>
+<text x="737.3333333333333" y="193" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n)</text>
+<line x1="737.3333333333333" y1="204" x2="737.3333333333333" y2="212" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="737.3333333333333" y="225" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Path / depth / diameter?</text>
+<text x="737.3333333333333" y="237" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="614.6666666666666" y="242" width="245.33333333333331" height="36" rx="8" fill="#201a0d" stroke="#a8862e" stroke-width="1.5"/>
+<text x="737.3333333333333" y="258" font-size="11.5" fill="#f0cf6a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >DFS (Recursion)</text>
+<text x="737.3333333333333" y="271" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n)</text>
+<line x1="737.3333333333333" y1="282" x2="737.3333333333333" y2="290" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="737.3333333333333" y="303" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Lowest common ancestor?</text>
+<text x="737.3333333333333" y="315" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="614.6666666666666" y="320" width="245.33333333333331" height="36" rx="8" fill="#201a0d" stroke="#a8862e" stroke-width="1.5"/>
+<text x="737.3333333333333" y="336" font-size="11.5" fill="#f0cf6a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >DFS + Parent Track</text>
+<text x="737.3333333333333" y="349" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n)</text>
+<line x1="737.3333333333333" y1="360" x2="737.3333333333333" y2="368" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="737.3333333333333" y="381" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Validate BST?</text>
+<text x="737.3333333333333" y="393" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="614.6666666666666" y="398" width="245.33333333333331" height="36" rx="8" fill="#201a0d" stroke="#a8862e" stroke-width="1.5"/>
+<text x="737.3333333333333" y="414" font-size="11.5" fill="#f0cf6a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Inorder Traversal</text>
+<text x="737.3333333333333" y="427" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n)</text>
+<line x1="737.3333333333333" y1="438" x2="737.3333333333333" y2="446" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="737.3333333333333" y="459" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Serialize / rebuild?</text>
+<text x="737.3333333333333" y="471" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="614.6666666666666" y="476" width="245.33333333333331" height="36" rx="8" fill="#201a0d" stroke="#a8862e" stroke-width="1.5"/>
+<text x="737.3333333333333" y="492" font-size="11.5" fill="#f0cf6a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >DFS (Pre-order)</text>
+<text x="737.3333333333333" y="505" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n)</text>
+<text x="737.3333333333333" y="532" font-size="9.5" fill="#6a7565" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" font-style="italic">Still unsure? Draw the tree, then </text>
+<line x1="18" y1="902" x2="737.3333333333333" y2="902" stroke="#3a4a38" stroke-width="2"/>
+<line x1="178.66666666666666" y1="902" x2="178.66666666666666" y2="918" stroke="#3a4a38" stroke-width="2"/>
+<rect x="46.0" y="918" width="265.3333333333333" height="34" rx="10" fill="#0d120d" stroke="#3f66a8" stroke-width="1.5"/>
+<text x="178.66666666666666" y="940" font-size="13" fill="#8ab4f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >GRAPH</text>
+<line x1="178.66666666666666" y1="952" x2="178.66666666666666" y2="960" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="178.66666666666666" y="973" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Shortest path, unweighted?</text>
+<text x="178.66666666666666" y="985" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="56.0" y="990" width="245.33333333333331" height="36" rx="8" fill="#0f1622" stroke="#3f66a8" stroke-width="1.5"/>
+<text x="178.66666666666666" y="1006" font-size="11.5" fill="#8ab4f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >BFS</text>
+<text x="178.66666666666666" y="1019" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(V+E)</text>
+<line x1="178.66666666666666" y1="1030" x2="178.66666666666666" y2="1038" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="178.66666666666666" y="1051" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Weighted, no negatives?</text>
+<text x="178.66666666666666" y="1063" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="56.0" y="1068" width="245.33333333333331" height="36" rx="8" fill="#0f1622" stroke="#3f66a8" stroke-width="1.5"/>
+<text x="178.66666666666666" y="1084" font-size="11.5" fill="#8ab4f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Dijkstra</text>
+<text x="178.66666666666666" y="1097" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(E log V)</text>
+<line x1="178.66666666666666" y1="1108" x2="178.66666666666666" y2="1116" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="178.66666666666666" y="1129" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Negative weights?</text>
+<text x="178.66666666666666" y="1141" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="56.0" y="1146" width="245.33333333333331" height="36" rx="8" fill="#0f1622" stroke="#3f66a8" stroke-width="1.5"/>
+<text x="178.66666666666666" y="1162" font-size="11.5" fill="#8ab4f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Bellman-Ford</text>
+<text x="178.66666666666666" y="1175" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(V·E)</text>
+<line x1="178.66666666666666" y1="1186" x2="178.66666666666666" y2="1194" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="178.66666666666666" y="1207" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >All-pairs shortest?</text>
+<text x="178.66666666666666" y="1219" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="56.0" y="1224" width="245.33333333333331" height="36" rx="8" fill="#0f1622" stroke="#3f66a8" stroke-width="1.5"/>
+<text x="178.66666666666666" y="1240" font-size="11.5" fill="#8ab4f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Floyd-Warshall</text>
+<text x="178.66666666666666" y="1253" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(V³)</text>
+<line x1="178.66666666666666" y1="1264" x2="178.66666666666666" y2="1272" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="178.66666666666666" y="1285" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Connectivity / components?</text>
+<text x="178.66666666666666" y="1297" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="56.0" y="1302" width="245.33333333333331" height="36" rx="8" fill="#0f1622" stroke="#3f66a8" stroke-width="1.5"/>
+<text x="178.66666666666666" y="1318" font-size="11.5" fill="#8ab4f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Union-Find</text>
+<text x="178.66666666666666" y="1331" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(α(n))</text>
+<line x1="178.66666666666666" y1="1342" x2="178.66666666666666" y2="1350" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="178.66666666666666" y="1363" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Dependency order / DAG?</text>
+<text x="178.66666666666666" y="1375" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="56.0" y="1380" width="245.33333333333331" height="36" rx="8" fill="#0f1622" stroke="#3f66a8" stroke-width="1.5"/>
+<text x="178.66666666666666" y="1396" font-size="11.5" fill="#8ab4f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Topological Sort</text>
+<text x="178.66666666666666" y="1409" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(V+E)</text>
+<text x="178.66666666666666" y="1436" font-size="9.5" fill="#6a7565" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" font-style="italic">Model the graph first — name nodes</text>
+<line x1="458.0" y1="902" x2="458.0" y2="918" stroke="#3a4a38" stroke-width="2"/>
+<rect x="325.3333333333333" y="918" width="265.3333333333333" height="34" rx="10" fill="#0d120d" stroke="#a85e2e" stroke-width="1.5"/>
+<text x="458.0" y="940" font-size="13" fill="#f0a05f" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >DP</text>
+<line x1="458.0" y1="952" x2="458.0" y2="960" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="458.0" y="973" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Overlapping subproblems?</text>
+<text x="458.0" y="985" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="335.3333333333333" y="990" width="245.33333333333331" height="36" rx="8" fill="#201409" stroke="#a85e2e" stroke-width="1.5"/>
+<text x="458.0" y="1006" font-size="11.5" fill="#f0a05f" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Memoization (Top-Down)</text>
+<text x="458.0" y="1019" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >—</text>
+<line x1="458.0" y1="1030" x2="458.0" y2="1038" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="458.0" y="1051" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Build from smaller cases?</text>
+<text x="458.0" y="1063" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="335.3333333333333" y="1068" width="245.33333333333331" height="36" rx="8" fill="#201409" stroke="#a85e2e" stroke-width="1.5"/>
+<text x="458.0" y="1084" font-size="11.5" fill="#f0a05f" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Tabulation (Bottom-Up)</text>
+<text x="458.0" y="1097" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >—</text>
+<line x1="458.0" y1="1108" x2="458.0" y2="1116" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="458.0" y="1129" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Local choice = optimal?</text>
+<text x="458.0" y="1141" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="335.3333333333333" y="1146" width="245.33333333333331" height="36" rx="8" fill="#201409" stroke="#a85e2e" stroke-width="1.5"/>
+<text x="458.0" y="1162" font-size="11.5" fill="#f0a05f" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Greedy</text>
+<text x="458.0" y="1175" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >prove it!</text>
+<text x="458.0" y="1202" font-size="9.5" fill="#6a7565" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" font-style="italic">Not DP — try DFS / greedy</text>
+<line x1="737.3333333333333" y1="902" x2="737.3333333333333" y2="918" stroke="#3a4a38" stroke-width="2"/>
+<rect x="604.6666666666666" y="918" width="265.3333333333333" height="34" rx="10" fill="#0d120d" stroke="#5a6a58" stroke-width="1.5"/>
+<text x="737.3333333333333" y="940" font-size="13" fill="#d8ddc9" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >OTHER</text>
+<line x1="737.3333333333333" y1="952" x2="737.3333333333333" y2="960" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="737.3333333333333" y="973" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Prefix match / autocomplete?</text>
+<text x="737.3333333333333" y="985" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="614.6666666666666" y="990" width="245.33333333333331" height="36" rx="8" fill="#181c18" stroke="#5a6a58" stroke-width="1.5"/>
+<text x="737.3333333333333" y="1006" font-size="11.5" fill="#d8ddc9" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Trie</text>
+<text x="737.3333333333333" y="1019" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n·m)</text>
+<line x1="737.3333333333333" y1="1030" x2="737.3333333333333" y2="1038" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="737.3333333333333" y="1051" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >XOR / odd one out?</text>
+<text x="737.3333333333333" y="1063" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="614.6666666666666" y="1068" width="245.33333333333331" height="36" rx="8" fill="#181c18" stroke="#5a6a58" stroke-width="1.5"/>
+<text x="737.3333333333333" y="1084" font-size="11.5" fill="#d8ddc9" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Bit Manipulation</text>
+<text x="737.3333333333333" y="1097" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(1) space</text>
+<line x1="737.3333333333333" y1="1108" x2="737.3333333333333" y2="1116" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="737.3333333333333" y="1129" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Median of a stream?</text>
+<text x="737.3333333333333" y="1141" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="614.6666666666666" y="1146" width="245.33333333333331" height="36" rx="8" fill="#181c18" stroke="#5a6a58" stroke-width="1.5"/>
+<text x="737.3333333333333" y="1162" font-size="11.5" fill="#d8ddc9" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Two Heaps</text>
+<text x="737.3333333333333" y="1175" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(log n)</text>
+<line x1="737.3333333333333" y1="1186" x2="737.3333333333333" y2="1194" stroke="#3a4a38" stroke-width="1.2"/>
+<text x="737.3333333333333" y="1207" font-size="11" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Counting / combinatorics?</text>
+<text x="737.3333333333333" y="1219" font-size="9" fill="#7dc97a" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >yes ↓</text>
+<rect x="614.6666666666666" y="1224" width="245.33333333333331" height="36" rx="8" fill="#181c18" stroke="#5a6a58" stroke-width="1.5"/>
+<text x="737.3333333333333" y="1240" font-size="11.5" fill="#d8ddc9" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Math / nCr</text>
+<text x="737.3333333333333" y="1253" font-size="9" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(1)-ish</text>
+<text x="737.3333333333333" y="1280" font-size="9.5" fill="#6a7565" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" font-style="italic">Reframe the problem</text>
+<text x="440.0" y="1484" font-size="12" fill="#f0b268" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >FIRST “YES” WINS · PATTERN RECOGNITION &gt; CODE WRITING · @hackproduct</text>
+</svg>
+<div class="tree-caption">The mega tree · screenshot this · scroll sideways on mobile</div>
+</div>
+<div class="prose">
+  <p>Now, a confession about how this tree gets used badly: people treat it like an answer key. It isn't. It's a <em>conversation script</em>. The winning move is to walk it out loud — <em>"okay, sorted array, looking for a pair… that smells like two pointers or binary search"</em> — because the interviewer is grading your navigation, not just your destination.</p>
+  <div class="callout">
+    <p><strong>The 60-second ritual:</strong> read the problem twice. Name the data structure out loud. Walk that branch of the tree out loud. Propose the pattern and its complexity — <em>then</em> touch the keyboard. Every senior engineer you admire does some version of this. It just doesn't look like a ritual anymore because it's fast.</p>
+  </div>
+  <p>Each tab above is one branch of this tree, drawn in full and walked through slowly — with stories from both sides of the interview table, and just enough Python to make the tricks stick.</p>
+  <blockquote>You're not learning 300 solutions. You're learning 25 locks and the shape of each key.</blockquote>
+</div>
+</div>
+<div class="panel" id="arrays">
+
+<div class="prose">
+  <h2>Arrays &amp; strings — the ninety-second tell</h2>
+  <p>I've interviewed a lot of engineers over the years, and here's a secret from my side of the table: I can usually tell within ninety seconds whether a candidate has a <em>system</em> or a <em>stack of memorized solutions</em>. The tell isn't speed. It's the first sentence they say after reading the problem.</p>
+  <p>Candidates with a system say things like <em>"unsorted array, need pairs that sum to a target — hash map, one pass."</em> Candidates without one say <em>"hmm, I think I've seen this…"</em> and start excavating.</p>
+  <p>This branch is where that system pays off most, because arrays are 40% of everything you'll face. Here's the full branch:</p>
+</div>
+<div class="treebox">
+<svg viewBox="0 0 610 916" xmlns="http://www.w3.org/2000/svg">
+<rect x="40.0" y="10" width="200" height="40" rx="11" fill="#0d120d" stroke="#3f7c4a" stroke-width="1.5"/>
+<text x="140.0" y="35" font-size="14" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >⌘ ARRAY / STRING</text>
+<line x1="140.0" y1="50" x2="140.0" y2="78" stroke="#3f7c4a" stroke-width="1.5"/>
+<rect x="20" y="78" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="99" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Need fast</text>
+<text x="140.0" y="116" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >lookup?</text>
+<line x1="260" y1="103.0" x2="338" y2="103.0" stroke="#7dc97a" stroke-width="2"/>
+<polygon points="338,103.0 328,98.0 328,108.0" fill="#7dc97a"/>
+<text x="299.0" y="95.0" font-size="10" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="78" width="230" height="50" rx="10" fill="#121f14" stroke="#3f7c4a" stroke-width="1.5"/>
+<text x="465.0" y="98" font-size="13" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >HashMap</text>
+<text x="465.0" y="120" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(1) avg</text>
+<line x1="140.0" y1="128" x2="140.0" y2="160" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,162 136.0,154 144.0,154" fill="#5a6a58"/>
+<text x="156.0" y="150" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="164" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="185" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Input</text>
+<text x="140.0" y="202" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >sorted?</text>
+<line x1="260" y1="189.0" x2="338" y2="189.0" stroke="#7dc97a" stroke-width="2"/>
+<polygon points="338,189.0 328,184.0 328,194.0" fill="#7dc97a"/>
+<text x="299.0" y="181.0" font-size="10" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="164" width="230" height="50" rx="10" fill="#121f14" stroke="#3f7c4a" stroke-width="1.5"/>
+<text x="465.0" y="184" font-size="13" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Binary Search</text>
+<text x="465.0" y="206" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(log n)</text>
+<line x1="140.0" y1="214" x2="140.0" y2="246" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,248 136.0,240 144.0,240" fill="#5a6a58"/>
+<text x="156.0" y="236" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="250" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="271" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Contiguous</text>
+<text x="140.0" y="288" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >subarray?</text>
+<line x1="260" y1="275.0" x2="338" y2="275.0" stroke="#7dc97a" stroke-width="2"/>
+<polygon points="338,275.0 328,270.0 328,280.0" fill="#7dc97a"/>
+<text x="299.0" y="267.0" font-size="10" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="250" width="230" height="50" rx="10" fill="#121f14" stroke="#3f7c4a" stroke-width="1.5"/>
+<text x="465.0" y="270" font-size="13" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Sliding Window</text>
+<text x="465.0" y="292" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n)</text>
+<line x1="140.0" y1="300" x2="140.0" y2="332" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,334 136.0,326 144.0,326" fill="#5a6a58"/>
+<text x="156.0" y="322" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="336" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="357" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Top K / Kth</text>
+<text x="140.0" y="374" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >element?</text>
+<line x1="260" y1="361.0" x2="338" y2="361.0" stroke="#7dc97a" stroke-width="2"/>
+<polygon points="338,361.0 328,356.0 328,366.0" fill="#7dc97a"/>
+<text x="299.0" y="353.0" font-size="10" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="336" width="230" height="50" rx="10" fill="#121f14" stroke="#3f7c4a" stroke-width="1.5"/>
+<text x="465.0" y="356" font-size="13" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Heap (PQ)</text>
+<text x="465.0" y="378" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n log k)</text>
+<line x1="140.0" y1="386" x2="140.0" y2="418" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,420 136.0,412 144.0,412" fill="#5a6a58"/>
+<text x="156.0" y="408" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="422" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="443" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Range /</text>
+<text x="140.0" y="460" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >prefix sums?</text>
+<line x1="260" y1="447.0" x2="338" y2="447.0" stroke="#7dc97a" stroke-width="2"/>
+<polygon points="338,447.0 328,442.0 328,452.0" fill="#7dc97a"/>
+<text x="299.0" y="439.0" font-size="10" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="422" width="230" height="50" rx="10" fill="#121f14" stroke="#3f7c4a" stroke-width="1.5"/>
+<text x="465.0" y="442" font-size="13" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Prefix Sum</text>
+<text x="465.0" y="464" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n)</text>
+<line x1="140.0" y1="472" x2="140.0" y2="504" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,506 136.0,498 144.0,498" fill="#5a6a58"/>
+<text x="156.0" y="494" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="508" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="529" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Next greater /</text>
+<text x="140.0" y="546" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >smaller?</text>
+<line x1="260" y1="533.0" x2="338" y2="533.0" stroke="#7dc97a" stroke-width="2"/>
+<polygon points="338,533.0 328,528.0 328,538.0" fill="#7dc97a"/>
+<text x="299.0" y="525.0" font-size="10" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="508" width="230" height="50" rx="10" fill="#121f14" stroke="#3f7c4a" stroke-width="1.5"/>
+<text x="465.0" y="528" font-size="13" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Monotonic Stack</text>
+<text x="465.0" y="550" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n)</text>
+<line x1="140.0" y1="558" x2="140.0" y2="590" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,592 136.0,584 144.0,584" fill="#5a6a58"/>
+<text x="156.0" y="580" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="594" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="615" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Overlapping</text>
+<text x="140.0" y="632" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >intervals?</text>
+<line x1="260" y1="619.0" x2="338" y2="619.0" stroke="#7dc97a" stroke-width="2"/>
+<polygon points="338,619.0 328,614.0 328,624.0" fill="#7dc97a"/>
+<text x="299.0" y="611.0" font-size="10" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="594" width="230" height="50" rx="10" fill="#121f14" stroke="#3f7c4a" stroke-width="1.5"/>
+<text x="465.0" y="614" font-size="13" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Merge Intervals</text>
+<text x="465.0" y="636" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n log n)</text>
+<line x1="140.0" y1="644" x2="140.0" y2="676" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,678 136.0,670 144.0,670" fill="#5a6a58"/>
+<text x="156.0" y="666" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="680" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="701" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Pair from</text>
+<text x="140.0" y="718" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >both ends?</text>
+<line x1="260" y1="705.0" x2="338" y2="705.0" stroke="#7dc97a" stroke-width="2"/>
+<polygon points="338,705.0 328,700.0 328,710.0" fill="#7dc97a"/>
+<text x="299.0" y="697.0" font-size="10" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="680" width="230" height="50" rx="10" fill="#121f14" stroke="#3f7c4a" stroke-width="1.5"/>
+<text x="465.0" y="700" font-size="13" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Two Pointers</text>
+<text x="465.0" y="722" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n)</text>
+<line x1="140.0" y1="730" x2="140.0" y2="762" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,764 136.0,756 144.0,756" fill="#5a6a58"/>
+<text x="156.0" y="752" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="766" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="787" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Need ordered</text>
+<text x="140.0" y="804" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >output?</text>
+<line x1="260" y1="791.0" x2="338" y2="791.0" stroke="#7dc97a" stroke-width="2"/>
+<polygon points="338,791.0 328,786.0 328,796.0" fill="#7dc97a"/>
+<text x="299.0" y="783.0" font-size="10" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="766" width="230" height="50" rx="10" fill="#121f14" stroke="#3f7c4a" stroke-width="1.5"/>
+<text x="465.0" y="786" font-size="13" fill="#7dc97a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Sort</text>
+<text x="465.0" y="808" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n log n)</text>
+<line x1="140.0" y1="816" x2="140.0" y2="834" stroke="#5a6a58" stroke-width="1.5"/>
+<text x="156.0" y="831" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="838" width="350" height="36" rx="9" fill="transparent" stroke="#3a4a38" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="195.0" y="860" font-size="11" fill="#8a9480" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" font-style="italic">Still unsure? Brute-force it → then optimize</text>
+</svg>
+<div class="tree-caption">The array / string branch · walk top to bottom</div>
+</div>
+<div class="prose">
+  <h3 class="beat"><span class="k">FIRST QUESTION</span>Do I need to find things fast?</h3>
+  <p>The top of the branch is the <strong>HashMap</strong>, and it's the top for a reason: the most common transformation in all of interviewing is turning "search the array again and again" — O(n²) — into "file everything in labeled drawers, check the drawer" — O(n). Two Sum, the most famous interview question on the planet, is exactly this: for each number, check the drawer for its complement <em>before</em> filing the current number. (That order matters. File first and a 4 will happily pair with itself to make 8. I've watched that bug eat fifteen minutes of a strong candidate's interview.)</p>
+  <span class="rep"><b>REP:</b> Two Sum · Group Anagrams · Longest Consecutive Sequence</span>
+
+  <h3 class="beat"><span class="k">SORTED? SAY IT OUT LOUD</span>The word "sorted" is a gift</h3>
+  <p>If the input is sorted and you don't say "binary search or two pointers" within ten seconds, you've left points on the table. Sorted input means every comparison kills half the search space (<strong>Binary Search</strong>, O(log n)) or tells you exactly which end to move (<strong>Two Pointers</strong> — sum too small? left finger moves right; too big? right finger moves left). It's the number-guessing game from childhood — "higher… lower…" — a billion numbers, thirty guesses.</p>
+  <span class="rep"><b>REP:</b> Binary Search · Two Sum II · 3Sum · Container With Most Water</span>
+
+  <h3 class="beat"><span class="k">THE CATERPILLAR</span>"Contiguous subarray" means sliding window</h3>
+  <p>Any problem that says <em>contiguous subarray</em> or <em>substring</em> is asking you to check a stretch of consecutive elements — and the naive way is to check all O(n²) stretches. The <strong>Sliding Window</strong> is a caterpillar instead: the head crawls forward every step, and the tail only catches up when the window breaks a rule. Every element enters once and leaves once. Here it is finding the longest substring without repeats:</p>
+  <pre class="code"><code>def longest_unique(s):
+    seen = {}                 # char -&gt; last index we saw it
+    left = best = 0
+    for right, ch in enumerate(s):
+        if ch in seen and seen[ch] &gt;= left:
+            left = seen[ch] + 1        # tail catches up
+        seen[ch] = right
+        best = max(best, right - left + 1)
+    return best                        # one pass. O(n).</code></pre>
+  <p>Read the middle line again — <code style="font-family:'JetBrains Mono',monospace;font-size:14px;">left = seen[ch] + 1</code>. That's the entire pattern: the tail jumping forward past the duplicate. Everything else is bookkeeping.</p>
+  <span class="rep"><b>REP:</b> Longest Substring Without Repeats · Minimum Window Substring · Max Consecutive Ones III</span>
+
+  <h3 class="beat"><span class="k">MIDDLE OF THE BRANCH</span>Four specialists worth knowing cold</h3>
+  <p><strong>Heap</strong> for anything "top K" — you don't sort the whole leaderboard to find the podium; you keep a K-sized VIP room where the <em>weakest member guards the door</em> (that's why it's a min-heap for "K largest" — the counterintuitive detail interviewers love to probe). <strong>Prefix Sum</strong> for range-sum questions — mile markers on a highway; any stretch is just <em>marker[j] − marker[i]</em>. <strong>Monotonic Stack</strong> for "next greater element" — the one pattern on this branch that nobody invents live in 45 minutes, so learn it before you need it. And <strong>Merge Intervals</strong> for anything with meetings or bookings: sort by start time, sweep once, and overlaps can only ever be between neighbors.</p>
+  <span class="rep"><b>REP:</b> Kth Largest · Subarray Sum Equals K · Daily Temperatures · Meeting Rooms II</span>
+
+  <h3 class="beat"><span class="k">BOTTOM OF THE BRANCH</span>The move that never embarrasses you</h3>
+  <p>And when nothing above fires? Two honorable exits. One: ask <em>"would this be easy if the array were sorted?"</em> — sorting costs O(n log n) and unlocks half the branch above. Two: say, with a straight face, <em>"let me brute-force it first, then optimize."</em> I have never once penalized a candidate for that sentence. I have penalized plenty for fifteen minutes of silence while they hunted for the clever answer.</p>
+</div>
+</div>
+<div class="panel" id="lists">
+
+<div class="prose">
+  <h2>Linked lists — five moves, endlessly recombined</h2>
+  <p>A story from the other side of the table. A candidate once told me, mid-problem: <em>"I hate linked lists."</em> I asked why. <em>"Because I can't see them."</em></p>
+  <p>That's actually the correct diagnosis — and the fix is the whole branch. You can't index into a linked list, you can't glance at it, so every technique is really a way of <em>seeing without looking</em>: clever pointers that report back where things are. There are only five moves. Every "hard" list problem is choreography built from them.</p>
+</div>
+<div class="treebox">
+<svg viewBox="0 0 610 572" xmlns="http://www.w3.org/2000/svg">
+<rect x="40.0" y="10" width="200" height="40" rx="11" fill="#0d120d" stroke="#6a55a8" stroke-width="1.5"/>
+<text x="140.0" y="35" font-size="14" fill="#b9a0f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >⌘ LINKED LIST</text>
+<line x1="140.0" y1="50" x2="140.0" y2="78" stroke="#6a55a8" stroke-width="1.5"/>
+<rect x="20" y="78" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="99" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Cycle or</text>
+<text x="140.0" y="116" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >middle node?</text>
+<line x1="260" y1="103.0" x2="338" y2="103.0" stroke="#b9a0f0" stroke-width="2"/>
+<polygon points="338,103.0 328,98.0 328,108.0" fill="#b9a0f0"/>
+<text x="299.0" y="95.0" font-size="10" fill="#b9a0f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="78" width="230" height="50" rx="10" fill="#171225" stroke="#6a55a8" stroke-width="1.5"/>
+<text x="465.0" y="98" font-size="13" fill="#b9a0f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Fast &amp; Slow</text>
+<text x="465.0" y="114" font-size="13" fill="#b9a0f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Pointers</text>
+<text x="465.0" y="120" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(1) space</text>
+<line x1="140.0" y1="128" x2="140.0" y2="160" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,162 136.0,154 144.0,154" fill="#5a6a58"/>
+<text x="156.0" y="150" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="164" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="185" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Reverse list</text>
+<text x="140.0" y="202" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >or part?</text>
+<line x1="260" y1="189.0" x2="338" y2="189.0" stroke="#b9a0f0" stroke-width="2"/>
+<polygon points="338,189.0 328,184.0 328,194.0" fill="#b9a0f0"/>
+<text x="299.0" y="181.0" font-size="10" fill="#b9a0f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="164" width="230" height="50" rx="10" fill="#171225" stroke="#6a55a8" stroke-width="1.5"/>
+<text x="465.0" y="184" font-size="13" fill="#b9a0f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >In-place</text>
+<text x="465.0" y="200" font-size="13" fill="#b9a0f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Reversal</text>
+<text x="465.0" y="206" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(1) space</text>
+<line x1="140.0" y1="214" x2="140.0" y2="246" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,248 136.0,240 144.0,240" fill="#5a6a58"/>
+<text x="156.0" y="236" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="250" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="271" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Intersection</text>
+<text x="140.0" y="288" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >of lists?</text>
+<line x1="260" y1="275.0" x2="338" y2="275.0" stroke="#b9a0f0" stroke-width="2"/>
+<polygon points="338,275.0 328,270.0 328,280.0" fill="#b9a0f0"/>
+<text x="299.0" y="267.0" font-size="10" fill="#b9a0f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="250" width="230" height="50" rx="10" fill="#171225" stroke="#6a55a8" stroke-width="1.5"/>
+<text x="465.0" y="270" font-size="13" fill="#b9a0f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Two-Pointer</text>
+<text x="465.0" y="286" font-size="13" fill="#b9a0f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Switch</text>
+<text x="465.0" y="292" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n+m)</text>
+<line x1="140.0" y1="300" x2="140.0" y2="332" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,334 136.0,326 144.0,326" fill="#5a6a58"/>
+<text x="156.0" y="322" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="336" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="357" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Merge sorted</text>
+<text x="140.0" y="374" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >lists?</text>
+<line x1="260" y1="361.0" x2="338" y2="361.0" stroke="#b9a0f0" stroke-width="2"/>
+<polygon points="338,361.0 328,356.0 328,366.0" fill="#b9a0f0"/>
+<text x="299.0" y="353.0" font-size="10" fill="#b9a0f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="336" width="230" height="50" rx="10" fill="#171225" stroke="#6a55a8" stroke-width="1.5"/>
+<text x="465.0" y="356" font-size="13" fill="#b9a0f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Min-Heap</text>
+<text x="465.0" y="372" font-size="13" fill="#b9a0f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Merge</text>
+<text x="465.0" y="378" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(N log k)</text>
+<line x1="140.0" y1="386" x2="140.0" y2="418" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,420 136.0,412 144.0,412" fill="#5a6a58"/>
+<text x="156.0" y="408" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="422" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="443" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Reorder /</text>
+<text x="140.0" y="460" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >palindrome?</text>
+<line x1="260" y1="447.0" x2="338" y2="447.0" stroke="#b9a0f0" stroke-width="2"/>
+<polygon points="338,447.0 328,442.0 328,452.0" fill="#b9a0f0"/>
+<text x="299.0" y="439.0" font-size="10" fill="#b9a0f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="422" width="230" height="50" rx="10" fill="#171225" stroke="#6a55a8" stroke-width="1.5"/>
+<text x="465.0" y="442" font-size="13" fill="#b9a0f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Reverse +</text>
+<text x="465.0" y="458" font-size="13" fill="#b9a0f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Merge</text>
+<text x="465.0" y="464" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(1) space</text>
+<line x1="140.0" y1="472" x2="140.0" y2="490" stroke="#5a6a58" stroke-width="1.5"/>
+<text x="156.0" y="487" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="494" width="350" height="36" rx="9" fill="transparent" stroke="#3a4a38" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="195.0" y="516" font-size="11" fill="#8a9480" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" font-style="italic">Still unsure? Simulate with pointers on paper</text>
+</svg>
+<div class="tree-caption">The linked list branch</div>
+</div>
+<div class="prose">
+  <h3 class="beat"><span class="k">MOVE ONE</span>The tortoise and the hare</h3>
+  <p>Two runners on a track, one walking, one sprinting double speed. If the track loops, the sprinter <em>must</em> lap the walker — that's cycle detection with zero extra memory. If it doesn't loop, the sprinter hits the wall exactly when the walker reaches halfway — that's middle-finding without ever counting nodes. One trick, two superpowers:</p>
+  <pre class="code"><code>def middle(head):
+    slow = fast = head
+    while fast and fast.next:          # chant: fast AND fast.next
+        slow, fast = slow.next, fast.next.next
+    return slow    # fast hit the end; slow is standing halfway</code></pre>
+  <p>That <code style="font-family:'JetBrains Mono',monospace;font-size:14px;">while fast and fast.next</code> is a chant. Say it every time. Nearly every linked-list crash in interview history is someone advancing <code style="font-family:'JetBrains Mono',monospace;font-size:14px;">fast.next.next</code> when <code style="font-family:'JetBrains Mono',monospace;font-size:14px;">fast.next</code> was already None.</p>
+  <span class="rep"><b>REP:</b> Linked List Cycle · Middle of the List · Happy Number</span>
+
+  <h3 class="beat"><span class="k">MOVE TWO</span>Reversal, rehearsed until boring</h3>
+  <p><strong>In-place reversal</strong> is four lines that everyone fumbles under pressure, which is precisely why you rehearse it until it's muscle memory: carry three sticky notes — <em>prev</em>, <em>curr</em>, <em>next</em> — save next, flip curr's arrow backward, shuffle all three forward. The one commandment: <em>save next before you flip</em>, or the rest of the list floats away into garbage collection and takes your offer with it.</p>
+  <span class="rep"><b>REP:</b> Reverse Linked List · Reverse Linked List II · Reverse Nodes in K-Group</span>
+
+  <h3 class="beat"><span class="k">MOVES THREE &amp; FOUR</span>The commute trick and the checkout lines</h3>
+  <p>Where do two lists intersect? The <strong>two-pointer switch</strong>: when your pointer finishes its own list, teleport it to the head of the <em>other</em> one. Both pointers travel exactly n + m steps, so they arrive at the junction in perfect sync — two people walking each other's commutes, meeting where the routes merge. It feels like a magic trick; it's just equalized distance. And merging K sorted lists? A <strong>min-heap</strong> holding one head per list — K checkout lines, one bagger, always grabbing from whichever line has the smallest front item. O(N log k), and the interviewer will absolutely ask why not merge one-by-one (that's O(N·k) — say it before they ask).</p>
+  <span class="rep"><b>REP:</b> Intersection of Two Lists · Merge K Sorted Lists</span>
+
+  <h3 class="beat"><span class="k">THE BOSS FIGHT</span>Reverse + merge</h3>
+  <p>Palindrome check. Reorder list. These look advanced, and they're actually a <em>combo meal</em>: fast &amp; slow to find the middle, in-place reversal on the back half, then walk the two halves together. If you drilled moves one and two, the boss fight is free. And if you're ever truly stuck on a list problem — draw five boxes and arrows on paper and push your pointers by hand. Every list bug ever written is a pointer aimed somewhere its author didn't draw.</p>
+  <span class="rep"><b>REP:</b> Palindrome Linked List · Reorder List</span>
+</div>
+</div>
+<div class="panel" id="trees">
+
+<div class="prose">
+  <h2>Trees — one fork decides everything</h2>
+  <p>My favorite moment to watch in an interview is the first ten seconds after a tree problem lands, because there's exactly one decision that matters and candidates either know it or don't: <strong>am I going wide, or am I going deep?</strong></p>
+  <p>Everything with the word "level" in it goes wide — that's BFS with a queue. Everything about paths, depths, and ancestors goes deep — that's DFS with recursion. Answer that fork and you've done half the problem before writing a character.</p>
+</div>
+<div class="treebox">
+<svg viewBox="0 0 610 572" xmlns="http://www.w3.org/2000/svg">
+<rect x="40.0" y="10" width="200" height="40" rx="11" fill="#0d120d" stroke="#a8862e" stroke-width="1.5"/>
+<text x="140.0" y="35" font-size="14" fill="#f0cf6a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >⌘ TREE</text>
+<line x1="140.0" y1="50" x2="140.0" y2="78" stroke="#a8862e" stroke-width="1.5"/>
+<rect x="20" y="78" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="99" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Level by</text>
+<text x="140.0" y="116" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >level?</text>
+<line x1="260" y1="103.0" x2="338" y2="103.0" stroke="#f0cf6a" stroke-width="2"/>
+<polygon points="338,103.0 328,98.0 328,108.0" fill="#f0cf6a"/>
+<text x="299.0" y="95.0" font-size="10" fill="#f0cf6a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="78" width="230" height="50" rx="10" fill="#201a0d" stroke="#a8862e" stroke-width="1.5"/>
+<text x="465.0" y="98" font-size="13" fill="#f0cf6a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >BFS</text>
+<text x="465.0" y="114" font-size="13" fill="#f0cf6a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >(Level Order)</text>
+<text x="465.0" y="120" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n)</text>
+<line x1="140.0" y1="128" x2="140.0" y2="160" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,162 136.0,154 144.0,154" fill="#5a6a58"/>
+<text x="156.0" y="150" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="164" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="185" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Path / depth /</text>
+<text x="140.0" y="202" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >diameter?</text>
+<line x1="260" y1="189.0" x2="338" y2="189.0" stroke="#f0cf6a" stroke-width="2"/>
+<polygon points="338,189.0 328,184.0 328,194.0" fill="#f0cf6a"/>
+<text x="299.0" y="181.0" font-size="10" fill="#f0cf6a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="164" width="230" height="50" rx="10" fill="#201a0d" stroke="#a8862e" stroke-width="1.5"/>
+<text x="465.0" y="184" font-size="13" fill="#f0cf6a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >DFS</text>
+<text x="465.0" y="200" font-size="13" fill="#f0cf6a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >(Recursion)</text>
+<text x="465.0" y="206" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n)</text>
+<line x1="140.0" y1="214" x2="140.0" y2="246" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,248 136.0,240 144.0,240" fill="#5a6a58"/>
+<text x="156.0" y="236" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="250" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="271" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Lowest common</text>
+<text x="140.0" y="288" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >ancestor?</text>
+<line x1="260" y1="275.0" x2="338" y2="275.0" stroke="#f0cf6a" stroke-width="2"/>
+<polygon points="338,275.0 328,270.0 328,280.0" fill="#f0cf6a"/>
+<text x="299.0" y="267.0" font-size="10" fill="#f0cf6a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="250" width="230" height="50" rx="10" fill="#201a0d" stroke="#a8862e" stroke-width="1.5"/>
+<text x="465.0" y="270" font-size="13" fill="#f0cf6a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >DFS + Parent</text>
+<text x="465.0" y="286" font-size="13" fill="#f0cf6a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Track</text>
+<text x="465.0" y="292" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n)</text>
+<line x1="140.0" y1="300" x2="140.0" y2="332" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,334 136.0,326 144.0,326" fill="#5a6a58"/>
+<text x="156.0" y="322" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="336" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="357" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Validate</text>
+<text x="140.0" y="374" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >BST?</text>
+<line x1="260" y1="361.0" x2="338" y2="361.0" stroke="#f0cf6a" stroke-width="2"/>
+<polygon points="338,361.0 328,356.0 328,366.0" fill="#f0cf6a"/>
+<text x="299.0" y="353.0" font-size="10" fill="#f0cf6a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="336" width="230" height="50" rx="10" fill="#201a0d" stroke="#a8862e" stroke-width="1.5"/>
+<text x="465.0" y="356" font-size="13" fill="#f0cf6a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Inorder</text>
+<text x="465.0" y="372" font-size="13" fill="#f0cf6a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Traversal</text>
+<text x="465.0" y="378" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n)</text>
+<line x1="140.0" y1="386" x2="140.0" y2="418" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,420 136.0,412 144.0,412" fill="#5a6a58"/>
+<text x="156.0" y="408" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="422" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="443" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Serialize /</text>
+<text x="140.0" y="460" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >rebuild?</text>
+<line x1="260" y1="447.0" x2="338" y2="447.0" stroke="#f0cf6a" stroke-width="2"/>
+<polygon points="338,447.0 328,442.0 328,452.0" fill="#f0cf6a"/>
+<text x="299.0" y="439.0" font-size="10" fill="#f0cf6a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="422" width="230" height="50" rx="10" fill="#201a0d" stroke="#a8862e" stroke-width="1.5"/>
+<text x="465.0" y="442" font-size="13" fill="#f0cf6a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >DFS</text>
+<text x="465.0" y="458" font-size="13" fill="#f0cf6a" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >(Pre-order)</text>
+<text x="465.0" y="464" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n)</text>
+<line x1="140.0" y1="472" x2="140.0" y2="490" stroke="#5a6a58" stroke-width="1.5"/>
+<text x="156.0" y="487" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="494" width="350" height="36" rx="9" fill="transparent" stroke="#3a4a38" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="195.0" y="516" font-size="11" fill="#8a9480" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" font-style="italic">Still unsure? Draw the tree, then choose</text>
+</svg>
+<div class="tree-caption">The tree branch · wide or deep?</div>
+</div>
+<div class="prose">
+  <h3 class="beat"><span class="k">GOING WIDE</span>BFS and the snapshot trick</h3>
+  <p>Level-order traversal is a queue and a loop, but the detail that separates working code from scrambled output is the <em>size snapshot</em>: at the top of each round, freeze the queue's current length — that count is exactly one level. Process that many, enqueue their children, repeat. Skip the snapshot and levels bleed into each other silently; you won't notice until your output is wrong and the clock is ugly.</p>
+  <span class="rep"><b>REP:</b> Level Order Traversal · Right Side View · Zigzag Traversal</span>
+
+  <h3 class="beat"><span class="k">GOING DEEP</span>The one-sentence religion of DFS</h3>
+  <p>Here's the entire philosophy of tree recursion: <em>ask each child for its answer, combine, pass it up.</em> Depth is 1 + the taller child. Diameter is best-left-path plus best-right-path. Path sums, balance checks, subtree matches — all the same sentence with a different combine step.</p>
+  <pre class="code"><code>def depth(node):
+    if not node:                       # the base case IS the design
+        return 0
+    return 1 + max(depth(node.left), depth(node.right))</code></pre>
+  <p>The discipline that makes it work: <strong>don't trace the recursion.</strong> Ever. Trying to simulate the whole call stack in your head is how people melt down mid-interview. Instead: define what the function returns for any subtree, nail the null base case, write the combine. Trust that it works on children — because by induction, it does.</p>
+  <span class="rep"><b>REP:</b> Maximum Depth · Diameter of Binary Tree · Path Sum II</span>
+
+  <h3 class="beat"><span class="k">THE FAMILY REUNION</span>Lowest common ancestor</h3>
+  <p>LCA sounds intimidating and is actually one elegant observation: recurse into both subtrees looking for either target, and the first node that finds one on its left and one on its right is the meeting point — the first person both cousins report up to at the family reunion. One subtlety worth saying out loud: a node counts as its own ancestor, so if you find one target while searching, you can stop — the other is somewhere below it.</p>
+  <span class="rep"><b>REP:</b> LCA of a Binary Tree · LCA of a BST (easier — use the ordering!)</span>
+
+  <h3 class="beat"><span class="k">THE BST FACT</span>Worth an actual tattoo</h3>
+  <p>One fact unlocks every BST question: <strong>inorder traversal visits values in sorted order.</strong> Validate a BST? Check that your inorder sequence strictly increases. Kth smallest? Stop at the Kth visit. (The classic trap: validating by comparing only parents to children — a grandchild can violate its <em>grandparent's</em> range and your check passes anyway. Pass down (min, max) bounds, or lean on inorder.) And for serializing a tree to a string, go <strong>pre-order with explicit null markers</strong> — root arrives before its subtrees, so rebuilding is a simple recursive read. Skip the null markers to "save space" and the shape becomes ambiguous — flat-pack furniture with no instruction sheet.</p>
+  <span class="rep"><b>REP:</b> Validate BST · Kth Smallest in BST · Serialize &amp; Deserialize</span>
+</div>
+</div>
+<div class="panel" id="graphs">
+
+<div class="prose">
+  <h2>Graphs — the costume department</h2>
+  <p>Graph problems almost never say "graph." They say cities and flights. Courses and prerequisites. Employees and managers. Islands in a grid of water. The problem-writers are running a costume department, and your first job — before any algorithm — is to undress the problem: <em>say out loud what your nodes are and what your edges are.</em></p>
+  <p>I've watched candidates solve the hardest part of a graph problem in one sentence — "okay, each course is a node, each prerequisite is a directed edge" — and then coast. I've also watched candidates skip that sentence and flail for half an hour at a problem they actually knew. Model first. Then this branch picks the algorithm for you:</p>
+</div>
+<div class="treebox">
+<svg viewBox="0 0 610 658" xmlns="http://www.w3.org/2000/svg">
+<rect x="40.0" y="10" width="200" height="40" rx="11" fill="#0d120d" stroke="#3f66a8" stroke-width="1.5"/>
+<text x="140.0" y="35" font-size="14" fill="#8ab4f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >⌘ GRAPH</text>
+<line x1="140.0" y1="50" x2="140.0" y2="78" stroke="#3f66a8" stroke-width="1.5"/>
+<rect x="20" y="78" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="99" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Shortest path,</text>
+<text x="140.0" y="116" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >unweighted?</text>
+<line x1="260" y1="103.0" x2="338" y2="103.0" stroke="#8ab4f0" stroke-width="2"/>
+<polygon points="338,103.0 328,98.0 328,108.0" fill="#8ab4f0"/>
+<text x="299.0" y="95.0" font-size="10" fill="#8ab4f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="78" width="230" height="50" rx="10" fill="#0f1622" stroke="#3f66a8" stroke-width="1.5"/>
+<text x="465.0" y="98" font-size="13" fill="#8ab4f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >BFS</text>
+<text x="465.0" y="120" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(V+E)</text>
+<line x1="140.0" y1="128" x2="140.0" y2="160" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,162 136.0,154 144.0,154" fill="#5a6a58"/>
+<text x="156.0" y="150" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="164" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="185" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Weighted, no</text>
+<text x="140.0" y="202" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >negatives?</text>
+<line x1="260" y1="189.0" x2="338" y2="189.0" stroke="#8ab4f0" stroke-width="2"/>
+<polygon points="338,189.0 328,184.0 328,194.0" fill="#8ab4f0"/>
+<text x="299.0" y="181.0" font-size="10" fill="#8ab4f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="164" width="230" height="50" rx="10" fill="#0f1622" stroke="#3f66a8" stroke-width="1.5"/>
+<text x="465.0" y="184" font-size="13" fill="#8ab4f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Dijkstra</text>
+<text x="465.0" y="206" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(E log V)</text>
+<line x1="140.0" y1="214" x2="140.0" y2="246" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,248 136.0,240 144.0,240" fill="#5a6a58"/>
+<text x="156.0" y="236" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="250" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="271" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Negative</text>
+<text x="140.0" y="288" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >weights?</text>
+<line x1="260" y1="275.0" x2="338" y2="275.0" stroke="#8ab4f0" stroke-width="2"/>
+<polygon points="338,275.0 328,270.0 328,280.0" fill="#8ab4f0"/>
+<text x="299.0" y="267.0" font-size="10" fill="#8ab4f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="250" width="230" height="50" rx="10" fill="#0f1622" stroke="#3f66a8" stroke-width="1.5"/>
+<text x="465.0" y="270" font-size="13" fill="#8ab4f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Bellman-Ford</text>
+<text x="465.0" y="292" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(V·E)</text>
+<line x1="140.0" y1="300" x2="140.0" y2="332" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,334 136.0,326 144.0,326" fill="#5a6a58"/>
+<text x="156.0" y="322" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="336" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="357" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >All-pairs</text>
+<text x="140.0" y="374" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >shortest?</text>
+<line x1="260" y1="361.0" x2="338" y2="361.0" stroke="#8ab4f0" stroke-width="2"/>
+<polygon points="338,361.0 328,356.0 328,366.0" fill="#8ab4f0"/>
+<text x="299.0" y="353.0" font-size="10" fill="#8ab4f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="336" width="230" height="50" rx="10" fill="#0f1622" stroke="#3f66a8" stroke-width="1.5"/>
+<text x="465.0" y="356" font-size="13" fill="#8ab4f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Floyd-Warshall</text>
+<text x="465.0" y="378" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(V³)</text>
+<line x1="140.0" y1="386" x2="140.0" y2="418" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,420 136.0,412 144.0,412" fill="#5a6a58"/>
+<text x="156.0" y="408" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="422" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="443" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Connectivity /</text>
+<text x="140.0" y="460" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >components?</text>
+<line x1="260" y1="447.0" x2="338" y2="447.0" stroke="#8ab4f0" stroke-width="2"/>
+<polygon points="338,447.0 328,442.0 328,452.0" fill="#8ab4f0"/>
+<text x="299.0" y="439.0" font-size="10" fill="#8ab4f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="422" width="230" height="50" rx="10" fill="#0f1622" stroke="#3f66a8" stroke-width="1.5"/>
+<text x="465.0" y="442" font-size="13" fill="#8ab4f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Union-Find</text>
+<text x="465.0" y="464" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(α(n))</text>
+<line x1="140.0" y1="472" x2="140.0" y2="504" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,506 136.0,498 144.0,498" fill="#5a6a58"/>
+<text x="156.0" y="494" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="508" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="529" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Dependency</text>
+<text x="140.0" y="546" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >order / DAG?</text>
+<line x1="260" y1="533.0" x2="338" y2="533.0" stroke="#8ab4f0" stroke-width="2"/>
+<polygon points="338,533.0 328,528.0 328,538.0" fill="#8ab4f0"/>
+<text x="299.0" y="525.0" font-size="10" fill="#8ab4f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="508" width="230" height="50" rx="10" fill="#0f1622" stroke="#3f66a8" stroke-width="1.5"/>
+<text x="465.0" y="528" font-size="13" fill="#8ab4f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Topological</text>
+<text x="465.0" y="544" font-size="13" fill="#8ab4f0" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Sort</text>
+<text x="465.0" y="550" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(V+E)</text>
+<line x1="140.0" y1="558" x2="140.0" y2="576" stroke="#5a6a58" stroke-width="1.5"/>
+<text x="156.0" y="573" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="580" width="350" height="36" rx="9" fill="transparent" stroke="#3a4a38" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="195.0" y="602" font-size="11" fill="#8a9480" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" font-style="italic">Model the graph first — name nodes &amp; edges</text>
+</svg>
+<div class="tree-caption">The graph branch · six questions, six algorithms</div>
+</div>
+<div class="prose">
+  <h3 class="beat"><span class="k">THE STONE IN THE POND</span>BFS owns unweighted shortest paths</h3>
+  <p>When every step costs the same — and a maze or grid always qualifies — BFS explores in rings, like ripples from a stone. The <em>first</em> time you touch the target is provably the shortest route, because you reached it in the smallest possible number of rings. The template is worth having cold:</p>
+  <pre class="code"><code>from collections import deque
+
+def shortest_steps(grid, start, goal):
+    q, seen = deque([(start, 0)]), {start}
+    while q:
+        (r, c), d = q.popleft()
+        if (r, c) == goal:
+            return d                   # first arrival = shortest
+        for dr, dc in ((1,0),(-1,0),(0,1),(0,-1)):
+            nxt = (r + dr, c + dc)
+            if nxt not in seen and open_cell(grid, nxt):
+                seen.add(nxt)          # mark on PUSH, not on pop
+                q.append((nxt, d + 1))
+    return -1</code></pre>
+  <p>The comment on the second-to-last line is the classic trap, so it gets its own paragraph: mark nodes visited when you <em>push</em> them, not when you pop them. Mark-on-pop lets the same cell enter the queue five times from five neighbors, and your "shortest" path quietly isn't.</p>
+  <span class="rep"><b>REP:</b> Shortest Path in Binary Matrix · Word Ladder · Rotting Oranges</span>
+
+  <h3 class="beat"><span class="k">WHEN EDGES HAVE PRICES</span>The shortest-path ladder</h3>
+  <p>Weighted edges, none negative? <strong>Dijkstra</strong> — BFS's older sibling, where the queue becomes a min-heap keyed on total cost, and you always expand the cheapest frontier. The greedy bet works for one reason: with no negative edges, a settled node can never be undercut later. Break that assumption with negative weights and you climb down to <strong>Bellman-Ford</strong> — slower at O(V·E), but unbreakable: relax every edge V−1 times, and if a V-th sweep still improves something, congratulations, you've found a negative cycle (in interview-land: a free-money loop, and usually the actual question). Need <em>every</em> pair's distance on a small graph? <strong>Floyd-Warshall</strong> — three nested loops, K outermost, five lines total.</p>
+  <span class="rep"><b>REP:</b> Network Delay Time · Cheapest Flights Within K Stops · Find the City</span>
+
+  <h3 class="beat"><span class="k">FRIEND CIRCLES &amp; GETTING DRESSED</span>The two non-path questions</h3>
+  <p>Not every graph question is about paths. <em>"Are these connected? How many islands / provinces / clusters?"</em> — that's <strong>Union-Find</strong>: everyone starts alone, every edge merges two circles, and two nodes are connected exactly when they report to the same root. With path compression it's effectively O(1) per operation, which is why it wins whenever edges arrive as a stream. And <em>"what order do I take the courses?"</em> — that's <strong>Topological Sort</strong>, the getting-dressed algorithm: socks before shoes, shirt before jacket. Kahn's version is mechanical — repeatedly take anything with zero unmet prerequisites and cross it off — with a built-in bonus: if you finish without processing every node, the leftovers form a cycle. Course Schedule, both parts, one algorithm.</p>
+  <span class="rep"><b>REP:</b> Number of Provinces · Accounts Merge · Course Schedule I &amp; II</span>
+
+  <div class="callout">
+    <p><strong>The 10-second graph chant:</strong> unweighted → BFS. Weighted, no negatives → Dijkstra. Negatives → Bellman-Ford. All pairs → Floyd-Warshall. "Connected?" → Union-Find. "What order?" → Topological sort. Six lines. Say them in the shower until they say themselves.</p>
+  </div>
+</div>
+</div>
+<div class="panel" id="dp">
+
+<div class="prose">
+  <h2>DP &amp; greedy — the branch with the worst PR</h2>
+  <p>Let me tell you how "dynamic programming" got its name, because it explains a lot. Richard Bellman, working at RAND in the 1950s, needed a name that his funding-averse boss couldn't object to — so he picked two words that meant almost nothing and sounded impressive. Seventy years later, students are still intimidated by a name chosen specifically to be meaningless.</p>
+  <p>Strip the name away and DP is one household idea: <em>this big problem contains the same small problem many times — so solve each small one once and write the answer down.</em> You already do this. It's called not re-deriving your times tables.</p>
+</div>
+<div class="treebox">
+<svg viewBox="0 0 610 400" xmlns="http://www.w3.org/2000/svg">
+<rect x="40.0" y="10" width="200" height="40" rx="11" fill="#0d120d" stroke="#a85e2e" stroke-width="1.5"/>
+<text x="140.0" y="35" font-size="14" fill="#f0a05f" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >⌘ DP</text>
+<line x1="140.0" y1="50" x2="140.0" y2="78" stroke="#a85e2e" stroke-width="1.5"/>
+<rect x="20" y="78" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="99" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Overlapping</text>
+<text x="140.0" y="116" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >subproblems?</text>
+<line x1="260" y1="103.0" x2="338" y2="103.0" stroke="#f0a05f" stroke-width="2"/>
+<polygon points="338,103.0 328,98.0 328,108.0" fill="#f0a05f"/>
+<text x="299.0" y="95.0" font-size="10" fill="#f0a05f" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="78" width="230" height="50" rx="10" fill="#201409" stroke="#a85e2e" stroke-width="1.5"/>
+<text x="465.0" y="98" font-size="13" fill="#f0a05f" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Memoization</text>
+<text x="465.0" y="114" font-size="13" fill="#f0a05f" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >(Top-Down)</text>
+<line x1="140.0" y1="128" x2="140.0" y2="160" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,162 136.0,154 144.0,154" fill="#5a6a58"/>
+<text x="156.0" y="150" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="164" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="185" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Build from</text>
+<text x="140.0" y="202" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >smaller cases?</text>
+<line x1="260" y1="189.0" x2="338" y2="189.0" stroke="#f0a05f" stroke-width="2"/>
+<polygon points="338,189.0 328,184.0 328,194.0" fill="#f0a05f"/>
+<text x="299.0" y="181.0" font-size="10" fill="#f0a05f" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="164" width="230" height="50" rx="10" fill="#201409" stroke="#a85e2e" stroke-width="1.5"/>
+<text x="465.0" y="184" font-size="13" fill="#f0a05f" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Tabulation</text>
+<text x="465.0" y="200" font-size="13" fill="#f0a05f" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >(Bottom-Up)</text>
+<line x1="140.0" y1="214" x2="140.0" y2="246" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,248 136.0,240 144.0,240" fill="#5a6a58"/>
+<text x="156.0" y="236" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="250" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="271" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Local choice</text>
+<text x="140.0" y="288" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >= optimal?</text>
+<line x1="260" y1="275.0" x2="338" y2="275.0" stroke="#f0a05f" stroke-width="2"/>
+<polygon points="338,275.0 328,270.0 328,280.0" fill="#f0a05f"/>
+<text x="299.0" y="267.0" font-size="10" fill="#f0a05f" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="250" width="230" height="50" rx="10" fill="#201409" stroke="#a85e2e" stroke-width="1.5"/>
+<text x="465.0" y="270" font-size="13" fill="#f0a05f" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Greedy</text>
+<text x="465.0" y="292" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >prove it!</text>
+<line x1="140.0" y1="300" x2="140.0" y2="318" stroke="#5a6a58" stroke-width="1.5"/>
+<text x="156.0" y="315" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="322" width="350" height="36" rx="9" fill="transparent" stroke="#3a4a38" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="195.0" y="344" font-size="11" fill="#8a9480" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" font-style="italic">Not DP — try DFS / greedy</text>
+</svg>
+<div class="tree-caption">The DP branch · three questions</div>
+</div>
+<div class="prose">
+  <h3 class="beat"><span class="k">START HERE, ALWAYS</span>Memoization is recursion plus a notebook</h3>
+  <p>Write the honest recursive solution first — the slow one, the one that just states the truth of the problem. Then hand it a notebook: before computing, check the notebook; after computing, write it down. Watch what that does to Fibonacci:</p>
+  <pre class="code"><code>def fib(n):                            # honest. and 2^n slow.
+    return n if n &lt; 2 else fib(n-1) + fib(n-2)
+
+from functools import cache
+
+@cache                                 # same function. n calls.
+def fib(n):
+    return n if n &lt; 2 else fib(n-1) + fib(n-2)</code></pre>
+  <p>Same function. One decorator. Exponential becomes linear, because the notebook collapses a tree of repeated calls into n distinct ones. That's the entire top-down method — and in Python, <code style="font-family:'JetBrains Mono',monospace;font-size:14px;">@cache</code> makes it nearly free. The one real bug in memoization: caching on a key that doesn't capture everything that varies between calls. Miss one parameter and you'll serve stale answers with total confidence.</p>
+  <span class="rep"><b>REP:</b> Climbing Stairs · House Robber · Longest Common Subsequence</span>
+
+  <h3 class="beat"><span class="k">THE ONE-SENTENCE TEST</span>Tabulation, or: fill the table forward</h3>
+  <p>Bottom-up is the same idea walked in the opposite direction — start from the base cases and fill a table toward the answer. No recursion, no stack limits, and often the table shrinks to two variables once you notice each row only reads the previous one. But here's my hard rule, learned from watching dozens of DP meltdowns: <strong>you may not write a loop until you can say the sentence "dp[i] means ___" in plain English.</strong> If you can't say the sentence, the loops are guesswork and the bugs are unfindable. If you can, the code writes itself.</p>
+  <span class="rep"><b>REP:</b> Coin Change · Unique Paths · Word Break</span>
+
+  <h3 class="beat"><span class="k">THE SEDUCTIVE COUSIN</span>Greedy — but prove it</h3>
+  <p>Greedy means never looking back: grab the best local option and commit. When it's right (activity selection, jump game) it's gloriously short. When it's wrong, it fails <em>silently and confidently</em> — my favorite demonstration is coin change with coins {1, 3, 4} making 6: greedy grabs 4+1+1 (three coins) and struts right past 3+3 (two). So the professional habit is the counterexample hunt: before committing to greedy, spend thirty seconds actively trying to break your own rule, out loud. Interviewers score the attempt to falsify yourself higher than the algorithm.</p>
+  <span class="rep"><b>REP:</b> Jump Game · Non-overlapping Intervals · Gas Station</span>
+
+  <div class="callout">
+    <p><strong>The DP litmus test:</strong> overlapping subproblems <em>and</em> optimal answers built from optimal sub-answers? Two yeses → DP. One no → it's backtracking or greedy wearing DP's jacket. Don't force the table onto problems that merely look hard.</p>
+  </div>
+</div>
+</div>
+<div class="panel" id="other">
+
+<div class="prose">
+  <h2>Everything else — the specialists</h2>
+  <p>Every toolbox has a drawer of tools you rarely reach for, but when you need them, <em>nothing else works</em>. That's this tab. Four patterns with trigger words so specific that recognizing the trigger basically is the solution — plus the escape hatch for when nothing fits at all.</p>
+</div>
+<div class="treebox">
+<svg viewBox="0 0 610 486" xmlns="http://www.w3.org/2000/svg">
+<rect x="40.0" y="10" width="200" height="40" rx="11" fill="#0d120d" stroke="#5a6a58" stroke-width="1.5"/>
+<text x="140.0" y="35" font-size="14" fill="#d8ddc9" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >⌘ OTHER</text>
+<line x1="140.0" y1="50" x2="140.0" y2="78" stroke="#5a6a58" stroke-width="1.5"/>
+<rect x="20" y="78" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="99" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Prefix match /</text>
+<text x="140.0" y="116" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >autocomplete?</text>
+<line x1="260" y1="103.0" x2="338" y2="103.0" stroke="#d8ddc9" stroke-width="2"/>
+<polygon points="338,103.0 328,98.0 328,108.0" fill="#d8ddc9"/>
+<text x="299.0" y="95.0" font-size="10" fill="#d8ddc9" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="78" width="230" height="50" rx="10" fill="#181c18" stroke="#5a6a58" stroke-width="1.5"/>
+<text x="465.0" y="98" font-size="13" fill="#d8ddc9" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Trie</text>
+<text x="465.0" y="120" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(n·m)</text>
+<line x1="140.0" y1="128" x2="140.0" y2="160" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,162 136.0,154 144.0,154" fill="#5a6a58"/>
+<text x="156.0" y="150" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="164" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="185" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >XOR / odd</text>
+<text x="140.0" y="202" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >one out?</text>
+<line x1="260" y1="189.0" x2="338" y2="189.0" stroke="#d8ddc9" stroke-width="2"/>
+<polygon points="338,189.0 328,184.0 328,194.0" fill="#d8ddc9"/>
+<text x="299.0" y="181.0" font-size="10" fill="#d8ddc9" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="164" width="230" height="50" rx="10" fill="#181c18" stroke="#5a6a58" stroke-width="1.5"/>
+<text x="465.0" y="184" font-size="13" fill="#d8ddc9" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Bit</text>
+<text x="465.0" y="200" font-size="13" fill="#d8ddc9" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Manipulation</text>
+<text x="465.0" y="206" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(1) space</text>
+<line x1="140.0" y1="214" x2="140.0" y2="246" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,248 136.0,240 144.0,240" fill="#5a6a58"/>
+<text x="156.0" y="236" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="250" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="271" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Median of</text>
+<text x="140.0" y="288" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >a stream?</text>
+<line x1="260" y1="275.0" x2="338" y2="275.0" stroke="#d8ddc9" stroke-width="2"/>
+<polygon points="338,275.0 328,270.0 328,280.0" fill="#d8ddc9"/>
+<text x="299.0" y="267.0" font-size="10" fill="#d8ddc9" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="250" width="230" height="50" rx="10" fill="#181c18" stroke="#5a6a58" stroke-width="1.5"/>
+<text x="465.0" y="270" font-size="13" fill="#d8ddc9" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Two Heaps</text>
+<text x="465.0" y="292" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(log n)</text>
+<line x1="140.0" y1="300" x2="140.0" y2="332" stroke="#5a6a58" stroke-width="1.5"/>
+<polygon points="140.0,334 136.0,326 144.0,326" fill="#5a6a58"/>
+<text x="156.0" y="322" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="336" width="240" height="50" rx="9" fill="#171e17" stroke="#2c362c" stroke-width="1.5"/>
+<text x="140.0" y="357" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >Counting /</text>
+<text x="140.0" y="374" font-size="12.5" fill="#c9c4b2" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" >combinatorics?</text>
+<line x1="260" y1="361.0" x2="338" y2="361.0" stroke="#d8ddc9" stroke-width="2"/>
+<polygon points="338,361.0 328,356.0 328,366.0" fill="#d8ddc9"/>
+<text x="299.0" y="353.0" font-size="10" fill="#d8ddc9" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >YES</text>
+<rect x="350" y="336" width="230" height="50" rx="10" fill="#181c18" stroke="#5a6a58" stroke-width="1.5"/>
+<text x="465.0" y="356" font-size="13" fill="#d8ddc9" text-anchor="middle" font-weight="700" font-family="'JetBrains Mono', monospace" >Math / nCr</text>
+<text x="465.0" y="378" font-size="10" fill="#9aa88f" text-anchor="middle" font-weight="400" font-family="'JetBrains Mono', monospace" >O(1)-ish</text>
+<line x1="140.0" y1="386" x2="140.0" y2="404" stroke="#5a6a58" stroke-width="1.5"/>
+<text x="156.0" y="401" font-size="10" fill="#b0684a" text-anchor="start" font-weight="700" font-family="'JetBrains Mono', monospace" >NO</text>
+<rect x="20" y="408" width="350" height="36" rx="9" fill="transparent" stroke="#3a4a38" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="195.0" y="430" font-size="11" fill="#8a9480" text-anchor="middle" font-weight="400" font-family="Inter, sans-serif" font-style="italic">Reframe the problem</text>
+</svg>
+<div class="tree-caption">The specialists branch</div>
+</div>
+<div class="prose">
+  <h3 class="beat"><span class="k">THE NEON SIGN</span>"Prefix" means Trie</h3>
+  <p>A Trie is a tree where each root-to-node path spells a prefix, one character per hop — so every word sharing a prefix shares a path. That's why autocomplete-style queries are instant while a HashMap (which hashes <em>whole</em> strings) can't help at all. The word "prefix" in a problem is a neon sign; walk toward it. One classic slip: forgetting the end-of-word flag — "app" and "apple" share a path, and without the flag you can't tell which stops are real words.</p>
+  <span class="rep"><b>REP:</b> Implement Trie · Word Search II · Design Add &amp; Search Words</span>
+
+  <h3 class="beat"><span class="k">THE CARD TRICK</span>XOR and the vanishing pairs</h3>
+  <p>XOR has one magical property — a number XORed with itself vanishes — and one famous consequence:</p>
+  <pre class="code"><code>def single_number(nums):
+    x = 0
+    for n in nums:
+        x ^= n         # pairs annihilate: a ^ a == 0
+    return x           # the loner survives</code></pre>
+  <p>Every pair annihilates; the loner survives. Five lines that feel like a card trick, O(1) space, and the interviewer smiles because you clearly know the classic. Resist the urge to memorize twenty bit hacks — you need three: XOR cancellation, <code style="font-family:'JetBrains Mono',monospace;font-size:14px;">n &amp; (n-1)</code> drops the lowest set bit, and shifts multiply or divide by two.</p>
+  <span class="rep"><b>REP:</b> Single Number · Missing Number · Counting Bits</span>
+
+  <h3 class="beat"><span class="k">THE SEESAW</span>Two heaps hold the median</h3>
+  <p>"Median of a data stream" sounds like it needs sorting on every insert. Instead: a max-heap holds the smaller half, a min-heap holds the larger half, sizes kept within one. The median is always sitting on top of one heap (or averaged across both tops) — a seesaw where you only ever look at the two kids nearest the middle. Rebalance after <em>every</em> insert; let the heaps drift and the seesaw lies to you.</p>
+  <span class="rep"><b>REP:</b> Find Median from Data Stream · Sliding Window Median</span>
+
+  <h3 class="beat"><span class="k">SOMETIMES IT'S JUST MATH</span>Counting problems in disguise</h3>
+  <p>Unique paths through an m×n grid is a beloved DP exercise — and also, quietly, one binomial coefficient: of your m+n−2 total moves, choose which ones go down. C(m+n−2, m−1). Done, O(1). When the answer depends on <em>how many</em> ways rather than <em>which</em> ways, check for a formula before building a table. (Then watch for overflow in factorials — compute nCr multiplicatively, and say why.)</p>
+  <span class="rep"><b>REP:</b> Unique Paths (formula version) · Pow(x, n)</span>
+
+  <h3 class="beat"><span class="k">THE ESCAPE HATCH</span>Reframe — the most senior move on this page</h3>
+  <p>And when nothing fits? Change the question. Can't solve "minimum removals"? Solve "maximum keeps" — same problem, friendlier shape. Stuck on a weird string puzzle? Model states and transitions, and suddenly it's a graph. Problem-writers deliberately dress familiar patterns in unfamiliar stories; reframing is how you undress them. Do it out loud — <em>"let me restate this"</em> — because the restatement scores points before you've solved anything. And here's the rep that compounds fastest of everything in this post: for every problem you fail, write one sentence. <em>"This was actually ___ in disguise."</em> Thirty of those sentences and you'll feel the tree growing behind your eyes.</p>
+  <blockquote>80% of interviews start with this decision tree. The other 20% start with you staying calm because you have one.</blockquote>
+</div>
+</div>
+
+  <div class="cta">
+    <h3>Pattern recognition &gt; code writing.</h3>
+    <p>The tree won't write the code for you — it wins you the first sixty seconds, and the first sixty seconds set the tone for the whole interview. The same muscle carries over to product sense, system design, and every other blank-page moment in your career. That's the whole thesis behind <a href="https://hackproduct.com">hackproduct.com</a> — think, choose, code, optimize.</p>
+  </div>
+
+</div>
+<script>
+  const btns = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.panel');
+  function show(id) {
+    btns.forEach(b => b.classList.toggle('active', b.dataset.tab === id));
+    panels.forEach(p => p.classList.toggle('active', p.id === id));
+    history.replaceState(null, '', '#' + id);
+    window.scrollTo({ top: document.getElementById('tabbar').offsetTop - 8, behavior: 'instant' });
+  }
+  btns.forEach(b => b.addEventListener('click', () => show(b.dataset.tab)));
+  if (location.hash) {
+    const id = location.hash.slice(1);
+    if (document.getElementById(id)) show(id);
+  }
+</script>
+</body>
+</html>
