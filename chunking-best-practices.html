@@ -1,0 +1,893 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chunking for RAG: Interview Questions and Best Practices | HackProduct</title>
+    <meta
+      name="description"
+      content="A HackProduct guide to RAG chunking interview questions, missing-context diagnostics, retrieval evaluation, and production best practices."
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0d0e12;
+        --panel: #16181e;
+        --panel-2: #1c1f27;
+        --ink: #e8ebf0;
+        --muted: #98a1ae;
+        --faint: #596170;
+        --border: #30343f;
+        --teal: #3ddc97;
+        --yellow: #f5c542;
+        --blue: #5aa8ff;
+        --purple: #c6a0e6;
+        --coral: #f07850;
+        --max: 1060px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background:
+          radial-gradient(circle at 18% 8%, rgb(61 220 151 / 10%), transparent 30%),
+          radial-gradient(circle at 88% 18%, rgb(90 168 255 / 8%), transparent 28%),
+          var(--bg);
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        line-height: 1.65;
+      }
+
+      a {
+        color: var(--teal);
+        text-decoration-thickness: 1px;
+        text-underline-offset: 4px;
+      }
+
+      code {
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        background: rgb(255 255 255 / 4%);
+        color: var(--yellow);
+        padding: 0.08rem 0.32rem;
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: 0.92em;
+      }
+
+      header,
+      main,
+      footer {
+        width: min(calc(100% - 40px), var(--max));
+        margin-inline: auto;
+      }
+
+      header {
+        padding: 48px 0 32px;
+      }
+
+      .brand {
+        color: var(--muted);
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: 0.95rem;
+        letter-spacing: 0.04em;
+        text-align: center;
+      }
+
+      .hero {
+        padding: 34px 0 20px;
+        text-align: center;
+      }
+
+      h1,
+      h2,
+      h3 {
+        line-height: 1.12;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        margin: 0 auto 18px;
+        max-width: 900px;
+        color: var(--teal);
+        font-size: clamp(2.6rem, 7vw, 5.6rem);
+        font-weight: 900;
+      }
+
+      .subtitle {
+        display: inline-block;
+        margin: 0 auto;
+        border-radius: 16px;
+        background: var(--panel-2);
+        padding: 12px 22px;
+        color: var(--ink);
+        font-size: clamp(1.05rem, 2.4vw, 1.55rem);
+        font-weight: 800;
+      }
+
+      .summary {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-top: 34px;
+      }
+
+      .summary article,
+      .card,
+      .callout,
+      .question,
+      .metric {
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        background: rgb(22 24 30 / 86%);
+      }
+
+      .summary article {
+        padding: 18px;
+        text-align: left;
+      }
+
+      .summary strong {
+        display: block;
+        color: var(--teal);
+        font-size: 1.02rem;
+      }
+
+      .summary span {
+        color: var(--muted);
+        font-size: 0.96rem;
+      }
+
+      nav {
+        margin: 20px 0 0;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        padding: 14px 0;
+      }
+
+      nav ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      nav a {
+        display: inline-flex;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: rgb(255 255 255 / 3%);
+        padding: 7px 12px;
+        color: var(--ink);
+        font-size: 0.92rem;
+        font-weight: 750;
+        text-decoration: none;
+      }
+
+      section {
+        margin: 52px 0;
+      }
+
+      h2 {
+        margin: 0 0 18px;
+        color: var(--teal);
+        font-size: clamp(1.9rem, 4vw, 3rem);
+        font-weight: 900;
+      }
+
+      h3 {
+        margin: 0 0 10px;
+        color: var(--ink);
+        font-size: 1.35rem;
+      }
+
+      p {
+        margin: 0 0 16px;
+        color: var(--muted);
+        font-size: 1.04rem;
+      }
+
+      .lead {
+        max-width: 860px;
+        color: var(--ink);
+        font-size: 1.2rem;
+      }
+
+      .callout {
+        margin: 22px 0;
+        padding: 22px;
+      }
+
+      .callout strong {
+        color: var(--yellow);
+      }
+
+      .rule {
+        border-color: rgb(61 220 151 / 55%);
+        background: linear-gradient(135deg, rgb(61 220 151 / 12%), rgb(90 168 255 / 6%));
+      }
+
+      .flow {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr auto 1fr;
+        align-items: center;
+        gap: 12px;
+        margin: 26px 0;
+      }
+
+      .flow .step {
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: var(--panel);
+        padding: 16px;
+        min-height: 112px;
+      }
+
+      .flow .arrow {
+        color: var(--yellow);
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: 1.8rem;
+        font-weight: 900;
+      }
+
+      .step b {
+        color: var(--ink);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .card,
+      .question,
+      .metric {
+        padding: 20px;
+      }
+
+      .question {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .question::before {
+        content: attr(data-number);
+        position: absolute;
+        top: 16px;
+        right: 18px;
+        color: rgb(245 197 66 / 18%);
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: 3.4rem;
+        font-weight: 900;
+        line-height: 1;
+      }
+
+      .question h3 {
+        padding-right: 72px;
+      }
+
+      .answer {
+        color: var(--ink);
+        font-weight: 700;
+      }
+
+      .bad {
+        color: var(--coral);
+      }
+
+      .good {
+        color: var(--teal);
+      }
+
+      ul,
+      ol {
+        margin: 12px 0 0;
+        padding-left: 1.25rem;
+        color: var(--muted);
+      }
+
+      li + li {
+        margin-top: 8px;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        background: var(--panel);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 720px;
+      }
+
+      th,
+      td {
+        border-bottom: 1px solid var(--border);
+        padding: 14px 16px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--yellow);
+        font-size: 0.95rem;
+      }
+
+      td {
+        color: var(--muted);
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .metric strong {
+        color: var(--blue);
+      }
+
+      .checklist li::marker {
+        color: var(--teal);
+      }
+
+      .references li {
+        color: var(--muted);
+      }
+
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 32px 0 46px;
+        color: var(--faint);
+        text-align: center;
+      }
+
+      @media (max-width: 820px) {
+        header,
+        main,
+        footer {
+          width: min(calc(100% - 28px), var(--max));
+        }
+
+        .summary,
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .flow {
+          grid-template-columns: 1fr;
+        }
+
+        .flow .arrow {
+          transform: rotate(90deg);
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">@hackproduct</div>
+      <div class="hero">
+        <h1>Chunking for RAG</h1>
+        <p class="subtitle">Interview questions, missing-context diagnostics, and production best practices</p>
+      </div>
+      <div class="summary" aria-label="Key takeaways">
+        <article>
+          <strong>Chunking is a retrieval decision</strong>
+          <span>Good chunks are designed around what users ask and what the retriever must find.</span>
+        </article>
+        <article>
+          <strong>Always track the gold chunk</strong>
+          <span>If the answer chunk never enters Top-K, the LLM never had a fair chance.</span>
+        </article>
+        <article>
+          <strong>Evaluate before tuning</strong>
+          <span>Use hit rate, recall@k, MRR, citations, and traces instead of guessing.</span>
+        </article>
+      </div>
+      <nav aria-label="Article sections">
+        <ul>
+          <li><a href="#diagnostic">Diagnostic</a></li>
+          <li><a href="#questions">Questions</a></li>
+          <li><a href="#best-practices">Best Practices</a></li>
+          <li><a href="#metrics">Metrics</a></li>
+          <li><a href="#playbook">Playbook</a></li>
+          <li><a href="#checklist">Checklist</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section id="diagnostic">
+        <h2>The Most Important Chunking Diagnostic</h2>
+        <p class="lead">
+          When a RAG answer is wrong, do not start by blaming the LLM. First ask whether the
+          chunk containing the answer was actually retrieved and included in the prompt context.
+        </p>
+        <div class="callout rule">
+          <p>
+            <strong>Debug rule:</strong> If the gold chunk is absent from Top-K, you have a
+            retrieval or chunking problem. If the gold chunk is present but the answer is still
+            wrong, you likely have a ranking, context placement, prompt, citation, or generation
+            problem.
+          </p>
+        </div>
+
+        <div class="flow" aria-label="Missing context diagnostic flow">
+          <div class="step">
+            <h3>1. Identify Gold Chunk</h3>
+            <p>Find the source span that contains the correct answer. Record its <code>chunk_id</code>, page, section, and document.</p>
+          </div>
+          <div class="arrow">&rarr;</div>
+          <div class="step">
+            <h3>2. Inspect Top-K</h3>
+            <p>Log retrieved <code>chunk_id</code>, rank, score, source metadata, and reranker score for the failed query.</p>
+          </div>
+          <div class="arrow">&rarr;</div>
+          <div class="step">
+            <h3>3. Classify Failure</h3>
+            <p>Absent means retrieval miss. Present but unused means ranking, prompt placement, or answer synthesis issue.</p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <article class="card">
+            <h3>If the gold chunk is missing</h3>
+            <p>This usually means the chunk was split poorly, embedded without enough context, filtered out, outranked, or never indexed.</p>
+            <ul>
+              <li>Check whether metadata filters removed the source document.</li>
+              <li>Try semantic chunking, smaller chunks, or modest overlap.</li>
+              <li>Add title, section, entity, and page context before embedding.</li>
+              <li>Compare vector search, keyword search, and hybrid search.</li>
+              <li>Increase candidate retrieval before reranking.</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>If the gold chunk is present</h3>
+            <p>The retriever found the evidence, but the final answer path failed to use it correctly.</p>
+            <ul>
+              <li>Check if the chunk was ranked too low or placed in the middle of a long prompt.</li>
+              <li>Inspect whether the prompt asks the model to cite sources and abstain when unsupported.</li>
+              <li>Use reranking or reorder the best evidence near the beginning or end of context.</li>
+              <li>Look for contradictory chunks or noisy neighbors.</li>
+              <li>Test whether the answer works when only the gold chunk is provided.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="questions">
+        <h2>Top Interview Questions</h2>
+        <p class="lead">
+          Strong RAG candidates do not just say "use chunk size 500." They explain tradeoffs,
+          evaluation, failure modes, and how they would prove a chunking strategy works.
+        </p>
+
+        <div class="grid">
+          <article class="question" data-number="01">
+            <h3>How do you know whether the right chunk was included in context?</h3>
+            <p class="answer">
+              Create a golden eval set where each question maps to one or more source chunks.
+              For every query, log retrieved chunk IDs, rank, score, reranker score, and final
+              prompt context. Then compute hit rate, recall@k, and MRR against the gold chunks.
+            </p>
+            <p>
+              In production, traces should show the exact chunks sent to the model. If the source
+              span is not in Top-K or not in the final prompt, the LLM cannot cite it reliably.
+            </p>
+          </article>
+
+          <article class="question" data-number="02">
+            <h3>What chunk size would you choose?</h3>
+            <p class="answer">
+              Start from the document type and query type, not a universal number. Common text
+              ranges are roughly a few hundred tokens per chunk, but dense policies, APIs, tables,
+              code, transcripts, and FAQs need different boundaries.
+            </p>
+            <p>
+              Smaller chunks can improve precision but lose context. Larger chunks preserve context
+              but may dilute embeddings and add irrelevant text. The real answer is to test multiple
+              sizes against retrieval metrics and answer quality.
+            </p>
+          </article>
+
+          <article class="question" data-number="03">
+            <h3>Fixed-size chunking or semantic chunking?</h3>
+            <p class="answer">
+              Fixed-size chunking is simple and predictable. Semantic chunking respects headings,
+              paragraphs, sections, tables, and code blocks, which often makes chunks more
+              self-contained.
+            </p>
+            <p>
+              A strong default is structure-aware recursive splitting: split by document structure
+              first, then paragraph/sentence boundaries, then token limits as a fallback.
+            </p>
+          </article>
+
+          <article class="question" data-number="04">
+            <h3>How much overlap should chunks have?</h3>
+            <p class="answer">
+              Use overlap to protect answer spans that cross boundaries. Too little overlap drops
+              context. Too much overlap creates duplicate retrieval results and wastes context budget.
+            </p>
+            <p>
+              Start with modest overlap, then tune using recall@k, duplicate rate, and answer
+              faithfulness. If overlap is doing too much work, your boundaries may be wrong.
+            </p>
+          </article>
+
+          <article class="question" data-number="05">
+            <h3>What metadata should every chunk store?</h3>
+            <p class="answer">
+              At minimum: <code>chunk_id</code>, <code>document_id</code>, source URL or file,
+              page number, section heading, token range, timestamp or version, access-control tags,
+              and parent document reference.
+            </p>
+            <p>
+              Metadata helps filtering, citations, debugging, re-indexing, and permission checks.
+              Missing metadata turns retrieval debugging into archaeology.
+            </p>
+          </article>
+
+          <article class="question" data-number="06">
+            <h3>What is contextual retrieval?</h3>
+            <p class="answer">
+              Contextual retrieval adds identifying document-level context to each chunk before
+              embedding or indexing. For example, a chunk from a revenue table may get a prefix
+              saying which company, quarter, report, and section it came from.
+            </p>
+            <p>
+              This helps when a chunk is locally ambiguous. "Revenue grew 3%" is weak alone;
+              "ACME 2023 Q2 10-Q revenue grew 3%" is much easier to retrieve for the right query.
+            </p>
+          </article>
+
+          <article class="question" data-number="07">
+            <h3>How do you handle tables, code, and diagrams?</h3>
+            <p class="answer">
+              Do not blindly split them like prose. Tables often need row groups, column headers,
+              captions, and page context. Code needs function/class boundaries. Diagrams may need
+              extracted descriptions plus the surrounding text.
+            </p>
+            <p>
+              The retrieval unit should preserve the meaning a human would need to answer a question.
+            </p>
+          </article>
+
+          <article class="question" data-number="08">
+            <h3>What is parent-child chunking?</h3>
+            <p class="answer">
+              Use small child chunks for retrieval, then return a larger parent section to the LLM.
+              This can combine precise search with enough surrounding context for answer generation.
+            </p>
+            <p>
+              It works well when exact sentences retrieve best, but the model needs the paragraph,
+              section, table caption, or policy exception around them.
+            </p>
+          </article>
+
+          <article class="question" data-number="09">
+            <h3>Why can adding more chunks make answers worse?</h3>
+            <p class="answer">
+              More context can add hard negatives, contradictions, duplicated text, and irrelevant
+              passages. Long-context models can also underuse evidence placed in the middle of a
+              long prompt.
+            </p>
+            <p>
+              Increasing <code>k</code> is not a free improvement. Measure whether additional chunks
+              raise recall without hurting precision, citation quality, latency, and token cost.
+            </p>
+          </article>
+
+          <article class="question" data-number="10">
+            <h3>How would you evaluate a chunking strategy?</h3>
+            <p class="answer">
+              Build an eval set of realistic questions with gold source spans. Measure retrieval
+              quality before generation, then measure answer quality with citations after generation.
+            </p>
+            <p>
+              Compare chunk sizes, overlap, semantic boundaries, metadata enrichment, hybrid search,
+              and reranking. Keep the test fixed so improvements are real and repeatable.
+            </p>
+          </article>
+
+          <article class="question" data-number="11">
+            <h3>How do permissions affect chunking?</h3>
+            <p class="answer">
+              Every chunk must carry access-control metadata. Retrieval should filter unauthorized
+              chunks before they enter the prompt, not after answer generation.
+            </p>
+            <p>
+              A chunking strategy that ignores permissions can create data leaks even when the model
+              itself behaves correctly.
+            </p>
+          </article>
+
+          <article class="question" data-number="12">
+            <h3>What signals show chunking is bad?</h3>
+            <p class="answer">
+              The right document appears but the answer span does not. Retrieved chunks start or end
+              mid-thought. Citations point to broad irrelevant passages. Similar chunks dominate the
+              prompt. Users complain that answers miss exceptions, definitions, or qualifiers.
+            </p>
+            <p>
+              The fix is usually better boundaries, metadata, contextual prefixes, reranking, or
+              parent-child retrieval, not simply a larger model.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section id="best-practices">
+        <h2>Best Practices</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>1. Design chunks around questions</h3>
+            <p>
+              Chunking is not just document preprocessing. It is an information access design
+              problem. Start by listing the questions users ask, the evidence needed, and the
+              natural boundaries in the source material.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>2. Preserve semantic boundaries</h3>
+            <p>
+              Prefer headings, paragraphs, list items, table regions, code blocks, and transcript
+              turns over arbitrary character counts. Use token limits as constraints, not as the
+              only logic.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>3. Make chunks self-contained</h3>
+            <p>
+              A chunk should include enough local context to stand alone in search results. Add
+              section titles, document title, entity names, page number, and date when the text
+              would otherwise be ambiguous.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>4. Keep chunk IDs stable</h3>
+            <p>
+              Stable IDs make evals, citations, cache invalidation, and debugging possible. If
+              content changes, version the chunk instead of silently replacing evidence under the
+              same ID.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>5. Tune overlap with evidence</h3>
+            <p>
+              Overlap should protect boundary-spanning answers. It should not create a wall of
+              near-duplicate chunks. Track duplicate retrieval rate and recall improvements together.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>6. Retrieve more, then rerank</h3>
+            <p>
+              A common production pattern is to retrieve a larger candidate set, then use a reranker
+              to choose the final context. This separates broad recall from final precision.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>7. Use hybrid search when language varies</h3>
+            <p>
+              Dense vectors help semantic similarity. Keyword or BM25-style search helps exact
+              terms, product names, IDs, policy codes, and error messages. Hybrid retrieval often
+              beats either one alone for enterprise documents.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>8. Keep citations tied to chunks</h3>
+            <p>
+              The final answer should cite the chunks it used. If a model gives an answer without
+              citing the gold chunk, your system should treat that as a reliability signal.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>9. Do not overstuff context</h3>
+            <p>
+              More chunks can increase noise. Prefer fewer high-quality chunks with clear provenance
+              over many loosely related passages. Reorder important evidence intentionally.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>10. Re-index deliberately</h3>
+            <p>
+              Chunking changes should trigger evals and controlled re-indexing. Store the chunking
+              config with the index so you can explain why a chunk exists and reproduce results.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section id="metrics">
+        <h2>Metrics That Matter</h2>
+        <p class="lead">
+          Separate retrieval metrics from answer-generation metrics. If retrieval is broken, answer
+          quality metrics alone will hide the root cause.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th>What It Answers</th>
+                <th>Why It Matters</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Hit Rate@K</strong></td>
+                <td>Did at least one gold chunk appear in the top K?</td>
+                <td>Fast signal for whether retrieval found the needed evidence at all.</td>
+              </tr>
+              <tr>
+                <td><strong>Recall@K</strong></td>
+                <td>What fraction of relevant chunks were retrieved?</td>
+                <td>Useful when questions need multiple chunks, such as comparison or synthesis tasks.</td>
+              </tr>
+              <tr>
+                <td><strong>MRR</strong></td>
+                <td>How high did the first relevant chunk rank?</td>
+                <td>High rank matters because final context windows are limited and rerankers may trim results.</td>
+              </tr>
+              <tr>
+                <td><strong>NDCG</strong></td>
+                <td>Are better chunks ranked above weaker chunks?</td>
+                <td>Helps evaluate graded relevance, not just binary relevant/not relevant.</td>
+              </tr>
+              <tr>
+                <td><strong>Citation Accuracy</strong></td>
+                <td>Does the answer cite the chunks that support it?</td>
+                <td>Separates grounded answers from plausible but unsupported generations.</td>
+              </tr>
+              <tr>
+                <td><strong>Duplicate Rate</strong></td>
+                <td>Are near-identical chunks crowding out diversity?</td>
+                <td>High overlap or repeated boilerplate can waste Top-K slots.</td>
+              </tr>
+              <tr>
+                <td><strong>Abstention Quality</strong></td>
+                <td>Does the system say "not enough evidence" when chunks are missing?</td>
+                <td>A reliable RAG system should fail closed, not invent missing facts.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="playbook">
+        <h2>Debugging Playbook</h2>
+        <ol class="checklist">
+          <li>
+            <strong>Start with a failed user question.</strong> Capture the query, answer, citations,
+            retrieval logs, reranker logs, final prompt, and model output.
+          </li>
+          <li>
+            <strong>Find the gold source span.</strong> Identify the document, page, section, and
+            exact text needed to answer correctly.
+          </li>
+          <li>
+            <strong>Map source span to chunk IDs.</strong> If the source span was split across chunks,
+            flag a boundary or overlap issue.
+          </li>
+          <li>
+            <strong>Inspect Top-K retrieval.</strong> If the gold chunk is absent, compare vector,
+            keyword, and hybrid retrieval. Check filters and permissions.
+          </li>
+          <li>
+            <strong>Inspect final prompt context.</strong> If the gold chunk was retrieved but trimmed
+            before generation, adjust reranking, context budget, or packing logic.
+          </li>
+          <li>
+            <strong>Test the model with only the gold chunk.</strong> If it still fails, improve the
+            prompt or answer format. If it succeeds, retrieval/context assembly is the problem.
+          </li>
+          <li>
+            <strong>Run the eval suite.</strong> Confirm that the fix improves retrieval and answer
+            quality without regressing other query types.
+          </li>
+        </ol>
+      </section>
+
+      <section id="checklist">
+        <h2>Production Checklist</h2>
+        <div class="grid">
+          <article class="metric">
+            <h3>Indexing</h3>
+            <ul>
+              <li>Chunk config is versioned and reproducible.</li>
+              <li>Chunk IDs are stable and traceable to source spans.</li>
+              <li>Document title, section, page, and ACL metadata are attached.</li>
+              <li>Tables, code, and lists use custom splitting rules.</li>
+            </ul>
+          </article>
+          <article class="metric">
+            <h3>Retrieval</h3>
+            <ul>
+              <li>Top-K logs include IDs, ranks, scores, and filters.</li>
+              <li>Hybrid search and reranking are evaluated against baselines.</li>
+              <li>Duplicate chunks are detected and controlled.</li>
+              <li>Candidate retrieval is separated from final context packing.</li>
+            </ul>
+          </article>
+          <article class="metric">
+            <h3>Generation</h3>
+            <ul>
+              <li>Prompt includes citations and abstention instructions.</li>
+              <li>Important evidence is not buried in noisy middle context.</li>
+              <li>Answers cite source chunks, not just documents.</li>
+              <li>Contradictory chunks are handled explicitly.</li>
+            </ul>
+          </article>
+          <article class="metric">
+            <h3>Evaluation</h3>
+            <ul>
+              <li>Golden questions map to source spans or chunk IDs.</li>
+              <li>Retrieval metrics are tracked separately from answer metrics.</li>
+              <li>Tests cover short facts, multi-hop questions, tables, and edge cases.</li>
+              <li>Chunking changes require eval comparison before rollout.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="references">
+        <h2>References</h2>
+        <p class="lead">
+          These sources informed the evaluation and retrieval guidance in this article.
+        </p>
+        <ol class="references">
+          <li>
+            LlamaIndex, "Retrieval Evaluation," covering retriever metrics such as hit-rate,
+            MRR, precision, recall, AP, and NDCG.
+            <a href="https://developers.llamaindex.ai/python/examples/evaluation/retrieval/retriever_eval/">Read the docs</a>.
+          </li>
+          <li>
+            Anthropic, "Introducing Contextual Retrieval," describing contextual embeddings,
+            contextual BM25, and retrieval failure reduction with reranking.
+            <a href="https://www.anthropic.com/engineering/contextual-retrieval">Read the article</a>.
+          </li>
+          <li>
+            Nelson F. Liu et al., "Lost in the Middle: How Language Models Use Long Contexts,"
+            showing that models may use context less reliably when relevant information is in
+            the middle of long inputs.
+            <a href="https://arxiv.org/abs/2307.03172">Read the paper</a>.
+          </li>
+          <li>
+            LangChain API reference for recursive character text splitting, a common structure-aware
+            baseline for chunking text.
+            <a href="https://api.python.langchain.com/en/latest/character/langchain_text_splitters.character.RecursiveCharacterTextSplitter.html">Read the reference</a>.
+          </li>
+        </ol>
+      </section>
+    </main>
+
+    <footer>
+      hackproduct · webalgos · engineering flows for practical AI systems
+    </footer>
+  </body>
+</html>
+
