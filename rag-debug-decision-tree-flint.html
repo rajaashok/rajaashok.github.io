@@ -6,35 +6,41 @@
     <title>RAG Debugging Decision Tree | Raja Ashok</title>
     <meta
       name="description"
-      content="A practical top-down decision tree and documentation guide for debugging RAG systems from source documents through retrieval, indexing, prompt injection, and model grounding."
+      content="A compact top-down decision tree and field guide for debugging RAG systems across sources, parsing, chunking, retrieval, indexing, prompt assembly, and generation."
     />
     <meta property="og:title" content="RAG Debugging Decision Tree" />
     <meta
       property="og:description"
-      content="Do not start with the LLM. Start with the evidence it received."
+      content="Start with the evidence the model received, then move down the pipeline."
     />
-    <meta property="og:image" content="/assets/rag-debug-decision-tree-flint.png?v=tree-docs-1" />
+    <meta property="og:image" content="/assets/rag-debug-decision-tree-flint.png?v=minimal-1" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%23171717'/%3E%3Cpath d='M4 4h8v2H6v2h5v2H6v2H4z' fill='white'/%3E%3C/svg%3E" />
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap");
-
       :root {
-        color-scheme: dark;
-        --bg: #090b10;
-        --panel: #10141c;
-        --panel-2: #141a24;
-        --ink: #e8edf5;
-        --muted: #8f97a6;
-        --faint: #5b6474;
-        --line: #485263;
-        --green: #35db93;
-        --red: #ff7c73;
-        --yellow: #ffc943;
-        --orange: #ff9a3d;
-        --blue: #60aaff;
-        --cyan: #45d6df;
-        --purple: #bd8cff;
-        --pink: #ee78d8;
-        --max: 1180px;
+        color-scheme: light;
+        --bg: #f7f7f4;
+        --paper: #ffffff;
+        --ink: #171717;
+        --muted: #696969;
+        --faint: #9a9a9a;
+        --line: #c9c9c4;
+        --border: #deded8;
+        --soft: #f1f1ed;
+        --red-bg: #fff3f1;
+        --red: #b13b31;
+        --amber-bg: #fff7e6;
+        --amber: #8a5a00;
+        --green-bg: #effaf4;
+        --green: #187344;
+        --blue-bg: #eef6ff;
+        --blue: #235f9d;
+        --cyan-bg: #edfafa;
+        --cyan: #16707a;
+        --violet-bg: #f6f1ff;
+        --violet: #6844a0;
+        --pink-bg: #fff1fa;
+        --pink: #9b3b7b;
+        --max: 1120px;
       }
 
       * {
@@ -47,552 +53,737 @@
 
       body {
         margin: 0;
-        background:
-          radial-gradient(circle at 50% -10%, rgb(53 219 147 / 8%), transparent 34rem),
-          radial-gradient(circle at 88% 12%, rgb(96 170 255 / 6%), transparent 28rem),
-          var(--bg);
+        background: var(--bg);
         color: var(--ink);
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        line-height: 1.65;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        line-height: 1.58;
       }
 
       a {
-        color: var(--green);
-        text-underline-offset: 4px;
+        color: inherit;
+        text-underline-offset: 3px;
       }
 
       code {
-        border: 1px solid #263142;
-        border-radius: 7px;
-        background: rgb(255 255 255 / 4%);
-        color: var(--yellow);
-        padding: 0.08rem 0.32rem;
-        font-family: "JetBrains Mono", monospace;
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        background: var(--soft);
+        padding: 0.05rem 0.28rem;
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
         font-size: 0.92em;
       }
 
       .wrap {
         width: min(calc(100% - 32px), var(--max));
         margin: 0 auto;
-        padding: 34px 0 72px;
+        padding: 28px 0 64px;
       }
 
       .back {
-        margin-bottom: 28px;
+        margin-bottom: 34px;
       }
 
       .back a {
         color: var(--muted);
-        font-family: "JetBrains Mono", monospace;
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 0.14em;
+        font-size: 0.92rem;
         text-decoration: none;
-        text-transform: uppercase;
       }
 
-      .tree-card {
-        overflow: hidden;
-        border: 1px solid #1f2937;
-        border-radius: 22px;
-        background: #080a0f;
-        box-shadow: 0 24px 80px rgb(0 0 0 / 42%);
+      .back a:hover {
+        color: var(--ink);
+        text-decoration: underline;
       }
 
-      .tree-card svg {
-        display: block;
-        width: 100%;
-        height: auto;
-      }
-
-      .docs {
-        margin-top: 36px;
-      }
-
-      .docs-header {
-        max-width: 820px;
-        margin-bottom: 24px;
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 24px;
+        align-items: end;
+        margin-bottom: 28px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 24px;
       }
 
       .eyebrow {
-        margin-bottom: 10px;
-        color: var(--green);
-        font-family: "JetBrains Mono", monospace;
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: 0.18em;
+        margin: 0 0 9px;
+        color: var(--muted);
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font-size: 0.78rem;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
       }
 
       h1,
       h2,
       h3 {
-        letter-spacing: -0.02em;
-        line-height: 1.08;
+        margin: 0;
+        line-height: 1.12;
       }
 
       h1 {
-        margin: 0 0 10px;
-        color: var(--green);
-        font-size: clamp(2.7rem, 6vw, 5.6rem);
-        font-weight: 900;
-        text-transform: uppercase;
+        max-width: 850px;
+        font-size: clamp(2.25rem, 6vw, 4.9rem);
+        font-weight: 760;
+        letter-spacing: 0;
       }
 
       .subtitle {
-        margin: 0;
+        max-width: 680px;
+        margin: 16px 0 0;
         color: var(--muted);
-        font-size: clamp(1.1rem, 2vw, 1.55rem);
-        font-weight: 600;
+        font-size: clamp(1rem, 1.4vw, 1.18rem);
+      }
+
+      .meta {
+        min-width: 180px;
+        color: var(--muted);
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font-size: 0.82rem;
+        line-height: 1.9;
+        text-align: right;
+      }
+
+      .tree-card {
+        overflow: auto;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--paper);
+      }
+
+      .tree-card svg {
+        display: block;
+        width: 100%;
+        min-width: 980px;
+        height: auto;
+      }
+
+      .tree-title {
+        fill: #171717;
+        font-size: 32px;
+        font-weight: 720;
+      }
+
+      .tree-subtitle {
+        fill: #696969;
+        font-size: 17px;
+      }
+
+      .node rect {
+        stroke-width: 1.4;
+      }
+
+      .node text {
+        fill: #202020;
+        font-size: 17px;
+        font-weight: 640;
+      }
+
+      .node .minor {
+        fill: #555;
+        font-size: 13px;
+        font-weight: 500;
+      }
+
+      .start rect {
+        fill: var(--red-bg);
+        stroke: #e2aaa5;
+      }
+
+      .question rect {
+        fill: #fbfbf9;
+        stroke: #c8c8c2;
+      }
+
+      .neutral rect {
+        fill: var(--soft);
+        stroke: #d4d4ce;
+      }
+
+      .good rect {
+        fill: var(--green-bg);
+        stroke: #b8dcc8;
+      }
+
+      .warn rect {
+        fill: var(--amber-bg);
+        stroke: #ead49e;
+      }
+
+      .bad rect {
+        fill: var(--red-bg);
+        stroke: #e2aaa5;
+      }
+
+      .blue rect {
+        fill: var(--blue-bg);
+        stroke: #bdd6ee;
+      }
+
+      .cyan rect {
+        fill: var(--cyan-bg);
+        stroke: #b8dddd;
+      }
+
+      .violet rect {
+        fill: var(--violet-bg);
+        stroke: #d0c2ec;
+      }
+
+      .pink rect {
+        fill: var(--pink-bg);
+        stroke: #e4b7d6;
+      }
+
+      .line {
+        fill: none;
+        stroke: #b8b8b2;
+        stroke-width: 1.4;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .label {
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .yes {
+        fill: var(--green);
+      }
+
+      .no {
+        fill: var(--red);
+      }
+
+      .docs {
+        margin-top: 42px;
+      }
+
+      .section {
+        margin: 46px 0;
+      }
+
+      .section-header {
+        max-width: 760px;
+        margin-bottom: 18px;
       }
 
       h2 {
-        margin: 0 0 14px;
-        color: var(--ink);
-        font-size: clamp(1.9rem, 3vw, 3rem);
-        font-weight: 900;
+        font-size: clamp(1.55rem, 2.4vw, 2.25rem);
+        font-weight: 720;
+        letter-spacing: 0;
       }
 
       h3 {
-        margin: 0 0 10px;
-        color: var(--ink);
-        font-size: 1.18rem;
-        font-weight: 850;
+        margin-bottom: 8px;
+        font-size: 1.04rem;
+        font-weight: 700;
       }
 
       p {
-        margin: 0 0 16px;
-        color: #b8bfcb;
+        margin: 0 0 14px;
+        color: var(--muted);
         font-size: 1rem;
       }
 
       .lead {
-        max-width: 900px;
-        color: #d8dee8;
-        font-size: 1.12rem;
+        color: #4f4f4a;
+        font-size: 1.07rem;
       }
 
-      .rule {
-        border: 1px solid #283242;
-        border-radius: 18px;
-        background: linear-gradient(135deg, rgb(53 219 147 / 10%), rgb(96 170 255 / 5%));
-        padding: 22px;
-      }
-
-      .rule strong {
-        color: var(--yellow);
-      }
-
-      .grid {
+      .principles {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-        margin: 22px 0 34px;
+        gap: 14px;
+        margin-top: 18px;
       }
 
       .card {
-        border: 1px solid #273143;
-        border-radius: 16px;
-        background: rgb(20 26 36 / 90%);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--paper);
         padding: 18px;
       }
 
-      .card .tag {
-        margin-bottom: 8px;
-        color: var(--green);
-        font-family: "JetBrains Mono", monospace;
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 0.12em;
+      .tag {
+        margin-bottom: 10px;
+        color: var(--muted);
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font-size: 0.72rem;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
       }
 
-      .steps {
+      .workflow {
         display: grid;
-        grid-template-columns: 0.9fr 1.35fr;
-        gap: 18px;
+        grid-template-columns: 0.9fr 1.15fr;
+        gap: 14px;
         margin-top: 18px;
       }
 
       .checklist {
         margin: 0;
         padding-left: 1.1rem;
-        color: #b8bfcb;
+        color: var(--muted);
       }
 
       .checklist li {
-        margin: 8px 0;
+        margin: 7px 0;
+      }
+
+      .callout {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fbfbf8;
+        padding: 18px;
+      }
+
+      .callout strong {
+        color: var(--ink);
       }
 
       .table-wrap {
         overflow-x: auto;
-        border: 1px solid #273143;
-        border-radius: 16px;
-        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--paper);
       }
 
       table {
         width: 100%;
+        min-width: 860px;
         border-collapse: collapse;
-        min-width: 820px;
       }
 
       th,
       td {
-        border-bottom: 1px solid #273143;
-        padding: 14px 16px;
+        border-bottom: 1px solid var(--border);
+        padding: 13px 14px;
         text-align: left;
         vertical-align: top;
       }
 
       th {
-        background: #151c27;
-        color: var(--green);
-        font-family: "JetBrains Mono", monospace;
-        font-size: 12px;
-        letter-spacing: 0.08em;
+        background: var(--soft);
+        color: #40403c;
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
         text-transform: uppercase;
       }
 
       td {
-        color: #cbd3df;
+        color: #555550;
+      }
+
+      td:first-child {
+        color: var(--ink);
+        font-weight: 650;
       }
 
       tr:last-child td {
         border-bottom: 0;
       }
 
-      .section {
-        margin: 44px 0;
-      }
-
       footer {
-        margin-top: 54px;
-        border-top: 1px solid #273143;
-        padding-top: 22px;
+        margin-top: 52px;
+        border-top: 1px solid var(--border);
+        padding-top: 20px;
         color: var(--muted);
-        font-size: 0.95rem;
+        font-size: 0.94rem;
       }
 
-      @media (max-width: 900px) {
-        .grid,
-        .steps {
+      @media (max-width: 860px) {
+        .hero,
+        .workflow,
+        .principles {
           grid-template-columns: 1fr;
         }
 
-        .tree-card {
-          overflow-x: auto;
-        }
-
-        .tree-card svg {
-          min-width: 980px;
+        .meta {
+          text-align: left;
         }
       }
     </style>
   </head>
   <body>
     <main class="wrap">
-      <div class="back"><a href="/">← All posts</a></div>
+      <nav class="back"><a href="/">&larr; All posts</a></nav>
+
+      <header class="hero">
+        <div>
+          <p class="eyebrow">RAG operations</p>
+          <h1>RAG debugging decision tree</h1>
+          <p class="subtitle">
+            Start with the evidence the model received. Then trace the system downward:
+            source, parse, chunk, embed, index, retrieve, inject, generate.
+          </p>
+        </div>
+        <div class="meta">
+          top-down flow<br />
+          retrieval first<br />
+          generation second
+        </div>
+      </header>
 
       <section class="tree-card" aria-label="RAG debugging decision tree">
-        <svg viewBox="0 0 1400 2320" role="img" aria-labelledby="tree-title tree-desc" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 1200 1960" role="img" aria-labelledby="tree-title tree-desc" xmlns="http://www.w3.org/2000/svg">
           <title id="tree-title">RAG Debugging Decision Tree</title>
-          <desc id="tree-desc">A top-down decision tree for debugging wrong RAG answers by checking source documents, retrieval, generation, chunking, embeddings, indexing, filters, ranking, and model grounding.</desc>
+          <desc id="tree-desc">A top-down decision tree for debugging wrong RAG answers by checking source documents, retrieval, parsing, chunking, embeddings, indexing, filters, ranking, prompts, and grounding.</desc>
           <defs>
-            <marker id="arrow" markerWidth="9" markerHeight="9" refX="7.8" refY="4.5" orient="auto">
-              <path d="M 0 0 L 9 4.5 L 0 9 z" fill="#485263" />
+            <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+              <path d="M 0 0 L 8 4 L 0 8 z" fill="#b8b8b2" />
             </marker>
-            <filter id="soft-glow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#35db93" flood-opacity="0.18" />
-            </filter>
           </defs>
 
-          <rect width="1400" height="2320" fill="#090b10" />
-          <text x="700" y="92" text-anchor="middle" fill="#35db93" font-family="Inter, Arial, sans-serif" font-size="54" font-weight="900" letter-spacing="3">RAG DEBUGGING DECISION TREE</text>
-          <text x="700" y="138" text-anchor="middle" fill="#8f97a6" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="600">Don't start with the LLM — start with the evidence it received.</text>
+          <rect width="1200" height="1960" fill="#ffffff" />
+          <text x="600" y="58" text-anchor="middle" class="tree-title">RAG debugging decision tree</text>
+          <text x="600" y="88" text-anchor="middle" class="tree-subtitle">Do not start with the model. Start with the evidence packet.</text>
 
-          <g transform="translate(50 0)">
-
-          <g stroke="#485263" stroke-width="2.4" fill="none" marker-end="url(#arrow)" stroke-linecap="round">
-            <path d="M600 260 V322" />
-            <path d="M600 420 L460 500" />
-            <path d="M600 420 L740 500" />
-            <path d="M740 580 V665" />
-            <path d="M740 760 L560 845" />
-            <path d="M740 760 L915 845" />
-            <path d="M560 925 V1005" />
-            <path d="M560 1100 L365 1180" />
-            <path d="M560 1100 L600 1180" />
-            <path d="M600 1275 V1365" />
-            <path d="M600 1455 L405 1540" />
-            <path d="M600 1455 L790 1540" />
-            <path d="M790 1630 L635 1710" />
-            <path d="M790 1630 L895 1710" />
-            <path d="M895 1800 L955 1890" />
-            <path d="M955 1980 L790 2060" />
-            <path d="M955 1980 L1045 2060" />
-            <path d="M915 925 V1005" />
-            <path d="M915 1100 L850 1180" />
-            <path d="M915 1100 L1130 1180" />
-            <path d="M1130 1275 L970 1365" />
-            <path d="M1130 1275 L1230 1365" />
+          <g marker-end="url(#arrow)">
+            <path class="line" d="M560 165 V220" />
+            <path class="line" d="M560 300 C560 330 410 330 410 370" />
+            <path class="line" d="M560 300 C560 330 710 330 710 370" />
+            <path class="line" d="M710 450 V520" />
+            <path class="line" d="M710 600 C710 635 520 635 520 675" />
+            <path class="line" d="M710 600 C710 635 900 635 900 675" />
+            <path class="line" d="M520 755 V820" />
+            <path class="line" d="M520 900 C520 935 310 935 310 970" />
+            <path class="line" d="M520 900 C520 935 540 935 540 970" />
+            <path class="line" d="M540 1050 V1120" />
+            <path class="line" d="M540 1200 C540 1235 350 1235 350 1270" />
+            <path class="line" d="M540 1200 C540 1235 705 1235 705 1270" />
+            <path class="line" d="M705 1350 C705 1385 570 1385 570 1420" />
+            <path class="line" d="M705 1350 C705 1385 805 1385 805 1420" />
+            <path class="line" d="M805 1500 C805 1530 650 1530 650 1565" />
+            <path class="line" d="M805 1500 C805 1530 930 1530 930 1565" />
+            <path class="line" d="M930 1645 V1710" />
+            <path class="line" d="M930 1790 C930 1820 780 1820 780 1845" />
+            <path class="line" d="M930 1790 C930 1820 1020 1820 1020 1845" />
+            <path class="line" d="M900 755 V820" />
+            <path class="line" d="M900 900 C900 935 780 935 780 970" />
+            <path class="line" d="M900 900 C900 935 1000 935 1000 970" />
+            <path class="line" d="M1000 1050 C1000 1085 835 1085 835 1120" />
+            <path class="line" d="M1000 1050 C1000 1085 1060 1085 1060 1120" />
           </g>
 
-          <g font-family="JetBrains Mono, monospace" font-size="18" font-weight="800">
-            <text x="461" y="462" fill="#ff7c73">NO</text>
-            <text x="706" y="462" fill="#35db93">YES</text>
-            <text x="563" y="805" fill="#ff7c73">NO</text>
-            <text x="870" y="805" fill="#35db93">YES</text>
-            <text x="365" y="1137" fill="#ff7c73">NO</text>
-            <text x="559" y="1137" fill="#35db93">YES</text>
-            <text x="405" y="1502" fill="#35db93">YES</text>
-            <text x="710" y="1502" fill="#ff7c73">NO</text>
-            <text x="635" y="1678" fill="#ff7c73">NO</text>
-            <text x="850" y="1678" fill="#35db93">YES</text>
-            <text x="800" y="2030" fill="#35db93">YES</text>
-            <text x="1025" y="2030" fill="#ff7c73">NO</text>
-            <text x="840" y="1137" fill="#ff7c73">NO</text>
-            <text x="1088" y="1137" fill="#35db93">YES</text>
-            <text x="985" y="1330" fill="#ff7c73">NO</text>
-            <text x="1210" y="1330" fill="#35db93">YES</text>
+          <g class="label">
+            <text x="412" y="348" class="no">NO</text>
+            <text x="678" y="348" class="yes">YES</text>
+            <text x="525" y="650" class="no">NO</text>
+            <text x="865" y="650" class="yes">YES</text>
+            <text x="314" y="944" class="no">NO</text>
+            <text x="539" y="944" class="yes">YES</text>
+            <text x="358" y="1245" class="yes">YES</text>
+            <text x="673" y="1245" class="no">NO</text>
+            <text x="572" y="1398" class="no">NO</text>
+            <text x="790" y="1398" class="yes">YES</text>
+            <text x="650" y="1540" class="no">NO</text>
+            <text x="900" y="1540" class="yes">YES</text>
+            <text x="782" y="1826" class="yes">YES</text>
+            <text x="1000" y="1826" class="no">NO</text>
+            <text x="780" y="944" class="no">NO</text>
+            <text x="970" y="944" class="yes">YES</text>
+            <text x="842" y="1096" class="no">NO</text>
+            <text x="1040" y="1096" class="yes">YES</text>
           </g>
 
-          <g font-family="Inter, Arial, sans-serif" font-size="24" font-weight="850" text-anchor="middle">
-            <g transform="translate(600 225)">
-              <rect x="-112" y="-42" width="224" height="68" rx="13" fill="#372124" stroke="#ff7c73" stroke-width="2.6" />
-              <text fill="#ff8b83"><tspan x="0" y="-10">RAG answer</tspan><tspan x="0" y="18">is wrong</tspan></text>
+          <g text-anchor="middle">
+            <g class="node start" transform="translate(560 145)">
+              <rect x="-92" y="-32" width="184" height="64" rx="7" />
+              <text x="0" y="-4">RAG answer</text>
+              <text x="0" y="20">is wrong</text>
             </g>
 
-            <g transform="translate(600 382)">
-              <rect x="-110" y="-38" width="220" height="66" rx="12" fill="#141922" stroke="#8b95a7" stroke-width="2.4" />
-              <text fill="#e8edf5"><tspan x="0" y="-8">Correct info in</tspan><tspan x="0" y="20">source docs?</tspan></text>
+            <g class="node question" transform="translate(560 260)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Correct info in</text>
+              <text x="0" y="14">source docs?</text>
             </g>
 
-            <g transform="translate(365 540)">
-              <rect x="-110" y="-36" width="220" height="66" rx="12" fill="#302716" stroke="#ffc943" stroke-width="2.6" />
-              <text fill="#ffc943"><tspan x="0" y="-8">Fix / refresh</tspan><tspan x="0" y="20">source docs</tspan></text>
+            <g class="node warn" transform="translate(410 410)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Fix or refresh</text>
+              <text x="0" y="14">source docs</text>
             </g>
 
-            <g transform="translate(740 540)" filter="url(#soft-glow)">
-              <rect x="-112" y="-36" width="224" height="66" rx="12" fill="#112c27" stroke="#35db93" stroke-width="2.6" />
-              <text fill="#e8edf5"><tspan x="0" y="-8">Inspect</tspan><tspan x="0" y="20">retrieval</tspan></text>
+            <g class="node good" transform="translate(710 410)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Inspect</text>
+              <text x="0" y="14">retrieval</text>
             </g>
 
-            <g transform="translate(740 720)">
-              <rect x="-114" y="-36" width="228" height="66" rx="12" fill="#141922" stroke="#8b95a7" stroke-width="2.4" />
-              <text fill="#e8edf5"><tspan x="0" y="-8">Correct chunks</tspan><tspan x="0" y="20">retrieved?</tspan></text>
+            <g class="node question" transform="translate(710 560)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Correct chunks</text>
+              <text x="0" y="14">retrieved?</text>
             </g>
 
-            <g transform="translate(560 885)" filter="url(#soft-glow)">
-              <rect x="-112" y="-36" width="224" height="66" rx="12" fill="#112c27" stroke="#35db93" stroke-width="2.6" />
-              <text fill="#e8edf5"><tspan x="0" y="-8">Debug retrieval</tspan><tspan x="0" y="20">pipeline</tspan></text>
+            <g class="node good" transform="translate(520 715)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Debug retrieval</text>
+              <text x="0" y="14">pipeline</text>
             </g>
 
-            <g transform="translate(915 885)" filter="url(#soft-glow)">
-              <rect x="-112" y="-36" width="224" height="66" rx="12" fill="#112c27" stroke="#35db93" stroke-width="2.6" />
-              <text fill="#e8edf5"><tspan x="0" y="-8">Inspect</tspan><tspan x="0" y="20">generation</tspan></text>
+            <g class="node good" transform="translate(900 715)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Inspect</text>
+              <text x="0" y="14">generation</text>
             </g>
 
-            <g transform="translate(560 1060)">
-              <rect x="-112" y="-36" width="224" height="66" rx="12" fill="#141922" stroke="#8b95a7" stroke-width="2.4" />
-              <text fill="#e8edf5"><tspan x="0" y="-8">Documents parsed</tspan><tspan x="0" y="20">correctly?</tspan></text>
+            <g class="node question" transform="translate(520 860)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Documents parsed</text>
+              <text x="0" y="14">correctly?</text>
             </g>
 
-            <g transform="translate(365 1220)">
-              <rect x="-110" y="-36" width="220" height="66" rx="12" fill="#3a1934" stroke="#ee78d8" stroke-width="2.6" />
-              <text fill="#ee78d8"><tspan x="0" y="-8">Fix</tspan><tspan x="0" y="20">extraction</tspan></text>
+            <g class="node pink" transform="translate(310 1010)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Fix extraction</text>
+              <text class="minor" x="0" y="15">OCR, tables, layout</text>
             </g>
 
-            <g transform="translate(600 1220)" filter="url(#soft-glow)">
-              <rect x="-112" y="-36" width="224" height="66" rx="12" fill="#112c27" stroke="#35db93" stroke-width="2.6" />
-              <text fill="#e8edf5"><tspan x="0" y="-8">Check chunking</tspan><tspan x="0" y="20">&amp; metadata</tspan></text>
+            <g class="node good" transform="translate(540 1010)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Check chunking</text>
+              <text x="0" y="14">and metadata</text>
             </g>
 
-            <g transform="translate(600 1415)">
-              <rect x="-112" y="-36" width="224" height="66" rx="12" fill="#141922" stroke="#8b95a7" stroke-width="2.4" />
-              <text fill="#e8edf5"><tspan x="0" y="-8">Chunks too big /</tspan><tspan x="0" y="20">small / split?</tspan></text>
+            <g class="node question" transform="translate(540 1160)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Chunks too big,</text>
+              <text x="0" y="14">small, or split?</text>
             </g>
 
-            <g transform="translate(405 1582)">
-              <rect x="-110" y="-36" width="220" height="66" rx="12" fill="#352316" stroke="#ff9a3d" stroke-width="2.6" />
-              <text fill="#ff9a3d"><tspan x="0" y="-8">Fix chunk size</tspan><tspan x="0" y="20">&amp; overlap</tspan></text>
+            <g class="node warn" transform="translate(350 1310)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Fix chunk size</text>
+              <text x="0" y="14">and overlap</text>
             </g>
 
-            <g transform="translate(790 1582)">
-              <rect x="-112" y="-36" width="224" height="66" rx="12" fill="#141922" stroke="#8b95a7" stroke-width="2.4" />
-              <text fill="#e8edf5"><tspan x="0" y="-8">Embeddings</tspan><tspan x="0" y="20">regenerated?</tspan></text>
+            <g class="node question" transform="translate(705 1310)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Embeddings</text>
+              <text x="0" y="14">regenerated?</text>
             </g>
 
-            <g transform="translate(635 1752)">
-              <rect x="-110" y="-36" width="220" height="66" rx="12" fill="#372124" stroke="#ff7c73" stroke-width="2.6" />
-              <text fill="#ff8b83"><tspan x="0" y="-8">Rebuild</tspan><tspan x="0" y="20">embeddings</tspan></text>
+            <g class="node bad" transform="translate(570 1460)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Rebuild</text>
+              <text x="0" y="14">embeddings</text>
             </g>
 
-            <g transform="translate(895 1752)">
-              <rect x="-112" y="-36" width="224" height="66" rx="12" fill="#141922" stroke="#8b95a7" stroke-width="2.4" />
-              <text fill="#e8edf5"><tspan x="0" y="-8">Vector index</tspan><tspan x="0" y="20">updated?</tspan></text>
+            <g class="node question" transform="translate(805 1460)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Vector index</text>
+              <text x="0" y="14">updated?</text>
             </g>
 
-            <g transform="translate(790 1932)">
-              <rect x="-110" y="-36" width="220" height="66" rx="12" fill="#372124" stroke="#ff7c73" stroke-width="2.6" />
-              <text fill="#ff8b83"><tspan x="0" y="-8">Rebuild</tspan><tspan x="0" y="20">index</tspan></text>
+            <g class="node bad" transform="translate(650 1605)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Rebuild</text>
+              <text x="0" y="14">index</text>
             </g>
 
-            <g transform="translate(1045 1932)" filter="url(#soft-glow)">
-              <rect x="-112" y="-36" width="224" height="66" rx="12" fill="#112c27" stroke="#35db93" stroke-width="2.6" />
-              <text fill="#e8edf5"><tspan x="0" y="-8">Check search /</tspan><tspan x="0" y="20">filters / rank</tspan></text>
+            <g class="node good" transform="translate(930 1605)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Check search,</text>
+              <text x="0" y="14">filters, rank</text>
             </g>
 
-            <g transform="translate(1045 2100)">
-              <rect x="-112" y="-36" width="224" height="66" rx="12" fill="#141922" stroke="#8b95a7" stroke-width="2.4" />
-              <text fill="#e8edf5"><tspan x="0" y="-8">Stale / wrong</tspan><tspan x="0" y="20">chunks returned?</tspan></text>
+            <g class="node question" transform="translate(900 860)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Prompt included</text>
+              <text x="0" y="14">context?</text>
             </g>
 
-            <g transform="translate(790 2210)">
-              <rect x="-112" y="-36" width="224" height="66" rx="12" fill="#102e35" stroke="#45d6df" stroke-width="2.6" />
-              <text fill="#45d6df"><tspan x="0" y="-8">Fix filters</tspan><tspan x="0" y="20">&amp; versioning</tspan></text>
+            <g class="node warn" transform="translate(780 1010)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Fix prompt</text>
+              <text x="0" y="14">assembly</text>
             </g>
 
-            <g transform="translate(1045 2210)">
-              <rect x="-112" y="-36" width="224" height="66" rx="12" fill="#2d2142" stroke="#bd8cff" stroke-width="2.6" />
-              <text fill="#bd8cff"><tspan x="0" y="-8">Rerank / rewrite</tspan><tspan x="0" y="20">/ hybrid</tspan></text>
+            <g class="node question" transform="translate(1000 1010)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Model followed</text>
+              <text x="0" y="14">context?</text>
             </g>
 
-            <g transform="translate(915 1060)">
-              <rect x="-112" y="-36" width="224" height="66" rx="12" fill="#141922" stroke="#8b95a7" stroke-width="2.4" />
-              <text fill="#e8edf5"><tspan x="0" y="-8">Prompt included</tspan><tspan x="0" y="20">context?</tspan></text>
+            <g class="node bad" transform="translate(835 1160)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Improve prompt</text>
+              <text x="0" y="14">or model</text>
             </g>
 
-            <g transform="translate(850 1220)">
-              <rect x="-112" y="-36" width="224" height="66" rx="12" fill="#302716" stroke="#ffc943" stroke-width="2.6" />
-              <text fill="#ffc943"><tspan x="0" y="-8">Fix prompt /</tspan><tspan x="0" y="20">context</tspan></text>
+            <g class="node blue" transform="translate(1060 1160)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Check source</text>
+              <text x="0" y="14">conflicts</text>
             </g>
 
-            <g transform="translate(1130 1220)">
-              <rect x="-112" y="-36" width="224" height="66" rx="12" fill="#141922" stroke="#8b95a7" stroke-width="2.4" />
-              <text fill="#e8edf5"><tspan x="0" y="-8">Model followed</tspan><tspan x="0" y="20">context?</tspan></text>
+            <g class="node question" transform="translate(930 1750)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Stale or wrong</text>
+              <text x="0" y="14">chunks returned?</text>
             </g>
 
-            <g transform="translate(970 1408)">
-              <rect x="-112" y="-36" width="224" height="66" rx="12" fill="#372124" stroke="#ff7c73" stroke-width="2.6" />
-              <text fill="#ff8b83"><tspan x="0" y="-8">Improve prompt</tspan><tspan x="0" y="20">/ model</tspan></text>
+            <g class="node cyan" transform="translate(780 1885)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Fix filters</text>
+              <text x="0" y="14">and versioning</text>
             </g>
 
-            <g transform="translate(1230 1408)">
-              <rect x="-112" y="-36" width="224" height="66" rx="12" fill="#10243d" stroke="#60aaff" stroke-width="2.6" />
-              <text fill="#60aaff"><tspan x="0" y="-8">Check source</tspan><tspan x="0" y="20">&amp; conflicts</tspan></text>
+            <g class="node violet" transform="translate(1020 1885)">
+              <rect x="-112" y="-40" width="224" height="80" rx="7" />
+              <text x="0" y="-10">Rerank, rewrite,</text>
+              <text x="0" y="14">or hybrid search</text>
             </g>
           </g>
-
-          </g>
-          <text x="700" y="2290" text-anchor="middle" fill="#5b6474" font-family="JetBrains Mono, monospace" font-size="24" font-weight="800" letter-spacing="2">hackproduct · webalgos</text>
         </svg>
       </section>
 
       <section class="docs">
-        <div class="docs-header">
-          <div class="eyebrow">How to use this tree</div>
-          <h1>Debug RAG from evidence upward.</h1>
-          <p class="subtitle">A wrong answer is rarely just a “bad model” problem. It is usually a broken chain: source → parse → chunk → embed → index → retrieve → inject → generate.</p>
+        <div class="section-header">
+          <p class="eyebrow">Field guide</p>
+          <h2>Use the tree as a fault isolation path.</h2>
+          <p class="lead">
+            Pick one failing question. Move through the tree only when you can prove the
+            previous step with an artifact: source text, parse output, chunk text, index
+            metadata, retrieved results, or the final prompt payload.
+          </p>
         </div>
 
-        <div class="grid" aria-label="Core debugging principles">
+        <div class="principles" aria-label="Core debugging principles">
           <article class="card">
-            <div class="tag">Rule 01</div>
-            <h3>Never start with the LLM</h3>
-            <p>First prove whether the answerable fact exists in the source corpus. If the source is missing, stale, duplicated, or contradictory, no retrieval strategy can rescue the answer reliably.</p>
+            <div class="tag">Principle 01</div>
+            <h3>Verify the source first</h3>
+            <p>
+              If the answer is missing, stale, duplicated, or contradicted in the corpus,
+              retrieval and prompting will only hide the real problem.
+            </p>
           </article>
           <article class="card">
-            <div class="tag">Rule 02</div>
-            <h3>Inspect the actual chunks</h3>
-            <p>Do not debug from scores alone. Read the top retrieved chunks exactly as the model saw them. Most RAG bugs become obvious once you inspect the evidence packet.</p>
+            <div class="tag">Principle 02</div>
+            <h3>Read the retrieved chunks</h3>
+            <p>
+              Scores are not enough. Inspect the exact text, order, metadata, and citations
+              the model received.
+            </p>
           </article>
           <article class="card">
-            <div class="tag">Rule 03</div>
+            <div class="tag">Principle 03</div>
             <h3>Separate retrieval from generation</h3>
-            <p>If the correct chunks were not retrieved, debug indexing and search. If the correct chunks were retrieved, debug context injection, prompt instructions, citations, and model grounding.</p>
+            <p>
+              Missing evidence is a retrieval problem. Ignored evidence is a prompt,
+              context, model, or conflict problem.
+            </p>
           </article>
         </div>
 
         <section class="section">
-          <h2>The diagnostic path</h2>
-          <p class="lead">Start at the top of the tree and follow the first question you can answer with evidence. Every branch should be backed by logs, source snippets, retrieved chunk text, prompt payloads, or index metadata.</p>
-          <div class="steps">
-            <article class="rule">
-              <h3>Fast workflow</h3>
+          <div class="section-header">
+            <h2>Fast debugging loop</h2>
+            <p>
+              Keep the loop small. One question, one expected answer, one source of truth,
+              one trace through the system.
+            </p>
+          </div>
+          <div class="workflow">
+            <article class="callout">
+              <h3>Runbook</h3>
               <ol class="checklist">
-                <li>Pick one failing user question.</li>
+                <li>Choose a failing user question.</li>
                 <li>Write the expected answer in one sentence.</li>
-                <li>Find the exact source document that contains the answer.</li>
-                <li>Inspect the retrieved chunks for that query.</li>
+                <li>Open the canonical source document.</li>
+                <li>Inspect the parse output and chunk boundaries.</li>
+                <li>Log the top retrieved chunks with ids and scores.</li>
                 <li>Inspect the final prompt sent to the model.</li>
-                <li>Fix the first broken link in the chain.</li>
+                <li>Fix the first broken link and add a regression question.</li>
               </ol>
             </article>
-            <article class="rule">
-              <h3>Golden rule</h3>
-              <p><strong>Do not ask, “Why did the model hallucinate?” first.</strong> Ask, “What evidence did the model receive, and was that evidence complete, fresh, and unambiguous?”</p>
-              <p>Once you answer that, the next move is usually mechanical: refresh docs, fix parsing, adjust chunking, rebuild embeddings, repair index versioning, tighten filters, rerank, or improve prompt grounding.</p>
+            <article class="callout">
+              <h3>Decision rule</h3>
+              <p>
+                <strong>Do not begin with "the model hallucinated."</strong> Begin with:
+                what evidence did the model receive, and was that evidence complete,
+                current, scoped to the user, and unambiguous?
+              </p>
+              <p>
+                Once that is clear, the fix is usually mechanical: refresh documents,
+                repair parsing, adjust chunking, rebuild embeddings, swap the index,
+                correct filters, rerank, or tighten prompt grounding.
+              </p>
             </article>
           </div>
         </section>
 
         <section class="section">
-          <h2>Branch-by-branch documentation</h2>
+          <div class="section-header">
+            <h2>Branch-by-branch guide</h2>
+            <p>
+              The table maps each decision point to the artifact worth inspecting and the
+              likely repair.
+            </p>
+          </div>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Tree node</th>
-                  <th>What to inspect</th>
-                  <th>Typical fix</th>
+                  <th>Decision point</th>
+                  <th>Inspect</th>
+                  <th>Likely repair</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td>Correct info in source docs?</td>
-                  <td>Open the canonical source. Check version, tenant, access policy, timestamp, duplicate copies, and contradictory documents.</td>
-                  <td>Refresh or remove documents, resolve conflicts, and add a known-answer regression question.</td>
+                  <td>Canonical document, version, timestamp, tenant, access policy, duplicates, and conflicts.</td>
+                  <td>Refresh or remove documents, resolve conflicts, and add a known-answer test.</td>
                 </tr>
                 <tr>
                   <td>Correct chunks retrieved?</td>
-                  <td>Log top-k chunks with document id, chunk id, score, rank, metadata filters, and exact text shown to the model.</td>
-                  <td>Fix retrieval before touching the prompt. Tune query rewriting, filters, hybrid search, reranking, or k.</td>
+                  <td>Top-k chunk ids, document ids, score, rank, metadata filters, and exact text.</td>
+                  <td>Tune retrieval before prompting: query rewrite, filters, hybrid search, reranking, or k.</td>
                 </tr>
                 <tr>
                   <td>Documents parsed correctly?</td>
-                  <td>Compare original PDFs, HTML, tables, headings, images, and extracted text. Look for missing tables, broken order, OCR errors, or boilerplate.</td>
-                  <td>Improve extraction, OCR, table parsing, layout parsing, and source-specific cleanup.</td>
+                  <td>Original PDF or HTML beside extracted text. Check tables, headings, OCR, order, and boilerplate.</td>
+                  <td>Improve extraction, OCR, table parsing, layout parsing, or source-specific cleanup.</td>
                 </tr>
                 <tr>
-                  <td>Chunks too big / small / split?</td>
-                  <td>Check whether the answer spans multiple chunks, whether headings were detached, and whether overlap preserves the needed context.</td>
-                  <td>Change chunk size, overlap, semantic boundaries, parent-child retrieval, or contextual chunk headers.</td>
+                  <td>Chunks too big, small, or split?</td>
+                  <td>Whether the answer spans chunks, loses headings, or needs adjacent context.</td>
+                  <td>Change chunk size, overlap, semantic boundaries, parent-child retrieval, or contextual headers.</td>
                 </tr>
                 <tr>
                   <td>Embeddings regenerated?</td>
-                  <td>Confirm every changed chunk has a fresh embedding using the current embedding model and schema version.</td>
-                  <td>Rebuild embeddings and tag them with model name, dimension, source version, and build timestamp.</td>
+                  <td>Embedding model, dimension, chunk hash, source version, and build timestamp.</td>
+                  <td>Rebuild embeddings for every changed chunk and version the embedding build.</td>
                 </tr>
                 <tr>
                   <td>Vector index updated?</td>
-                  <td>Check whether the deployed index contains the new embeddings and whether deleted chunks are actually removed.</td>
-                  <td>Rebuild or swap the index atomically. Avoid mixing old and new index versions.</td>
+                  <td>Deployed index version, deleted chunk tombstones, and index build logs.</td>
+                  <td>Rebuild or atomically swap the index. Avoid mixing old and new versions.</td>
                 </tr>
                 <tr>
-                  <td>Search / filters / rank</td>
-                  <td>Inspect metadata filters, tenant filters, ACL filters, lexical search, vector search, hybrid weights, and reranker inputs.</td>
-                  <td>Fix filter logic, add metadata tests, tune ranking, add reranking, or rewrite the query.</td>
+                  <td>Search, filters, rank</td>
+                  <td>Tenant filters, ACL filters, metadata predicates, lexical results, vector results, and reranker input.</td>
+                  <td>Fix filter logic, add metadata tests, tune weights, rerank, or rewrite the query.</td>
                 </tr>
                 <tr>
                   <td>Prompt included context?</td>
-                  <td>Inspect the final prompt payload, not the template. Verify chunk text, citations, ordering, truncation, and system instructions.</td>
-                  <td>Fix context injection, token budgeting, citation formatting, and prompt assembly.</td>
+                  <td>Final prompt payload, not just the template. Check truncation, order, citations, and instructions.</td>
+                  <td>Repair context injection, token budgeting, citation formatting, and prompt assembly.</td>
                 </tr>
                 <tr>
                   <td>Model followed context?</td>
-                  <td>Compare answer claims to provided chunks. Look for unsupported claims, ignored citations, or conflicts inside the context.</td>
-                  <td>Improve grounding instructions, require citations, lower creativity, change model, or resolve conflicting docs.</td>
+                  <td>Answer claims against supplied chunks. Look for unsupported claims, ignored citations, and conflicts.</td>
+                  <td>Tighten grounding instructions, require citations, reduce creativity, change model, or resolve source conflicts.</td>
                 </tr>
               </tbody>
             </table>
@@ -600,30 +791,36 @@
         </section>
 
         <section class="section">
-          <h2>After every document refresh</h2>
-          <div class="grid">
+          <div class="section-header">
+            <h2>Refresh checklist</h2>
+            <p>
+              Run this after every corpus refresh, parser change, chunking change, or
+              embedding model change.
+            </p>
+          </div>
+          <div class="principles">
             <article class="card">
               <div class="tag">Ingestion</div>
               <ul class="checklist">
-                <li>Confirm the new document uploaded.</li>
-                <li>Confirm parsing produced complete text.</li>
-                <li>Confirm old versions were removed or marked inactive.</li>
+                <li>New documents uploaded.</li>
+                <li>Parsing produced complete text.</li>
+                <li>Old versions removed or marked inactive.</li>
               </ul>
             </article>
             <article class="card">
               <div class="tag">Indexing</div>
               <ul class="checklist">
-                <li>Regenerate chunks and embeddings.</li>
-                <li>Update the vector index atomically.</li>
-                <li>Verify metadata, tenant, and access filters.</li>
+                <li>Chunks and embeddings regenerated.</li>
+                <li>Vector index updated atomically.</li>
+                <li>Metadata, tenant, and ACL filters verified.</li>
               </ul>
             </article>
             <article class="card">
               <div class="tag">Evaluation</div>
               <ul class="checklist">
-                <li>Run known test questions.</li>
-                <li>Inspect top retrieved chunks.</li>
-                <li>Verify the answer cites the right evidence.</li>
+                <li>Known questions re-run.</li>
+                <li>Top chunks inspected manually.</li>
+                <li>Answers cite the expected evidence.</li>
               </ul>
             </article>
           </div>
@@ -631,7 +828,7 @@
       </section>
 
       <footer>
-        Built as a static, shareable debugging guide for HackProduct and WebAlgos. The previous Flint/ECharts prototype was replaced with a purpose-built decision-tree SVG so the page reads like an actual diagnostic flow.
+        Raja Ashok Bolla - HackProduct / WebAlgos.
       </footer>
     </main>
   </body>
