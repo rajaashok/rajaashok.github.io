@@ -8,6 +8,7 @@ Live at **[rajaashok.github.io](https://rajaashok.github.io)**
 
 | Post | URL | Published |
 |---|---|---|
+| RAG Debugging Decision Tree | [/rag-debug-decision-tree-flint](https://rajaashok.github.io/rag-debug-decision-tree-flint) | July 2026 |
 | Chunking for RAG: Interview Questions and Best Practices | [/chunking-best-practices](https://rajaashok.github.io/chunking-best-practices) | July 2026 |
 | Don't Memorize 300 Problems. Memorize This Decision Tree. | [/dont-memorize-300-problems](https://rajaashok.github.io/dont-memorize-300-problems) | July 2026 |
 | Your Next Data Center Weighs Three Pounds | [/three-pound-data-center](https://rajaashok.github.io/three-pound-data-center) | July 2026 |
@@ -18,8 +19,11 @@ Plain HTML, zero build step. Each post is a single self-contained file — style
 
 ```
 index.html                      → home / post index
+rag-debug-decision-tree-flint.html → interactive RAG debugging decision tree
 chunking-best-practices.html    → post (served extensionless by GitHub Pages)
+dont-memorize-300-problems.html → post (served extensionless by GitHub Pages)
 three-pound-data-center.html    → post (served extensionless by GitHub Pages)
+assets/                         → static images and chart options
 ```
 
 ## Adding a post
