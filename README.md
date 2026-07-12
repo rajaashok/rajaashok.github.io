@@ -19,11 +19,11 @@ Plain HTML, zero build step. Each post is a single self-contained file — style
 
 ```
 index.html                      → home / post index
-rag-debug-decision-tree-flint.html → interactive RAG debugging decision tree
+rag-debug-decision-tree-flint.html → static RAG debugging decision tree + documentation
 chunking-best-practices.html    → post (served extensionless by GitHub Pages)
 dont-memorize-300-problems.html → post (served extensionless by GitHub Pages)
 three-pound-data-center.html    → post (served extensionless by GitHub Pages)
-assets/                         → static images and chart options
+assets/                         → static preview images
 ```
 
 ## Adding a post
