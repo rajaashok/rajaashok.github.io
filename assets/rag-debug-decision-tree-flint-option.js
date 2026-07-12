@@ -15,8 +15,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#5470c6"
           },
-          "x": 115,
-          "y": 455,
+          "x": 760,
+          "y": 70,
           "fixed": true,
           "label": {
             "show": true,
@@ -42,8 +42,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#91cc75"
           },
-          "x": 211,
-          "y": 455,
+          "x": 760,
+          "y": 170,
           "fixed": true,
           "label": {
             "show": true,
@@ -69,8 +69,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#fac858"
           },
-          "x": 313,
-          "y": 170,
+          "x": 315,
+          "y": 300,
           "fixed": true,
           "label": {
             "show": true,
@@ -96,8 +96,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#ee6666"
           },
-          "x": 313,
-          "y": 455,
+          "x": 760,
+          "y": 300,
           "fixed": true,
           "label": {
             "show": true,
@@ -123,8 +123,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#73c0de"
           },
-          "x": 416,
-          "y": 455,
+          "x": 760,
+          "y": 430,
           "fixed": true,
           "label": {
             "show": true,
@@ -150,8 +150,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#3ba272"
           },
-          "x": 518,
-          "y": 340,
+          "x": 505,
+          "y": 560,
           "fixed": true,
           "label": {
             "show": true,
@@ -177,8 +177,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#fc8452"
           },
-          "x": 518,
-          "y": 650,
+          "x": 980,
+          "y": 560,
           "fixed": true,
           "label": {
             "show": true,
@@ -204,8 +204,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#9a60b4"
           },
-          "x": 621,
-          "y": 250,
+          "x": 365,
+          "y": 690,
           "fixed": true,
           "label": {
             "show": true,
@@ -231,8 +231,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#ea7ccc"
           },
-          "x": 723,
-          "y": 125,
+          "x": 165,
+          "y": 820,
           "fixed": true,
           "label": {
             "show": true,
@@ -258,8 +258,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#d48265"
           },
-          "x": 723,
-          "y": 340,
+          "x": 560,
+          "y": 820,
           "fixed": true,
           "label": {
             "show": true,
@@ -285,8 +285,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#749f83"
           },
-          "x": 825,
-          "y": 340,
+          "x": 560,
+          "y": 950,
           "fixed": true,
           "label": {
             "show": true,
@@ -312,8 +312,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#ca8622"
           },
-          "x": 928,
-          "y": 215,
+          "x": 330,
+          "y": 1080,
           "fixed": true,
           "label": {
             "show": true,
@@ -339,8 +339,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#bda29a"
           },
-          "x": 928,
-          "y": 465,
+          "x": 660,
+          "y": 1080,
           "fixed": true,
           "label": {
             "show": true,
@@ -366,8 +366,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#6e7074"
           },
-          "x": 1030,
-          "y": 340,
+          "x": 500,
+          "y": 1210,
           "fixed": true,
           "label": {
             "show": true,
@@ -393,8 +393,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#546570"
           },
-          "x": 1030,
-          "y": 590,
+          "x": 825,
+          "y": 1210,
           "fixed": true,
           "label": {
             "show": true,
@@ -420,8 +420,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#c4ccd3"
           },
-          "x": 1133,
-          "y": 470,
+          "x": 690,
+          "y": 1340,
           "fixed": true,
           "label": {
             "show": true,
@@ -447,8 +447,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#4b565b"
           },
-          "x": 1133,
-          "y": 700,
+          "x": 960,
+          "y": 1340,
           "fixed": true,
           "label": {
             "show": true,
@@ -474,8 +474,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#2f4554"
           },
-          "x": 1235,
-          "y": 700,
+          "x": 960,
+          "y": 1470,
           "fixed": true,
           "label": {
             "show": true,
@@ -501,8 +501,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#61a0a8"
           },
-          "x": 1337,
-          "y": 570,
+          "x": 760,
+          "y": 1600,
           "fixed": true,
           "label": {
             "show": true,
@@ -528,8 +528,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#c23531"
           },
-          "x": 1337,
-          "y": 815,
+          "x": 1185,
+          "y": 1600,
           "fixed": true,
           "label": {
             "show": true,
@@ -555,8 +555,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#5470c6"
           },
-          "x": 621,
-          "y": 650,
+          "x": 965,
+          "y": 690,
           "fixed": true,
           "label": {
             "show": true,
@@ -582,8 +582,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#91cc75"
           },
-          "x": 723,
-          "y": 555,
+          "x": 815,
+          "y": 820,
           "fixed": true,
           "label": {
             "show": true,
@@ -609,8 +609,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#fac858"
           },
-          "x": 723,
-          "y": 775,
+          "x": 1035,
+          "y": 820,
           "fixed": true,
           "label": {
             "show": true,
@@ -636,8 +636,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#ee6666"
           },
-          "x": 825,
-          "y": 680,
+          "x": 910,
+          "y": 950,
           "fixed": true,
           "label": {
             "show": true,
@@ -663,8 +663,8 @@ window.RAG_DEBUG_FLINT_OPTION = {
           "itemStyle": {
             "color": "#73c0de"
           },
-          "x": 825,
-          "y": 880,
+          "x": 1115,
+          "y": 950,
           "fixed": true,
           "label": {
             "show": true,
@@ -891,7 +891,7 @@ window.RAG_DEBUG_FLINT_OPTION = {
       "lineStyle": {
         "color": "#93a8d8",
         "opacity": 0.72,
-        "curveness": 0.18,
+        "curveness": 0.08,
         "width": 1.7
       },
       "emphasis": {
