@@ -8,6 +8,7 @@ Live at **[rajaashok.github.io](https://rajaashok.github.io)**
 
 | Post | URL | Published |
 |---|---|---|
+| Autonomous Chief Analytics Officer: An Agentic Org Idea | [/autonomous-cao-agentic-org](https://rajaashok.github.io/autonomous-cao-agentic-org) | July 2026 |
 | AI Engineer Roadmap: From Foundations to Real Impact | [/ai-engineer-bfs-roadmap](https://rajaashok.github.io/ai-engineer-bfs-roadmap) | July 2026 |
 | AI Agent Project: The Complete Architecture Map | [/ai-agent-project-bfs](https://rajaashok.github.io/ai-agent-project-bfs) | July 2026 |
 | RAG Debugging Decision Tree | [/rag-debug-decision-tree-flint](https://rajaashok.github.io/rag-debug-decision-tree-flint) | July 2026 |
@@ -21,6 +22,7 @@ Plain HTML with zero build step. Long-form posts remain self-contained; the two 
 
 ```
 index.html                             → home / project and post index
+autonomous-cao-agentic-org.html        → detailed autonomous CAO concept blueprint
 ai-engineer-bfs-roadmap.html           → detailed AI engineer roadmap project
 ai-agent-project-bfs.html              → detailed AI agent architecture project
 rag-debug-decision-tree-flint.html     → static RAG debugging decision tree + documentation
@@ -30,6 +32,7 @@ three-pound-data-center.html           → post (served extensionless by GitHub 
 assets/roadmap-project.css             → shared responsive styling for roadmap projects
 assets/*-reel.mp4                      → original 1080 x 1920 animated reels
 assets/*-final.png                     → lossless 1080 x 1920 final frames
+assets/autonomous-cao-agentic-org-structure.png → original 1491 x 1055 CAO concept diagram
 ```
 
 ## HackProduct roadmap projects
@@ -42,6 +45,18 @@ Both roadmap pages are designed as durable visual references rather than simple 
 - Detailed explanation of every roadmap or architecture stage
 - Production review questions that connect the visual to AI-engineering judgment
 - Responsive layouts tested for desktop and phone screens
+
+## Agentic analytics concept
+
+The Autonomous Chief Analytics Officer page is explicitly presented as an idea for an early-stage startup that has usable data foundations but cannot yet support a complete analytics organization. It includes:
+
+- The original full-resolution agentic organization diagram
+- A supervisor-led workflow and nine bounded specialist contracts
+- Read-only access, least privilege, security trimming, and sandboxing guidance
+- Deterministic analytics, model routing, context paging, and cost controls
+- Faithfulness, completeness, consistency, freshness, and reproducibility gates
+- A phased rollout that begins with one trusted brief instead of nine agents
+- Failure modes, human accountability boundaries, and a measurable launch scorecard
 
 ## Adding a post
 
