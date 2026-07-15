@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Agent Project: The Complete Architecture Map | Raja Ashok</title>
+  <meta name="description" content="A breadth-first architecture map for planning, designing, building, securing, deploying, observing, and improving production AI agents.">
+  <meta property="og:title" content="AI Agent Project: The Complete Architecture Map">
+  <meta property="og:description" content="Ten layers, from strategy and agent design to deployment, observability, and continuous improvement.">
+  <meta property="og:image" content="/assets/ai-agent-project-bfs-final.png">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="/assets/roadmap-project.css">
+</head>
+<body>
+  <header class="shell sitebar">
+    <a class="brand" href="/"><span>HackProduct</span> &middot; The Notebook</a>
+    <a class="back" href="/">Back to all projects</a>
+  </header>
+
+  <section class="shell hero">
+    <p class="eyebrow">AI Engineering &middot; Architecture Map &middot; BFS Reveal</p>
+    <h1>AI Agent Project: The Complete Architecture Map</h1>
+    <p class="dek">An agent is not a prompt with a loop. It is a product, model, memory, tool, orchestration, safety, and operations system that must work as one.</p>
+    <div class="meta">
+      <span>July 2026</span>
+      <span>10 architecture layers</span>
+      <span>14 second visual</span>
+      <span>1080 x 1920 source</span>
+    </div>
+  </section>
+
+  <section class="media-band" aria-label="Project media">
+    <div class="shell media-grid">
+      <div class="media-panel">
+        <h2>Watch the graph build breadth-first</h2>
+        <p>The agent appears first, followed by every architecture layer, its decisions, and finally the implementation ecosystem.</p>
+        <video controls playsinline preload="metadata" poster="/assets/ai-agent-project-bfs-final.png">
+          <source src="/assets/ai-agent-project-bfs-reel.mp4" type="video/mp4">
+          Your browser does not support embedded video.
+        </video>
+        <div class="asset-actions">
+          <a class="asset-link" href="/assets/ai-agent-project-bfs-reel.mp4">Open MP4</a>
+        </div>
+        <div class="asset-meta">H.264 &middot; 1080 x 1920 &middot; portrait MP4</div>
+      </div>
+      <div class="media-panel">
+        <h2>Final architecture map</h2>
+        <p>The frame below is extracted losslessly from the reel. Open it at full resolution to study or save the complete map.</p>
+        <a href="/assets/ai-agent-project-bfs-final.png" aria-label="Open the full-resolution AI Agent Project architecture map">
+          <img class="final-frame" src="/assets/ai-agent-project-bfs-final.png" width="1080" height="1920" alt="Complete AI Agent Project architecture map with ten layers and implementation tools">
+        </a>
+        <div class="asset-actions">
+          <a class="asset-link" href="/assets/ai-agent-project-bfs-final.png">Open full-resolution PNG</a>
+        </div>
+        <div class="asset-meta">Lossless PNG &middot; 1080 x 1920 &middot; no crop</div>
+      </div>
+    </div>
+  </section>
+
+  <main class="shell">
+    <section class="section intro-grid">
+      <div>
+        <p class="label">The core idea</p>
+        <h2>Choose the architecture before choosing the framework.</h2>
+        <p class="lead">Agent projects become fragile when implementation starts with a model name or orchestration library. This map starts with outcomes, decomposes the system into ten durable concerns, and only then places tools against those decisions.</p>
+        <p>The animation uses a breadth-first reveal for the same reason. First see the whole system. Then understand the responsibilities inside every layer. Only after the contracts are visible should products and frameworks enter the conversation.</p>
+      </div>
+      <dl class="facts">
+        <div><dt>Root</dt><dd>AI Agent Project</dd></div>
+        <div><dt>Architecture layers</dt><dd>10</dd></div>
+        <div><dt>Core decisions</dt><dd>41</dd></div>
+        <div><dt>Implementation families</dt><dd>18+</dd></div>
+        <div><dt>Reveal strategy</dt><dd>BFS</dd></div>
+      </dl>
+    </section>
+
+    <section class="section">
+      <p class="label">The ten-layer system</p>
+      <h2>What each branch is responsible for</h2>
+      <p class="lead">Treat each row as a design review. A production agent is ready only when the team can answer the questions in every layer.</p>
+
+      <div class="stage-list">
+        <article class="stage-row">
+          <div class="stage-number">01</div>
+          <div><h3>Strategy and planning</h3><p>Define why the agent exists before deciding how it works.</p></div>
+          <ul>
+            <li>Write concrete use cases, user personas, success metrics, and constraints.</li>
+            <li>Separate tasks that need agency from tasks better served by deterministic software.</li>
+            <li>Use Notion, Miro, Airtable, Figma, or Jira only to make decisions visible.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">02</div>
+          <div><h3>Agent design</h3><p>Turn the outcome into a bounded workflow.</p></div>
+          <ul>
+            <li>Choose the agent architecture and decompose the work into observable tasks.</li>
+            <li>Define workflow transitions, tool contracts, stop conditions, and failure paths.</li>
+            <li>Diagram the logic before code with Excalidraw, Lucidchart, Whimsical, or diagrams.net.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">03</div>
+          <div><h3>Model layer</h3><p>Route work to the smallest model that can do it reliably.</p></div>
+          <ul>
+            <li>Evaluate model quality, latency, context limits, cost, and data policy.</li>
+            <li>Version prompts, validate structured outputs, and add guarded fallbacks.</li>
+            <li>Keep provider boundaries replaceable across proprietary and open models.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">04</div>
+          <div><h3>Memory and knowledge</h3><p>Store only what improves the next decision.</p></div>
+          <ul>
+            <li>Separate short-term working state from durable user or business memory.</li>
+            <li>Choose vector storage and knowledge sources according to retrieval needs.</li>
+            <li>Design the RAG pipeline for freshness, permissions, citations, and evaluation.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">05</div>
+          <div><h3>Tools and integrations</h3><p>Give the model narrow, typed, auditable actions.</p></div>
+          <ul>
+            <li>Wrap APIs and services in explicit function schemas with authentication.</li>
+            <li>Define idempotency, timeouts, retries, permission boundaries, and side effects.</li>
+            <li>Use connectors and plugins as adapters, not as hidden business logic.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">06</div>
+          <div><h3>Orchestration and logic</h3><p>Make state transitions durable and inspectable.</p></div>
+          <ul>
+            <li>Choose a framework only after the state machine and recovery model are clear.</li>
+            <li>Use workflow orchestration for checkpoints, retries, schedules, and long-running work.</li>
+            <li>Add multiple agents only when role separation beats one well-designed workflow.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">07</div>
+          <div><h3>Guardrails and safety</h3><p>Control what enters, what leaves, and what requires review.</p></div>
+          <ul>
+            <li>Validate input, output, tool arguments, policies, and business rules.</li>
+            <li>Escalate high-impact, low-confidence, or irreversible actions to a human.</li>
+            <li>Evaluate safety behavior continuously rather than relying on one prompt.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">08</div>
+          <div><h3>Observability and debugging</h3><p>Capture enough evidence to explain every run.</p></div>
+          <ul>
+            <li>Trace model calls, prompts, retrieval, tool use, state transitions, and costs.</li>
+            <li>Log structured events with correlation IDs and privacy-aware payloads.</li>
+            <li>Test workflows against representative tasks and known failure cases.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">09</div>
+          <div><h3>Deployment and infrastructure</h3><p>Ship an agent as a governed service, not a notebook.</p></div>
+          <ul>
+            <li>Select cloud, container, and scaling patterns from workload behavior.</li>
+            <li>Automate builds and deployments while keeping secrets out of code and traces.</li>
+            <li>Plan queues, concurrency, rate limits, budgets, rollback, and regional constraints.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">10</div>
+          <div><h3>Monitor and improve</h3><p>Close the loop between production evidence and product decisions.</p></div>
+          <ul>
+            <li>Monitor task success, quality, latency, cost, safety, and user correction rates.</li>
+            <li>Segment analytics by workflow, user intent, model, and release version.</li>
+            <li>Convert feedback into datasets, evaluations, experiments, and targeted fixes.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">How to use the map</p>
+      <h2>Three passes for a real design review</h2>
+      <div class="principles">
+        <article class="principle">
+          <h3>Pass 1: coverage</h3>
+          <p>Walk the ten branches and mark each one explicit, assumed, missing, or intentionally deferred. Missing operations and safety decisions usually surface here.</p>
+        </article>
+        <article class="principle">
+          <h3>Pass 2: contracts</h3>
+          <p>For every edge, name the input, output, owner, timeout, failure behavior, and evidence emitted. This turns a pretty diagram into an executable design.</p>
+        </article>
+        <article class="principle">
+          <h3>Pass 3: proof</h3>
+          <p>Attach a test, metric, trace, or review gate to every important claim. If the team cannot observe it, the system cannot reliably improve it.</p>
+        </article>
+      </div>
+
+      <div class="callout">
+        <strong>The AI-engineer review question</strong>
+        <p>When a coding model generates an agent, can you verify the state model, tool permissions, recovery behavior, evaluation plan, and operational evidence, or are you trusting the happy path because the demo looks convincing?</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Production checkpoint</p>
+      <h2>Questions to answer before launch</h2>
+      <div class="columns">
+        <div>
+          <h3>Behavior and safety</h3>
+          <ul class="checklist">
+            <li>What can the agent decide, recommend, and execute?</li>
+            <li>Which actions require confirmation or human approval?</li>
+            <li>What happens when a model, tool, or knowledge source fails?</li>
+            <li>How are prompt injection and data access boundaries tested?</li>
+            <li>Can every material action be reconstructed from traces?</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Quality and operations</h3>
+          <ul class="checklist">
+            <li>Is there a versioned evaluation dataset for core tasks?</li>
+            <li>Are latency, token cost, tool failures, and task success measured together?</li>
+            <li>Can the workflow resume safely after a crash or timeout?</li>
+            <li>Are provider, model, and framework choices replaceable?</li>
+            <li>Does production feedback produce the next evaluation case?</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-note">Built for <a href="https://hackproduct.com">HackProduct</a> by Raja Ashok. Learn the architecture, then learn to judge what the machine builds.</div>
+  </footer>
+</body>
+</html>

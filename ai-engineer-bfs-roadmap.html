@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Engineer Roadmap: From Foundations to Impact | Raja Ashok</title>
+  <meta name="description" content="A practical ten-stage AI engineer roadmap covering software foundations, LLMs, RAG, tools, agents, products, evaluation, safety, deployment, and leadership.">
+  <meta property="og:title" content="AI Engineer Roadmap: From Foundations to Impact">
+  <meta property="og:description" content="Build capability in order: foundations, LLMs, products, RAG, tools, agents, evaluation, deployment, and leadership.">
+  <meta property="og:image" content="/assets/ai-engineer-bfs-roadmap-final.png">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="/assets/roadmap-project.css">
+</head>
+<body>
+  <header class="shell sitebar">
+    <a class="brand" href="/"><span>HackProduct</span> &middot; The Notebook</a>
+    <a class="back" href="/">Back to all projects</a>
+  </header>
+
+  <section class="shell hero">
+    <p class="eyebrow">AI Engineering &middot; Learning Roadmap &middot; BFS Reveal</p>
+    <h1>AI Engineer Roadmap: From Foundations to Real Impact</h1>
+    <p class="dek">Do not collect AI frameworks. Build the engineering judgment to design, ship, evaluate, secure, and improve systems that use them.</p>
+    <div class="meta">
+      <span>July 2026</span>
+      <span>10 capability stages</span>
+      <span>14 second visual</span>
+      <span>1080 x 1920 source</span>
+    </div>
+  </section>
+
+  <section class="media-band" aria-label="Project media">
+    <div class="shell media-grid">
+      <div class="media-panel">
+        <h2>Watch the roadmap unlock</h2>
+        <p>The root appears first, all ten milestones follow, and then each capability branch resolves in breadth-first order.</p>
+        <video controls playsinline preload="metadata" poster="/assets/ai-engineer-bfs-roadmap-final.png">
+          <source src="/assets/ai-engineer-bfs-roadmap-reel.mp4" type="video/mp4">
+          Your browser does not support embedded video.
+        </video>
+        <div class="asset-actions">
+          <a class="asset-link" href="/assets/ai-engineer-bfs-roadmap-reel.mp4">Open MP4</a>
+        </div>
+        <div class="asset-meta">H.264 &middot; 1080 x 1920 &middot; portrait MP4</div>
+      </div>
+      <div class="media-panel">
+        <h2>Final roadmap</h2>
+        <p>This is the exact final reel frame, extracted as a lossless PNG. Open the original to read, save, or revisit the roadmap at full resolution.</p>
+        <a href="/assets/ai-engineer-bfs-roadmap-final.png" aria-label="Open the full-resolution AI Engineer Roadmap">
+          <img class="final-frame" src="/assets/ai-engineer-bfs-roadmap-final.png" width="1080" height="1920" alt="AI Engineer Roadmap with ten stages from foundations to leadership">
+        </a>
+        <div class="asset-actions">
+          <a class="asset-link" href="/assets/ai-engineer-bfs-roadmap-final.png">Open full-resolution PNG</a>
+        </div>
+        <div class="asset-meta">Lossless PNG &middot; 1080 x 1920 &middot; no crop</div>
+      </div>
+    </div>
+  </section>
+
+  <main class="shell">
+    <section class="section intro-grid">
+      <div>
+        <p class="label">The progression</p>
+        <h2>Build capability in the order that systems expose it.</h2>
+        <p class="lead">The roadmap begins with software engineering because every AI product still has APIs, data contracts, tests, state, users, failures, and operating costs. Models add a probabilistic layer; they do not remove the engineering underneath.</p>
+        <p>Each stage adds a new kind of judgment. The goal is not to finish a technology checklist. The goal is to know what to build, why it should work, how to prove that it works, and where it will fail.</p>
+      </div>
+      <dl class="facts">
+        <div><dt>Starting point</dt><dd>Engineering</dd></div>
+        <div><dt>Core milestones</dt><dd>10</dd></div>
+        <div><dt>Visible capabilities</dt><dd>30</dd></div>
+        <div><dt>Final outcome</dt><dd>Impact</dd></div>
+        <div><dt>Reveal strategy</dt><dd>BFS</dd></div>
+      </dl>
+    </section>
+
+    <section class="section">
+      <p class="label">The ten stages</p>
+      <h2>What to learn, build, and prove at every level</h2>
+      <p class="lead">Move forward when you can demonstrate the stage in a working artifact. Familiarity is not the same as capability.</p>
+
+      <div class="stage-list">
+        <article class="stage-row">
+          <div class="stage-number">01</div>
+          <div><h3>Foundations and engineering</h3><p>Learn to build dependable software before adding probabilistic behavior.</p></div>
+          <ul>
+            <li>Use Python and Git fluently enough to navigate, change, test, and review a real codebase.</li>
+            <li>Understand HTTP, JSON, authentication, status codes, and API contracts.</li>
+            <li>Write SQL and focused tests that make data and behavior verifiable.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">02</div>
+          <div><h3>ML and LLM fundamentals</h3><p>Understand what the model receives, predicts, and cannot guarantee.</p></div>
+          <ul>
+            <li>Learn tokens, context windows, embeddings, sampling, and basic evaluation.</li>
+            <li>Design prompts around clear instructions, context, examples, and output schemas.</li>
+            <li>Use model APIs directly before hiding behavior behind a framework.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">03</div>
+          <div><h3>Build small AI apps</h3><p>Turn model calls into an observable user workflow.</p></div>
+          <ul>
+            <li>Build typed APIs and use asynchronous calls where latency or concurrency matters.</li>
+            <li>Stream results with SSE and design the interface for partial, delayed, or failed output.</li>
+            <li>Add retries, timeouts, validation, and tests instead of treating the model call as a demo.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">04</div>
+          <div><h3>Data, search, and RAG</h3><p>Ground generation in evidence the system can retrieve and cite.</p></div>
+          <ul>
+            <li>Chunk and embed content according to document structure and user questions.</li>
+            <li>Combine lexical and semantic retrieval, then rerank when precision matters.</li>
+            <li>Evaluate retrieval separately from generation so the wrong layer gets fixed.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">05</div>
+          <div><h3>Tools and integrations</h3><p>Connect models to data and actions through explicit contracts.</p></div>
+          <ul>
+            <li>Implement tool calling and understand MCP tools, resources, and prompts.</li>
+            <li>Add authentication, input schemas, output schemas, permissions, and auditability.</li>
+            <li>Separate working memory, durable state, and external systems of record.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">06</div>
+          <div><h3>Agentic systems</h3><p>Use agents when the problem requires stateful decisions across steps.</p></div>
+          <ul>
+            <li>Model workflows as state graphs with explicit transitions and stopping conditions.</li>
+            <li>Persist durable checkpoints so runs can recover after timeouts and failures.</li>
+            <li>Put humans into the loop for ambiguity, high impact, and irreversible actions.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">07</div>
+          <div><h3>Full-stack AI products</h3><p>Make the intelligence useful inside a complete product experience.</p></div>
+          <ul>
+            <li>Connect frontend, API, model, and data flows without hiding failure states.</li>
+            <li>Add authentication, persistence, permissions, billing, and user-level isolation as needed.</li>
+            <li>Design feedback loops that capture corrections and improve future evaluations.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">08</div>
+          <div><h3>Evaluation, safety, and observability</h3><p>Replace intuition with repeatable evidence.</p></div>
+          <ul>
+            <li>Build representative datasets and combine deterministic checks with model-based graders.</li>
+            <li>Trace prompts, retrieval, tools, latency, cost, and state transitions end to end.</li>
+            <li>Run safety reviews for data exposure, prompt injection, permissions, and harmful actions.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">09</div>
+          <div><h3>Scale, secure, and deploy</h3><p>Operate the product under real traffic, budgets, and security constraints.</p></div>
+          <ul>
+            <li>Use containers and CI/CD to make builds reproducible and releases reversible.</li>
+            <li>Apply least-privilege IAM and keep secrets out of prompts, code, logs, and traces.</li>
+            <li>Use queues, caching, rate limits, and concurrency controls to protect dependent systems.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">10</div>
+          <div><h3>Lead, learn, and create impact</h3><p>Connect technical choices to product outcomes and team capability.</p></div>
+          <ul>
+            <li>Use system and product design to make tradeoffs explicit across quality, speed, cost, and risk.</li>
+            <li>Read research critically, write clear docs, and record decisions through ADRs and RFCs.</li>
+            <li>Lead reviews, mentor engineers, and make the system easier for the next person to understand.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">The tool layer</p>
+      <h2>Technologies to explore after the capability is clear</h2>
+      <p class="lead">Tools change quickly. The underlying job changes more slowly. Pick from the ecosystem only after you can explain the responsibility it serves.</p>
+      <div class="columns">
+        <div>
+          <h3>Build and intelligence</h3>
+          <ul class="tool-list">
+            <li>PyTorch and Transformers for model understanding and experimentation</li>
+            <li>Pydantic and FastAPI for typed contracts and APIs</li>
+            <li>pgvector or OpenSearch for retrieval infrastructure</li>
+            <li>MCP for portable tools, resources, and prompts</li>
+            <li>LangGraph or durable workflow engines for stateful execution</li>
+            <li>Next.js and Postgres for complete product delivery</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Evidence and operations</h3>
+          <ul class="tool-list">
+            <li>LangSmith or OpenTelemetry for traces and operational evidence</li>
+            <li>OWASP guidance for application and LLM security review</li>
+            <li>Docker and GitHub Actions for reproducible delivery</li>
+            <li>Terraform for reviewable infrastructure changes</li>
+            <li>C4 diagrams for system communication</li>
+            <li>ADRs and RFCs for durable engineering decisions</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Learning loop</p>
+      <h2>Use projects as evidence, not tutorials as progress</h2>
+      <div class="principles">
+        <article class="principle">
+          <h3>Build one thin slice</h3>
+          <p>Choose one real user workflow and complete it end to end. A narrow deployed system teaches more than several disconnected notebooks.</p>
+        </article>
+        <article class="principle">
+          <h3>Break it deliberately</h3>
+          <p>Test empty retrieval, malformed tool output, rate limits, stale state, model refusal, timeouts, and partial failures. Reliability grows through specific evidence.</p>
+        </article>
+        <article class="principle">
+          <h3>Explain the tradeoff</h3>
+          <p>For every framework or model choice, state what it improves, what it costs, and what would make you replace it. That is engineering judgment.</p>
+        </article>
+      </div>
+
+      <div class="callout">
+        <strong>The AI-engineer test</strong>
+        <p>Can you explain why every layer exists, verify model-generated code against its contracts, and debug the system when the happy path breaks? The roadmap is complete only when the answer is yes.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Portfolio proof</p>
+      <h2>What a strong project should demonstrate</h2>
+      <div class="columns">
+        <div>
+          <h3>The artifact</h3>
+          <ul class="checklist">
+            <li>A real user problem and measurable success condition</li>
+            <li>A working UI and API with authentication where appropriate</li>
+            <li>Versioned prompts, schemas, tests, and evaluation data</li>
+            <li>Observable retrieval, model, tool, and workflow behavior</li>
+            <li>A deployed system with a clear operating model</li>
+          </ul>
+        </div>
+        <div>
+          <h3>The explanation</h3>
+          <ul class="checklist">
+            <li>Why AI is necessary for the workflow</li>
+            <li>How quality is measured beyond a polished demo</li>
+            <li>Where deterministic software replaces model judgment</li>
+            <li>How safety, cost, latency, and privacy shaped the design</li>
+            <li>What production evidence would trigger the next change</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-note">Built for <a href="https://hackproduct.com">HackProduct</a> by Raja Ashok. Learn to build with AI, then learn to judge what AI builds.</div>
+  </footer>
+</body>
+</html>
