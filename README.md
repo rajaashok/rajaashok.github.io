@@ -8,6 +8,7 @@ Live at **[rajaashok.github.io](https://rajaashok.github.io)**
 
 | Post | URL | Published |
 |---|---|---|
+| The DNA of a Forward Deployed Engineer | [/forward-deployed-engineer-dna](https://rajaashok.github.io/forward-deployed-engineer-dna) | July 2026 |
 | Autonomous Chief Analytics Officer: An Agentic Org Idea | [/autonomous-cao-agentic-org](https://rajaashok.github.io/autonomous-cao-agentic-org) | July 2026 |
 | AI Engineer Roadmap: From Foundations to Real Impact | [/ai-engineer-bfs-roadmap](https://rajaashok.github.io/ai-engineer-bfs-roadmap) | July 2026 |
 | AI Agent Project: The Complete Architecture Map | [/ai-agent-project-bfs](https://rajaashok.github.io/ai-agent-project-bfs) | July 2026 |
@@ -22,6 +23,7 @@ Plain HTML with zero build step. Long-form posts remain self-contained; the two 
 
 ```
 index.html                             → home / project and post index
+forward-deployed-engineer-dna.html     → Hatch's animated FDE visual guide
 autonomous-cao-agentic-org.html        → detailed autonomous CAO concept blueprint
 ai-engineer-bfs-roadmap.html           → detailed AI engineer roadmap project
 ai-agent-project-bfs.html              → detailed AI agent architecture project
@@ -33,6 +35,8 @@ assets/roadmap-project.css             → shared responsive styling for roadmap
 assets/*-reel.mp4                      → original 1080 x 1920 animated reels
 assets/*-final.png                     → lossless 1080 x 1920 final frames
 assets/autonomous-cao-agentic-org-structure.png → original 1491 x 1055 CAO concept diagram
+assets/forward-deployed-engineer-dna-reel.mp4   → centered 1080 x 1920 Hatch reel
+assets/forward-deployed-engineer-dna-final.png  → lossless final FDE guide
 ```
 
 ## HackProduct roadmap projects
@@ -45,6 +49,17 @@ Both roadmap pages are designed as durable visual references rather than simple 
 - Detailed explanation of every roadmap or architecture stage
 - Production review questions that connect the visual to AI-engineering judgment
 - Responsive layouts tested for desktop and phone screens
+
+## Hatch visual guides
+
+The Forward Deployed Engineer project introduces Hatch, the HackProduct mascot, as a visual guide. The page includes:
+
+- The approved centered 8.4-second dark-theme reel
+- A lossless 1080 x 1920 final frame
+- Detailed explanations of all six FDE qualities
+- A discover, build, and transfer operating model
+- Hiring signals and warning signs
+- Direct MP4 and full-resolution PNG links
 
 ## Agentic analytics concept
 
