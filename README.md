@@ -8,6 +8,7 @@ Live at **[rajaashok.github.io](https://rajaashok.github.io)**
 
 | Post | URL | Published |
 |---|---|---|
+| How an AI Chat Response Travels | [/ai-chat-system-design](https://rajaashok.github.io/ai-chat-system-design) | July 2026 |
 | The DNA of a Forward Deployed Engineer | [/forward-deployed-engineer-dna](https://rajaashok.github.io/forward-deployed-engineer-dna) | July 2026 |
 | Autonomous Chief Analytics Officer: An Agentic Org Idea | [/autonomous-cao-agentic-org](https://rajaashok.github.io/autonomous-cao-agentic-org) | July 2026 |
 | AI Engineer Roadmap: From Foundations to Real Impact | [/ai-engineer-bfs-roadmap](https://rajaashok.github.io/ai-engineer-bfs-roadmap) | July 2026 |
@@ -23,6 +24,7 @@ Plain HTML with zero build step. Long-form posts remain self-contained; the two 
 
 ```
 index.html                             → home / project and post index
+ai-chat-system-design.html             → AI chat request, inference, streaming, and operations architecture
 forward-deployed-engineer-dna.html     → Hatch's animated FDE visual guide
 autonomous-cao-agentic-org.html        → detailed autonomous CAO concept blueprint
 ai-engineer-bfs-roadmap.html           → detailed AI engineer roadmap project
@@ -32,6 +34,9 @@ chunking-best-practices.html           → post (served extensionless by GitHub 
 dont-memorize-300-problems.html        → post (served extensionless by GitHub Pages)
 three-pound-data-center.html           → post (served extensionless by GitHub Pages)
 assets/roadmap-project.css             → shared responsive styling for roadmap projects
+assets/ai-chat-system-design-reel.mp4  → 8-second AI chat data-flow reel
+assets/ai-chat-system-design-final.png → lossless 1080 x 1920 portrait frame
+assets/ai-chat-system-design-storyboard.png → four-phase architecture storyboard
 assets/*-reel.mp4                      → original 1080 x 1920 animated reels
 assets/*-final.png                     → lossless 1080 x 1920 final frames
 assets/autonomous-cao-agentic-org-structure.png → original 1491 x 1055 CAO concept diagram

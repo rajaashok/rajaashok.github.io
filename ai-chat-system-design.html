@@ -1,0 +1,733 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How an AI Chat Response Travels: A Production System Design | Raja Ashok</title>
+  <meta name="description" content="A detailed reference architecture for production AI chat: edge delivery, orchestration, context, model routing, GPU inference, token streaming, storage, safety, observability, scaling, and failure recovery.">
+  <meta property="og:title" content="How an AI Chat Response Travels">
+  <meta property="og:description" content="A production-minded system design for the complete AI chat request, inference, and streamed-response lifecycle.">
+  <meta property="og:image" content="https://rajaashok.github.io/assets/ai-chat-system-design-final.png">
+  <meta property="og:url" content="https://rajaashok.github.io/ai-chat-system-design">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://rajaashok.github.io/ai-chat-system-design">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%231c261f'/%3E%3Cpath d='M4 4h8v2H6v2h5v2H6v2H4z' fill='%23f4ebdc'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/assets/roadmap-project.css">
+  <style>
+    .scope-note {
+      margin: 28px 0 0;
+      border-left: 5px solid var(--teal);
+      padding: 16px 20px;
+      background: rgba(255, 250, 241, 0.72);
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .spec-table-wrap {
+      margin-top: 28px;
+      overflow-x: auto;
+      border-top: 3px solid var(--ink);
+    }
+
+    .spec-table {
+      width: 100%;
+      min-width: 720px;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+
+    .spec-table th,
+    .spec-table td {
+      padding: 15px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .spec-table th {
+      color: var(--ink);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .spec-table td:first-child {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .sequence {
+      margin: 30px 0 0;
+      padding: 0;
+      list-style: none;
+      border-top: 3px solid var(--ink);
+      counter-reset: flow;
+    }
+
+    .sequence li {
+      display: grid;
+      grid-template-columns: 54px minmax(0, 1fr);
+      gap: 20px;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      counter-increment: flow;
+    }
+
+    .sequence li::before {
+      content: counter(flow, decimal-leading-zero);
+      color: var(--orange);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 19px;
+      font-weight: 700;
+    }
+
+    .sequence strong {
+      color: var(--ink);
+    }
+
+    .contract {
+      margin: 28px 0 0;
+      border: 1px solid #2d3531;
+      border-radius: 7px;
+      padding: 22px;
+      overflow-x: auto;
+      background: #101311;
+      color: #d8dfdb;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      white-space: pre;
+    }
+
+    .formula {
+      margin-top: 26px;
+      border-left: 5px solid var(--orange);
+      padding: 20px 24px;
+      background: var(--paper);
+      box-shadow: 0 8px 26px rgba(69, 54, 36, 0.06);
+    }
+
+    .formula code {
+      display: block;
+      margin: 10px 0;
+      color: var(--ink);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 14px;
+      font-weight: 650;
+      overflow-wrap: anywhere;
+    }
+
+    .formula p {
+      margin: 0;
+    }
+
+    .mini-heading {
+      margin: 28px 0 8px;
+      color: var(--ink);
+      font-size: 21px;
+    }
+
+    @media (max-width: 620px) {
+      .sequence li {
+        grid-template-columns: 42px minmax(0, 1fr);
+        gap: 12px;
+      }
+
+      .contract {
+        padding: 16px;
+        font-size: 11px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="shell sitebar">
+    <a class="brand" href="/"><span>HackProduct</span> &middot; The Notebook</a>
+    <a class="back" href="/">Back to all projects</a>
+  </header>
+
+  <section class="shell hero">
+    <p class="eyebrow">AI Engineering &middot; System Design &middot; Streaming Architecture</p>
+    <h1>How an AI Chat Response Travels</h1>
+    <p class="dek">A prompt does not travel from a text box straight into a model. It crosses an edge, an admission layer, an orchestrator, memory systems, policy checks, a model router, GPU inference, and a streaming return path that must stay reliable while everything around it runs in parallel.</p>
+    <div class="meta">
+      <span>July 2026</span>
+      <span>Production reference architecture</span>
+      <span>8 second visual</span>
+      <span>1080 x 1920 source</span>
+    </div>
+    <p class="scope-note"><strong>Scope:</strong> This is a vendor-neutral reference architecture for a large-scale generative AI chat product. It is not a description of OpenAI's private ChatGPT implementation. The goal is to make the responsibilities, contracts, tradeoffs, and failure modes visible enough to support a real design review.</p>
+  </section>
+
+  <section class="media-band" aria-label="AI chat system design media">
+    <div class="shell media-grid">
+      <div class="media-panel">
+        <h2>Watch one prompt cross the system</h2>
+        <p>Teal dots carry the request toward inference. Green dots carry generated tokens back to the member. Context, persistence, and telemetry continue on quieter side paths.</p>
+        <video controls playsinline autoplay muted loop preload="metadata" poster="/assets/ai-chat-system-design-final.png">
+          <source src="/assets/ai-chat-system-design-reel.mp4" type="video/mp4">
+          Your browser does not support embedded video.
+        </video>
+        <div class="asset-actions">
+          <a class="asset-link" href="/assets/ai-chat-system-design-reel.mp4">Open MP4</a>
+        </div>
+        <div class="asset-meta">H.264 &middot; 1080 x 1920 &middot; 8 seconds &middot; stereo AAC</div>
+      </div>
+      <div class="media-panel">
+        <h2>The four-phase request lifecycle</h2>
+        <p>The storyboard freezes the entry, context, inference, and streaming phases so the complete flow can be studied without pausing the reel.</p>
+        <a href="/assets/ai-chat-system-design-storyboard.png" aria-label="Open the full AI chat system design storyboard">
+          <img class="final-frame" src="/assets/ai-chat-system-design-storyboard.png" width="840" height="1470" alt="Four-frame storyboard showing an AI chat request moving through edge, orchestration, context, inference, and response streaming">
+        </a>
+        <div class="asset-actions">
+          <a class="asset-link" href="/assets/ai-chat-system-design-storyboard.png">Open storyboard PNG</a>
+          <a class="asset-link" href="/assets/ai-chat-system-design-final.png">Open portrait frame</a>
+        </div>
+        <div class="asset-meta">Lossless PNG &middot; complete architecture &middot; no crop</div>
+      </div>
+    </div>
+  </section>
+
+  <main class="shell">
+    <section class="section intro-grid">
+      <div>
+        <p class="label">The core idea</p>
+        <h2>Optimize the hot path. Decouple everything else.</h2>
+        <p class="lead">The member is waiting for one thing: the first useful token. Every synchronous dependency between the prompt and that token consumes latency budget and creates another way for the request to fail.</p>
+        <p>A good architecture therefore separates work into two classes. The <strong>hot path</strong> authenticates, admits, enriches, checks, routes, executes, and streams the request. The <strong>side paths</strong> persist messages, update caches, publish usage, calculate analytics, run deeper evaluations, and feed operations. Side work remains observable and reliable, but it does not get to block a healthy response unless the product explicitly requires it.</p>
+      </div>
+      <dl class="facts">
+        <div><dt>Primary path</dt><dd>Request &rarr; tokens</dd></div>
+        <div><dt>Return transport</dt><dd>Streaming HTTP</dd></div>
+        <div><dt>State systems</dt><dd>Cache + database</dd></div>
+        <div><dt>Compute boundary</dt><dd>Model router + GPU</dd></div>
+        <div><dt>Background work</dt><dd>Event bus + workers</dd></div>
+        <div><dt>North-star metric</dt><dd>Useful first token</dd></div>
+      </dl>
+    </section>
+
+    <section class="section">
+      <p class="label">Requirements first</p>
+      <h2>Define the product before drawing the boxes</h2>
+      <p class="lead">The same diagram can hide very different systems. A support assistant, an enterprise copilot, a coding agent, and a public consumer chat product have different latency, privacy, context, tool, and reliability requirements.</p>
+
+      <div class="columns">
+        <div>
+          <h3>Functional requirements</h3>
+          <ul class="checklist">
+            <li>Members can create conversations and send messages from web or mobile clients.</li>
+            <li>The service preserves ordered conversation history across sessions and devices.</li>
+            <li>The system can enrich a prompt with recent context, durable memory, retrieved knowledge, tools, and policy instructions.</li>
+            <li>A model router chooses an eligible model and serving pool for each request.</li>
+            <li>Generated tokens stream back incrementally, with cancel, retry, and reconnect behavior.</li>
+            <li>Usage, moderation decisions, traces, feedback, and billing events are captured for downstream processing.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Non-functional requirements</h3>
+          <ul class="checklist">
+            <li>Low time to first token, stable inter-token latency, and bounded tail latency.</li>
+            <li>Tenant isolation, encryption, retention controls, and region-aware data handling.</li>
+            <li>Graceful degradation when cache, database, router, model, or background workers are impaired.</li>
+            <li>Per-member and per-tenant quotas, rate limits, budgets, and abuse controls.</li>
+            <li>End-to-end observability with one request ID across the edge, orchestration, inference, and event pipeline.</li>
+            <li>Cost controls that preserve quality while preventing unbounded context and output generation.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Capacity envelope</p>
+      <h2>Estimate tokens, not just requests</h2>
+      <p class="lead">Traditional API sizing starts with requests per second. AI chat must also model prompt tokens, generated tokens, context length, model mix, batching efficiency, and GPU memory pressure.</p>
+
+      <div class="spec-table-wrap">
+        <table class="spec-table">
+          <thead>
+            <tr><th>Planning input</th><th>Illustrative value</th><th>Why it matters</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Chat turns per day</td><td>10 million</td><td>Drives message storage, event volume, retention, and average compute demand.</td></tr>
+            <tr><td>Peak prompt rate</td><td>800 requests/second</td><td>Sizes admission control, orchestration concurrency, and model-routing throughput.</td></tr>
+            <tr><td>Average input</td><td>1,000 tokens</td><td>Determines prefill work, bandwidth, context-cache opportunity, and input cost.</td></tr>
+            <tr><td>Average output</td><td>350 tokens</td><td>Determines decode work, stream duration, output cost, and concurrent connection count.</td></tr>
+            <tr><td>Peak stream duration</td><td>20 seconds</td><td>At 800 new streams/second, the edge may hold roughly 16,000 active streams before headroom.</td></tr>
+            <tr><td>Message payload</td><td>About 4 KB average</td><td>Twenty million user and assistant messages imply roughly 80 GB/day before indexes, events, replicas, and backups.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="formula">
+        <p><strong>Inference sizing must come from a measured serving benchmark:</strong></p>
+        <code>required capacity = peak output tokens/second / measured tokens/second per serving replica</code>
+        <code>provisioned capacity = required capacity x headroom x failure-domain factor</code>
+        <p>Do not use a generic GPU count from a whiteboard interview. Throughput changes dramatically with model size, quantization, hardware, context length, batch shape, KV-cache pressure, and latency targets.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">The complete journey</p>
+      <h2>One prompt, fourteen observable transitions</h2>
+      <p class="lead">A reliable design gives every transition an owner, a timeout, a failure policy, and evidence that can be traced later.</p>
+
+      <ol class="sequence">
+        <li><div><strong>The client creates a request envelope.</strong> It includes the conversation ID, message ID, content, client capabilities, locale, model preference, and an idempotency key. The client starts a local pending state before opening the stream.</div></li>
+        <li><div><strong>The edge terminates the connection.</strong> CDN, WAF, bot controls, TLS, geographic routing, payload limits, and coarse abuse protection run close to the member. Static assets may come from cache; chat requests continue to the origin.</div></li>
+        <li><div><strong>The API Gateway authenticates and admits.</strong> It validates identity, tenant, entitlement, rate limit, quota, request size, API version, and request ID. It rejects work the serving tier should never see.</div></li>
+        <li><div><strong>The Chat Orchestrator creates a run.</strong> It reserves a run ID, applies idempotency, loads conversation metadata, establishes cancellation state, and starts the end-to-end trace.</div></li>
+        <li><div><strong>Hot context comes from cache.</strong> Recent messages, session state, model preferences, permission summaries, prompt prefixes, and short-lived retrieval results can avoid repeated database reads.</div></li>
+        <li><div><strong>Durable history fills any gap.</strong> The conversation store returns ordered messages and metadata not available or not trustworthy in cache. Access is scoped by member, tenant, and conversation ownership.</div></li>
+        <li><div><strong>The orchestrator builds the model input.</strong> It applies system policy, trims or summarizes history, adds retrieved knowledge and tool state, calculates a token budget, and records which evidence entered the prompt.</div></li>
+        <li><div><strong>Synchronous guardrails run before inference.</strong> Required policy, permission, data-loss, and tool-safety checks must sit on the blocking path if they are expected to prevent a response or action.</div></li>
+        <li><div><strong>The Model Router selects an eligible target.</strong> It evaluates capability, context window, latency tier, cost ceiling, region, data policy, availability, load, and fallback rules. Routing is a policy decision, not a random load balancer.</div></li>
+        <li><div><strong>Inference admission protects the GPU pool.</strong> The serving layer checks queue depth, token budget, memory availability, batch compatibility, and deadline. Overload should produce bounded queueing or a deliberate fallback, not indefinite waiting.</div></li>
+        <li><div><strong>The GPU performs prefill and decode.</strong> Prompt tokens populate the KV cache; decode then generates one or more next tokens repeatedly. Continuous batching improves utilization while the scheduler protects latency-sensitive streams.</div></li>
+        <li><div><strong>Tokens return through the same request context.</strong> The model gateway and orchestrator forward token events, usage updates, citations, tool requests, finish reasons, and errors without waiting for the complete answer.</div></li>
+        <li><div><strong>The client renders incrementally.</strong> It preserves order, ignores duplicate sequence numbers, handles reconnect or cancel, and converts the terminal event into a completed, failed, or interrupted message state.</div></li>
+        <li><div><strong>Persistence and telemetry finish around the stream.</strong> The final assistant message, usage, policy outcome, latency breakdown, model choice, feedback hooks, and billing events are committed or published with retryable semantics.</div></li>
+      </ol>
+    </section>
+
+    <section class="section">
+      <p class="label">Component contracts</p>
+      <h2>What every service owns</h2>
+      <p class="lead">Boxes are useful only when their responsibilities do not leak. These boundaries keep the request path understandable and independently scalable.</p>
+
+      <div class="stage-list">
+        <article class="stage-row">
+          <div class="stage-number">01</div>
+          <div><h3>Member client</h3><p>Owns interaction state, not system truth.</p></div>
+          <ul>
+            <li>Creates stable client message IDs and idempotency keys.</li>
+            <li>Renders partial tokens, citations, tool status, completion, cancellation, and recoverable errors.</li>
+            <li>Never assumes a locally rendered response is durable until the server confirms it.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">02</div>
+          <div><h3>Edge and CDN</h3><p>Protects and accelerates the public boundary.</p></div>
+          <ul>
+            <li>Terminates TLS, serves static assets, applies WAF and bot policies, and routes to a healthy region.</li>
+            <li>Maintains long-lived streaming connections without buffering the complete response.</li>
+            <li>Emits edge timing, connection, country, and rejection signals under the same request ID.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">03</div>
+          <div><h3>API Gateway</h3><p>Controls who may enter and how much work they may request.</p></div>
+          <ul>
+            <li>Authenticates identity and tenant; validates schemas, quotas, entitlements, and API versions.</li>
+            <li>Uses token-bucket or leaky-bucket limits at member, tenant, IP, and product-plan scopes.</li>
+            <li>Returns explicit overload and retry guidance instead of forwarding every request downstream.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">04</div>
+          <div><h3>Chat Orchestrator</h3><p>Owns the lifecycle of one conversational run.</p></div>
+          <ul>
+            <li>Combines history, policy, retrieval, tools, prompt templates, and token budgets.</li>
+            <li>Maintains run state, deadlines, cancellation, idempotency, model fallback, and stream sequencing.</li>
+            <li>Does not own durable analytics pipelines or hardware-specific inference scheduling.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">05</div>
+          <div><h3>Hot cache</h3><p>Accelerates reconstructible state.</p></div>
+          <ul>
+            <li>Stores session metadata, recent context, prompt prefixes, permission summaries, and short-lived coordination state.</li>
+            <li>Uses explicit TTLs, tenant-prefixed keys, bounded values, and versioned cache formats.</li>
+            <li>Is never the only copy of a conversation, billing event, or compliance record.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">06</div>
+          <div><h3>Conversation database</h3><p>Preserves ordered, authorized, durable history.</p></div>
+          <ul>
+            <li>Stores conversations, messages, runs, attachments, citations, tool calls, feedback, and deletion state.</li>
+            <li>Supports pagination by conversation and sequence, not unbounded scans of an entire account.</li>
+            <li>Separates large blobs from transactional metadata when payload size or retention justifies object storage.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">07</div>
+          <div><h3>Model Router</h3><p>Converts product policy into a serving decision.</p></div>
+          <ul>
+            <li>Filters by capability, region, privacy, modality, context window, and availability before ranking candidates.</li>
+            <li>Balances quality, predicted latency, measured queue depth, and total expected cost.</li>
+            <li>Records the decision reason and applies bounded fallback without silently changing product guarantees.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">08</div>
+          <div><h3>GPU inference</h3><p>Turns token work into streamed token events.</p></div>
+          <ul>
+            <li>Schedules prefill and decode, continuous batches, KV-cache allocation, cancellation, and model replicas.</li>
+            <li>Exports queue time, prefill time, decode rate, cache pressure, batch size, and out-of-memory signals.</li>
+            <li>Uses admission control and load shedding so overload remains bounded.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">09</div>
+          <div><h3>Event bus</h3><p>Decouples non-blocking facts from the request path.</p></div>
+          <ul>
+            <li>Publishes versioned events for usage, traces, moderation outcomes, billing, analytics, feedback, and lifecycle changes.</li>
+            <li>Partitions by a stable key when consumers require per-conversation or per-run ordering.</li>
+            <li>Provides retention, replay, dead-letter handling, lag visibility, and idempotent consumption.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">10</div>
+          <div><h3>Async workers</h3><p>Process evidence without delaying healthy tokens.</p></div>
+          <ul>
+            <li>Calculate metrics, invoices, analytics, quality scores, deeper safety evaluations, and operational alerts.</li>
+            <li>Retry with backoff, deduplicate by event ID, quarantine poison events, and expose consumer lag.</li>
+            <li>Never become the hidden source of synchronous product state without an explicit read model.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">API and streaming contract</p>
+      <h2>Make partial success a first-class state</h2>
+      <p class="lead">A stream can fail after the model generated useful tokens but before the final message was committed. The protocol must distinguish accepted, streaming, completed, cancelled, interrupted, and failed runs.</p>
+
+      <pre class="contract">POST /v1/conversations/{conversation_id}/messages
+Authorization: Bearer &lt;token&gt;
+Idempotency-Key: 3d28...
+X-Request-ID: req_01...
+
+{
+  "message_id": "msg_client_01",
+  "content": [{"type": "text", "text": "Explain the design"}],
+  "model_policy": "balanced",
+  "stream": true
+}
+
+event: run.accepted
+data: {"run_id":"run_01","sequence":0}
+
+event: response.token
+data: {"run_id":"run_01","sequence":1,"text":"A"}
+
+event: response.completed
+data: {"run_id":"run_01","sequence":87,"finish_reason":"stop"}</pre>
+
+      <div class="principles">
+        <article class="principle">
+          <h3>Prefer SSE for text streams</h3>
+          <p>Server-Sent Events fit one-way token delivery, reconnect cleanly over HTTP, and are operationally simpler than a bidirectional socket for ordinary chat.</p>
+        </article>
+        <article class="principle">
+          <h3>Use WebSocket when truly bidirectional</h3>
+          <p>Voice, live multimodal input, collaborative sessions, or frequent client-to-server events may justify a persistent bidirectional channel.</p>
+        </article>
+        <article class="principle">
+          <h3>Sequence every event</h3>
+          <p>A monotonically increasing sequence lets clients detect gaps, ignore duplicates, reconnect, and distinguish a complete answer from a visually plausible partial one.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">State and data model</p>
+      <h2>Separate the message from the run</h2>
+      <p class="lead">A member message is durable product data. A run is one attempt to produce an answer. Retries, fallbacks, tool calls, and interrupted streams become much easier to reason about when those identities are separate.</p>
+
+      <div class="spec-table-wrap">
+        <table class="spec-table">
+          <thead>
+            <tr><th>Entity</th><th>Important fields</th><th>Primary access pattern</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Conversation</td><td>conversation_id, tenant_id, member_id, title, model policy, created_at, deleted_at</td><td>List conversations for a member; authorize every message operation.</td></tr>
+            <tr><td>Message</td><td>message_id, conversation_id, role, sequence, content reference, status, created_at</td><td>Read an ordered page of messages by conversation and sequence.</td></tr>
+            <tr><td>Run</td><td>run_id, request_id, input_message_id, output_message_id, model, status, deadlines, finish reason</td><td>Resume, cancel, retry, trace, or audit one generation attempt.</td></tr>
+            <tr><td>Run event</td><td>run_id, event_id, sequence, type, payload reference, timestamp</td><td>Reconstruct the stream and debug state transitions.</td></tr>
+            <tr><td>Usage ledger</td><td>tenant, run, model, input tokens, output tokens, cache tokens, price version</td><td>Calculate spend and reconcile model-provider usage.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <strong>Idempotency rule</strong>
+        <p>The same authenticated member, conversation, and idempotency key must resolve to the same accepted operation. Never create a second billable generation merely because the client timed out before receiving the first acknowledgement.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Safety and policy</p>
+      <h2>Blocking safety and asynchronous evaluation are different systems</h2>
+      <p class="lead">The original whiteboard pattern often sends all safety work to asynchronous workers. That is useful for audits and model improvement, but it cannot stop a response that has already reached the member.</p>
+
+      <div class="columns">
+        <div>
+          <h3>Synchronous controls</h3>
+          <ul class="checklist">
+            <li>Authentication, authorization, tenant and document permissions.</li>
+            <li>Input and output policies required to block or transform content before delivery.</li>
+            <li>Tool permission checks, argument validation, spending limits, and confirmation gates.</li>
+            <li>PII or secret controls required by the product's data policy.</li>
+            <li>Strict timeouts and explicit degraded behavior when the policy service is unavailable.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Asynchronous controls</h3>
+          <ul class="checklist">
+            <li>Deep classifiers, sampled review, red-team replay, and policy trend analysis.</li>
+            <li>Conversation-level quality scoring and hallucination evaluation.</li>
+            <li>Abuse graph analysis, behavioral anomaly detection, and investigation queues.</li>
+            <li>Dataset creation for future safety and quality releases.</li>
+            <li>Compliance exports and long-retention audit processing.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Scaling and backpressure</p>
+      <h2>Scale each pressure point independently</h2>
+      <div class="principles">
+        <article class="principle">
+          <h3>Connections</h3>
+          <p>Edge and gateway capacity follow concurrent streams, keep-alives, bytes per second, disconnect rate, and regional traffic, not only request rate.</p>
+        </article>
+        <article class="principle">
+          <h3>Orchestration</h3>
+          <p>Keep workers stateless where practical. Externalize idempotency, cancellation, durable run state, and queues so instances can scale horizontally.</p>
+        </article>
+        <article class="principle">
+          <h3>Inference</h3>
+          <p>Scale by measured token throughput, KV-cache memory, queue time, batch efficiency, model replicas, and failure domains. Admission control is mandatory.</p>
+        </article>
+      </div>
+
+      <h3 class="mini-heading">Partitioning choices</h3>
+      <ul class="checklist">
+        <li>Partition conversation storage by tenant or conversation hash while preserving ordered access within a conversation.</li>
+        <li>Partition events by conversation or run when consumer ordering matters; use event IDs for deduplication.</li>
+        <li>Route inference by model, region, hardware type, context size, and service tier rather than one global queue.</li>
+        <li>Apply bounded queues at every layer. A full queue should reject, shed, downgrade, or defer work according to product policy.</li>
+        <li>Propagate deadlines and cancellation all the way to the scheduler so disconnected members do not leave expensive generation running.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <p class="label">Failure design</p>
+      <h2>Decide what degrades before it breaks</h2>
+      <div class="spec-table-wrap">
+        <table class="spec-table">
+          <thead>
+            <tr><th>Failure</th><th>Member-visible behavior</th><th>System response</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Cache unavailable</td><td>Potentially slower response</td><td>Read durable state directly, suppress cache stampedes, and keep cache failures out of the critical error rate.</td></tr>
+            <tr><td>Conversation DB slow</td><td>Bounded delay or context-limited response</td><td>Use a deadline; serve trusted recent cache only if product policy permits, otherwise fail before inference.</td></tr>
+            <tr><td>Preferred model saturated</td><td>Slightly longer queue, explicit retry, or approved fallback</td><td>Apply per-tier admission, route to an eligible fallback, or reject with a retry window. Never wait indefinitely.</td></tr>
+            <tr><td>GPU fails mid-stream</td><td>Interrupted answer with retry control</td><td>Mark the run interrupted, preserve partial text, release capacity, and retry only under explicit semantics.</td></tr>
+            <tr><td>Client disconnects</td><td>UI can reconnect or show interruption</td><td>Propagate cancellation; retain enough run state to reconcile whether generation completed or stopped.</td></tr>
+            <tr><td>Event bus unavailable</td><td>Healthy chat may continue within policy</td><td>Write a bounded transactional outbox or local durable buffer; alert before evidence loss threatens billing or compliance.</td></tr>
+            <tr><td>Worker lag</td><td>No immediate impact for non-blocking work</td><td>Autoscale consumers, expose lag by topic and partition, and protect downstream systems from catch-up floods.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Observability and SLOs</p>
+      <h2>Measure the experience as a latency waterfall</h2>
+      <p class="lead">One top-level duration hides the cause. The trace should separate edge, admission, state loading, prompt construction, policy, router, inference queue, prefill, decode, streaming, persistence, and asynchronous lag.</p>
+
+      <div class="columns">
+        <div>
+          <h3>Operational signals</h3>
+          <ul class="checklist">
+            <li>Request acceptance rate and rejection reason.</li>
+            <li>Time to first token and inter-token latency by model and region.</li>
+            <li>Inference queue time, prefill time, decode tokens/second, and cancellation waste.</li>
+            <li>Cache hit rate, database latency, event publish errors, and consumer lag.</li>
+            <li>Stream completion, disconnect, retry, fallback, and duplicate-operation rates.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Product and quality signals</h3>
+          <ul class="checklist">
+            <li>Task success, groundedness, citation validity, and tool execution correctness.</li>
+            <li>Member correction, regeneration, abandonment, and negative-feedback rates.</li>
+            <li>Safety blocks, policy overrides, false positives, and incident severity.</li>
+            <li>Input, output, and cached tokens; cost per successful task; spend by tenant and model.</li>
+            <li>Quality and latency changes after prompt, model, retrieval, or routing releases.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>Recommended trace identity</strong>
+        <p>Carry request_id, conversation_id, run_id, tenant_id, member pseudonym, region, model route, prompt version, retrieval version, and policy version as structured attributes. Redact or reference sensitive payloads instead of copying raw prompts into every log.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Security and privacy</p>
+      <h2>Conversation context is an authorization problem</h2>
+      <div class="columns">
+        <div>
+          <h3>Data protections</h3>
+          <ul class="checklist">
+            <li>Encrypt in transit and at rest with tenant-aware key and access controls.</li>
+            <li>Apply authorization before history, attachments, retrieved documents, or tool results enter the prompt.</li>
+            <li>Define retention, deletion, legal hold, export, residency, and training-use policies explicitly.</li>
+            <li>Keep raw content out of logs, metrics labels, queue keys, and trace attributes.</li>
+            <li>Use secret scanning and output controls for credentials, tokens, and regulated data.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>AI-specific protections</h3>
+          <ul class="checklist">
+            <li>Treat retrieved text, websites, attachments, and tool output as untrusted input.</li>
+            <li>Separate instructions from data and preserve provenance for every injected context item.</li>
+            <li>Enforce tool permissions outside the model and validate every argument against a typed contract.</li>
+            <li>Require confirmation for irreversible, high-impact, or expensive actions.</li>
+            <li>Test prompt injection, cross-tenant retrieval, indirect injection, and data exfiltration continuously.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Cost and quality</p>
+      <h2>Optimize successful outcomes, not the cheapest token</h2>
+      <div class="principles">
+        <article class="principle">
+          <h3>Control context</h3>
+          <p>Trim repetition, summarize older turns, retrieve narrowly, cap attachments, and use prefix caching. More context can increase cost and reduce answer quality.</p>
+        </article>
+        <article class="principle">
+          <h3>Route deliberately</h3>
+          <p>Use smaller models for classification, rewriting, extraction, or simple turns only when evaluation proves the quality boundary. Keep an explainable fallback policy.</p>
+        </article>
+        <article class="principle">
+          <h3>Stop wasted decode</h3>
+          <p>Propagate cancellation, enforce output budgets, use stop conditions, and monitor abandoned tokens. A disconnected stream should not keep an expensive GPU busy.</p>
+        </article>
+      </div>
+      <div class="formula">
+        <p><strong>Judge routing with task economics:</strong></p>
+        <code>cost per successful task = total model + retrieval + tool + infrastructure cost / successful evaluated tasks</code>
+        <p>A cheaper model that triggers more retries, corrections, escalations, or failed tool calls can be more expensive at the product level.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">What the reel corrects</p>
+      <h2>Five details missing from many chat-system diagrams</h2>
+      <div class="stage-list">
+        <article class="stage-row">
+          <div class="stage-number">01</div>
+          <div><h3>The response path matters</h3><p>Inference is not the finish line.</p></div>
+          <ul><li>Tokens must cross the model gateway, orchestrator, API boundary, edge, and client while preserving ordering, cancellation, errors, and final state.</li></ul>
+        </article>
+        <article class="stage-row">
+          <div class="stage-number">02</div>
+          <div><h3>Safety has two clocks</h3><p>Prevention and evaluation are separate.</p></div>
+          <ul><li>Controls that must stop content belong on the synchronous path; audits and deeper evaluation can run asynchronously.</li></ul>
+        </article>
+        <article class="stage-row">
+          <div class="stage-number">03</div>
+          <div><h3>The router is policy</h3><p>It is more than a load balancer.</p></div>
+          <ul><li>Eligibility, quality, data policy, context, cost, region, queue depth, and fallback all influence the serving decision.</li></ul>
+        </article>
+        <article class="stage-row">
+          <div class="stage-number">04</div>
+          <div><h3>Cache is optional acceleration</h3><p>Durable truth lives elsewhere.</p></div>
+          <ul><li>A cache outage should usually make chat slower, not erase a conversation or corrupt billing and compliance state.</li></ul>
+        </article>
+        <article class="stage-row">
+          <div class="stage-number">05</div>
+          <div><h3>Events require delivery semantics</h3><p>A queue icon is not a reliability strategy.</p></div>
+          <ul><li>Versioning, partition keys, idempotency, replay, dead letters, lag, and an outbox boundary determine whether downstream evidence can be trusted.</li></ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">AI-engineer review</p>
+      <h2>How to evaluate code generated for this architecture</h2>
+      <p class="lead">An AI assistant can generate endpoints, streaming handlers, cache adapters, model clients, and queue consumers quickly. Your job is to test whether the contracts remain correct under retries, concurrency, cancellation, partial failure, and hostile input.</p>
+
+      <div class="columns">
+        <div>
+          <h3>Read the hot path</h3>
+          <ul class="checklist">
+            <li>Does every network call have a deadline and cancellation propagation?</li>
+            <li>Can a retry create a duplicate message, generation, tool action, or charge?</li>
+            <li>Does the stream distinguish accepted, partial, complete, cancelled, and failed?</li>
+            <li>Can model fallback violate a tenant's privacy, region, capability, or quality policy?</li>
+            <li>Can an unavailable cache or worker accidentally take down the whole chat path?</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Read the evidence path</h3>
+          <ul class="checklist">
+            <li>Can one request be reconstructed across edge, orchestration, inference, storage, and events?</li>
+            <li>Are raw prompts or secrets leaking into logs, metric labels, traces, or exception messages?</li>
+            <li>Are queue consumers idempotent, replayable, and safe after partial side effects?</li>
+            <li>Do tests cover disconnects, duplicate events, reordering, timeouts, and model saturation?</li>
+            <li>Can you prove that policy and authorization run before sensitive context reaches the model?</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>The judgment question</strong>
+        <p>If the generated implementation works in a demo, what evidence proves it will still behave correctly when the member retries, the database slows down, the preferred model is saturated, the stream disconnects after 200 tokens, and the event bus is unavailable?</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Design-review checklist</p>
+      <h2>Questions to answer before launch</h2>
+      <div class="columns">
+        <div>
+          <h3>Product and architecture</h3>
+          <ul class="checklist">
+            <li>What exact event tells the client the response is durable and complete?</li>
+            <li>Which dependencies are allowed to block the first token?</li>
+            <li>What is the deadline and degraded behavior for each blocking dependency?</li>
+            <li>How are context, token, tool, and monetary budgets enforced?</li>
+            <li>What is the approved model fallback matrix by tenant and region?</li>
+            <li>Which operations are idempotent, and what key defines sameness?</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Operations and proof</h3>
+          <ul class="checklist">
+            <li>Can a request ID connect edge logs to GPU metrics and the final message?</li>
+            <li>What happens to an in-flight run when the client disconnects?</li>
+            <li>How does the system recover messages or events committed on only one side of a boundary?</li>
+            <li>Which SLOs cover first token, stream completion, quality, safety, and cost?</li>
+            <li>How are load shedding, queue limits, regional failover, and capacity headroom tested?</li>
+            <li>Which release gates prevent prompt, model, router, or retrieval changes from silently lowering quality?</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-note">Built for <a href="https://hackproduct.com">HackProduct</a> by Raja Ashok. Learn the flow, then learn to judge whether the machine implemented it correctly.</div>
+  </footer>
+</body>
+</html>
