@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Master System Design Template: One Mental Model for Any Interview | Raja Ashok</title>
+  <meta name="description" content="One adaptable system design template for interviews: entry and edge, application core, AI-native inference, and data and operations — plus the method to drive the whiteboard, the trade-offs to say out loud, and a six-point design checklist.">
+  <meta property="og:title" content="The Master System Design Template">
+  <meta property="og:description" content="Stop memorizing architectures. Carry one four-layer mental model into any system design interview and adapt it live.">
+  <meta property="og:image" content="https://rajaashok.github.io/assets/master-system-design-template-poster.png">
+  <meta property="og:url" content="https://rajaashok.github.io/master-system-design-template">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://rajaashok.github.io/master-system-design-template">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%231c261f'/%3E%3Cpath d='M4 4h8v2H6v2h5v2H6v2H4z' fill='%23f4ebdc'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/assets/roadmap-project.css">
+  <style>
+    .lede-note { margin: 28px 0 0; border-left: 5px solid var(--teal); padding: 16px 20px; background: rgba(255,250,241,0.72); color: var(--muted); font-size: 15px; }
+    .sequence { margin: 30px 0 0; padding: 0; list-style: none; border-top: 3px solid var(--ink); counter-reset: flow; }
+    .sequence li { display: grid; grid-template-columns: 54px minmax(0,1fr); gap: 20px; padding: 20px 0; border-bottom: 1px solid var(--line); color: var(--muted); counter-increment: flow; }
+    .sequence li::before { content: counter(flow, decimal-leading-zero); color: var(--orange); font-family: "JetBrains Mono", monospace; font-size: 19px; font-weight: 700; }
+    .sequence strong { color: var(--ink); }
+    .mini-heading { margin: 28px 0 8px; color: var(--ink); font-size: 21px; }
+    .say { margin: 8px 0 0; padding: 12px 16px; border-left: 4px solid var(--teal); background: rgba(21,157,118,0.06); color: var(--ink); font-size: 15px; }
+    .say b { font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--teal); display:block; margin-bottom:4px; }
+    .legend-key { display:inline-block; width:34px; height:0; border-top-width:3px; vertical-align:middle; margin-right:8px; }
+    @media (max-width: 620px){ .sequence li { grid-template-columns: 42px minmax(0,1fr); gap: 12px; } }
+  </style>
+</head>
+<body>
+  <header class="shell sitebar">
+    <a class="brand" href="/"><span>HackProduct</span> &middot; The Notebook</a>
+    <a class="back" href="/">Back to all projects</a>
+  </header>
+
+  <section class="shell hero">
+    <p class="eyebrow">System Design &middot; Interview Prep &middot; AI-Native Architecture</p>
+    <h1>The Master System Design Template</h1>
+    <p class="dek">Stop memorizing forty different architectures. Carry one mental model into the room &mdash; entry, core, AI inference, operations &mdash; and adapt it live to whatever the interviewer asks.</p>
+    <div class="meta">
+      <span>July 2026</span>
+      <span>Interview mental model</span>
+      <span>Animated reel + one-screen poster</span>
+      <span>1080 x 1920 source</span>
+    </div>
+    <p class="lede-note"><strong>Who this is for:</strong> engineers preparing for system design rounds from mid-level through staff, including the newer AI-native rounds. This is a repeatable structure, not a script. It stops you from freezing at a blank whiteboard and keeps your answer organized end to end &mdash; then you fill in depth where the question actually lives.</p>
+  </section>
+
+  <section class="media-band" aria-label="Master system design template media">
+    <div class="shell media-grid">
+      <div class="media-panel">
+        <h2>Watch the template build, layer by layer</h2>
+        <p>Solid lines are synchronous calls, dashed lines are asynchronous work, and the gold path is the AI flow. The data keeps moving so you can see how a request actually travels through the system.</p>
+        <video controls playsinline autoplay muted loop preload="metadata" poster="/assets/master-system-design-template-final.png">
+          <source src="/assets/master-system-design-template-reel.mp4" type="video/mp4">
+          Your browser does not support embedded video.
+        </video>
+        <div class="asset-actions">
+          <a class="asset-link" href="/assets/master-system-design-template-reel.mp4">Open MP4</a>
+        </div>
+        <div class="asset-meta">H.264 &middot; 1080 x 1920 &middot; ~17 seconds &middot; stereo AAC</div>
+      </div>
+      <div class="media-panel">
+        <h2>The one-screen reference</h2>
+        <p>Screenshot this. Four layers, every box, and the reading key on a single poster &mdash; the picture to hold in your head before you walk in.</p>
+        <a href="/assets/master-system-design-template-poster.png" aria-label="Open the full master system design template poster">
+          <img class="final-frame" src="/assets/master-system-design-template-poster.png" width="1080" height="1350" alt="Master system design template poster showing entry and edge, application core, AI-native inference, and data and operations layers with a design checklist">
+        </a>
+        <div class="asset-actions">
+          <a class="asset-link" href="/assets/master-system-design-template-poster.png">Open poster PNG</a>
+          <a class="asset-link" href="/assets/master-system-design-template-final.png">Open portrait frame</a>
+        </div>
+        <div class="asset-meta">Lossless PNG &middot; full template &middot; no crop</div>
+      </div>
+    </div>
+  </section>
+
+  <main class="shell">
+    <section class="section intro-grid">
+      <div>
+        <p class="label">The core idea</p>
+        <h2>Four layers, one request, top to bottom</h2>
+        <p class="lead">Almost every backend you will be asked to design does the same four things: a request <strong>enters</strong> at the edge, gets <strong>handled</strong> by the application core, sometimes calls a <strong>model</strong>, and is always <strong>observed, evaluated, and secured</strong>.</p>
+        <p>Memorize those four layers once. In the interview you draw them as empty containers, then fill in only the boxes the question needs. A URL shortener barely touches the AI layer. A support copilot lives in it. The frame stays the same; the depth moves to wherever the problem is.</p>
+      </div>
+      <dl class="facts">
+        <div><dt>Layer 1</dt><dd>Entry &amp; edge</dd></div>
+        <div><dt>Layer 2</dt><dd>Application core</dd></div>
+        <div><dt>Layer 3</dt><dd>AI-native inference</dd></div>
+        <div><dt>Layer 4</dt><dd>Data &amp; operations</dd></div>
+        <div><dt>Reading key</dt><dd>Solid / dashed / gold</dd></div>
+        <div><dt>What to go deep on</dt><dd>The box in the question</dd></div>
+      </dl>
+    </section>
+
+    <section class="section">
+      <p class="label">The method</p>
+      <h2>The first five minutes decide the interview</h2>
+      <p class="lead">Most candidates lose points before they draw a single box &mdash; by jumping to a solution before they know the problem. Spend the opening minutes here, out loud, every time.</p>
+      <ol class="sequence">
+        <li><span><strong>Clarify requirements.</strong> Separate functional (&ldquo;users send messages, get replies&rdquo;) from non-functional (latency, availability, consistency, privacy). Write them where the interviewer can see them.</span></li>
+        <li><span><strong>Estimate scale.</strong> Users, requests per second, read/write ratio, payload size, data growth per year. You are not chasing precision &mdash; you are choosing between a single database and a sharded fleet.</span></li>
+        <li><span><strong>Draw the four layers as empty boxes.</strong> Entry, core, inference, operations. This alone signals structure and buys you thinking time.</span></li>
+        <li><span><strong>Fill only the relevant boxes.</strong> Resist drawing everything. Put detail where the requirements pull you, and say why the other layers are thin.</span></li>
+        <li><span><strong>State trade-offs as you go.</strong> Every box is a choice. Name the alternative you rejected and the reason. That is the actual thing being graded.</span></li>
+      </ol>
+      <div class="callout">
+        <strong>Interviewers are not grading the diagram.</strong>
+        <p>They are grading whether you reason about scale, trade-offs, and failure. A clean diagram with no trade-off talk scores lower than a messy one with sharp reasoning. Narrate your choices.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Layer 1</p>
+      <h2>Entry &amp; edge &mdash; get the request in safely</h2>
+      <p class="lead">Everything the client touches before your business logic. Its job is to route fast, absorb abuse, and fail cheaply.</p>
+      <div class="stage-list">
+        <div class="stage-row"><div class="stage-number">01</div><div><h3>Client</h3><p>Web or mobile. Assume it is untrusted, retries on failure, and may disconnect mid-request.</p></div><div><p>Say: &ldquo;the client can drop at any point, so long-running work must survive a disconnect.&rdquo;</p></div></div>
+        <div class="stage-row"><div class="stage-number">02</div><div><h3>DNS + CDN</h3><p>Resolves the domain and serves static assets and cached responses close to the user.</p></div><div><p>Cuts latency and offloads origin traffic. Mention edge caching and TLS termination.</p></div></div>
+        <div class="stage-row"><div class="stage-number">03</div><div><h3>Load balancer</h3><p>Spreads traffic across service instances, runs health checks, and enables zero-downtime deploys.</p></div><div><p>Prefer stateless services behind it so any instance can serve any request.</p></div></div>
+        <div class="stage-row"><div class="stage-number">04</div><div><h3>API gateway</h3><p>The single front door: authentication, rate limiting, and routing to the right service.</p></div><div><p>This is where you protect everything downstream. Rate limit here or the core melts under load.</p></div></div>
+      </div>
+      <p class="say"><b>What to say</b>Authentication and rate limiting belong at the edge so a bad actor never reaches the expensive parts of the system.</p>
+    </section>
+
+    <section class="section">
+      <p class="label">Layer 2</p>
+      <h2>Application core &mdash; do the work, but not on the hot path</h2>
+      <p class="lead">The classic workhorse. The single most valuable move in this layer is deciding what happens synchronously versus what gets pushed to the background.</p>
+      <div class="stage-list">
+        <div class="stage-row"><div class="stage-number">01</div><div><h3>Stateless services</h3><p>Business logic with no local session state, so you can scale horizontally by adding instances.</p></div><div><p>State lives in the cache and database, never in the service memory.</p></div></div>
+        <div class="stage-row"><div class="stage-number">02</div><div><h3>Cache</h3><p>Redis or similar in front of the database for hot reads.</p></div><div><p>Name a strategy: read-through, TTLs, and how you invalidate. &ldquo;Cache invalidation&rdquo; is a trade-off, not a free win.</p></div></div>
+        <div class="stage-row"><div class="stage-number">03</div><div><h3>SQL / NoSQL</h3><p>Relational for transactions and joins; document or wide-column for scale and flexible schemas.</p></div><div><p>Justify the choice with the access pattern, then mention indexing, replication, and sharding by a key.</p></div></div>
+        <div class="stage-row"><div class="stage-number">04</div><div><h3>Object storage</h3><p>Blobs, uploads, and large artifacts &mdash; images, files, model outputs.</p></div><div><p>Keep large binaries out of the database; store a pointer instead.</p></div></div>
+        <div class="stage-row"><div class="stage-number">05</div><div><h3>Event bus / queue</h3><p>Decouples slow or spiky work from the request path (Kafka, SQS, etc.).</p></div><div><p>This is your latency lever. If work can be eventual, it belongs here.</p></div></div>
+        <div class="stage-row"><div class="stage-number">06</div><div><h3>Workers</h3><p>Consume the queue and do the heavy lifting asynchronously &mdash; emails, thumbnails, indexing, aggregation.</p></div><div><p>Make them idempotent so a retried message does not double-charge or double-send.</p></div></div>
+        <div class="stage-row"><div class="stage-number">07</div><div><h3>Search + notifications</h3><p>A search index (Elasticsearch/OpenSearch) and the fan-out that tells users something happened.</p></div><div><p>Both are fed off the queue, not the request path.</p></div></div>
+      </div>
+      <p class="say"><b>The one lever to remember</b>When latency is a problem, move work off the request path with a queue and let workers finish it later.</p>
+    </section>
+
+    <section class="section">
+      <p class="label">Layer 3</p>
+      <h2>AI-native inference &mdash; the layer most candidates skip</h2>
+      <p class="lead">If the role touches AI, this layer is where you win or lose. The whole thing collapses to one line: <strong>Prompt &rarr; Context &rarr; Model &rarr; Tokens.</strong></p>
+      <div class="stage-list">
+        <div class="stage-row"><div class="stage-number">01</div><div><h3>AI gateway / orchestrator</h3><p>The brain that coordinates the AI request &mdash; the equivalent of the API gateway for model calls.</p></div><div><p>Owns budgets, retries, and the fallback chain when a model is slow or down.</p></div></div>
+        <div class="stage-row"><div class="stage-number">02</div><div><h3>Safety + policy</h3><p>Moderation, PII handling, and compliance before and after the model runs.</p></div><div><p>Applies to input and output. Say both &mdash; a clean prompt can still produce an unsafe answer.</p></div></div>
+        <div class="stage-row"><div class="stage-number">03</div><div><h3>Context builder</h3><p>Assembles the prompt from three sources: <strong>RAG / vector DB</strong> (retrieved knowledge), <strong>memory</strong> (past turns), and <strong>tools + APIs</strong> (live data and actions).</p></div><div><p>This is where answer quality is actually made or lost &mdash; not in the model choice.</p></div></div>
+        <div class="stage-row"><div class="stage-number">04</div><div><h3>Model router</h3><p>Picks the model per request, balancing quality vs cost vs latency &mdash; a large model for hard asks, a small fast one for the rest.</p></div><div><p>Have a fallback matrix by tenant and region for when the first choice fails.</p></div></div>
+        <div class="stage-row"><div class="stage-number">05</div><div><h3>Inference server</h3><p>Where the money burns: batching, KV cache, and GPU utilization (vLLM, TGI, TensorRT-LLM).</p></div><div><p>Throughput lives here. Mention continuous batching and cache reuse to control cost.</p></div></div>
+        <div class="stage-row"><div class="stage-number">06</div><div><h3>Token stream</h3><p>Streams tokens back as they are generated over SSE or WebSocket.</p></div><div><p>The metric members feel is <em>time to first token</em>, not total time. Stream, don't wait.</p></div></div>
+      </div>
+      <p class="say"><b>What to say</b>Model choice is the last decision, not the first. Retrieval, context, and streaming decide whether the answer is good and whether it feels fast.</p>
+    </section>
+
+    <section class="section">
+      <p class="label">Layer 4</p>
+      <h2>Data &amp; operations &mdash; what makes it production, not a demo</h2>
+      <p class="lead">A system that can't be measured can't be trusted. This layer turns raw events into learning, and wraps everything in the four concerns that keep it alive.</p>
+      <div class="mini-heading">The data flywheel</div>
+      <p>Event stream &rarr; lake / warehouse &rarr; batch + stream jobs &rarr; features + embeddings &mdash; and those embeddings feed right back into the RAG store in Layer 3. That loop is how the product gets smarter over time.</p>
+      <div class="principles">
+        <div class="principle"><h3>Observability</h3><p>Logs, metrics, traces. One request ID should connect the edge log to the GPU metric to the final response.</p></div>
+        <div class="principle"><h3>AI evals</h3><p>Quality, safety, and drift. Release gates so a prompt or model change can't silently lower quality.</p></div>
+        <div class="principle"><h3>Security</h3><p>IAM, secrets, encryption in transit and at rest. Least privilege between every service.</p></div>
+      </div>
+      <div class="callout">
+        <strong>Reliability is the fourth wrap.</strong>
+        <p>Retries with backoff, backpressure when a dependency is slow, and regional failover. Assume every box fails and describe the degraded behavior &mdash; that single habit separates senior answers from junior ones.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Reading the diagram</p>
+      <h2>Three line types, three meanings</h2>
+      <p class="lead">Half of a good design review is knowing which calls block the user and which don't. Keep the notation honest.</p>
+      <div class="columns">
+        <div>
+          <h3>Solid = synchronous</h3>
+          <p>The caller waits for the response. Every solid line on the hot path spends latency budget and adds a way to fail. Keep this chain short.</p>
+          <h3 style="margin-top:22px;">Dashed = asynchronous</h3>
+          <p>Fire and continue. Work happens later via a queue and workers. This is how you keep the request fast and absorb spikes.</p>
+        </div>
+        <div>
+          <h3>Gold = the AI path</h3>
+          <p>The model flow, called out separately because it has its own latency, cost, and failure profile. It is often async-friendly (stream partial results) even when classic calls are sync.</p>
+          <div class="callout" style="margin-top:22px;">
+            <strong>Rule of thumb</strong>
+            <p>If a dependency doesn't have to finish before the user sees a result, it should be a dashed line.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">The checklist</p>
+      <h2>Six questions to answer before you say &ldquo;done&rdquo;</h2>
+      <p class="lead">Run these at the end of any design. They are the same six checks on the poster, and they map to exactly what interviewers probe.</p>
+      <div class="columns">
+        <div>
+          <ul class="checklist">
+            <li><strong>Requirements</strong> &mdash; did you separate functional from non-functional, and confirm them?</li>
+            <li><strong>Scale + QPS</strong> &mdash; do your component choices match the numbers you estimated?</li>
+            <li><strong>Latency + SLO</strong> &mdash; what is the target, and which calls are on the hot path?</li>
+          </ul>
+        </div>
+        <div>
+          <ul class="checklist">
+            <li><strong>Data model</strong> &mdash; does the schema and store fit the access pattern and consistency needs?</li>
+            <li><strong>Failure modes</strong> &mdash; for each box, what happens when it fails, and what is the degraded path?</li>
+            <li><strong>Cost + trade-offs</strong> &mdash; what did you optimize for, and what did you consciously give up?</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Worked example</p>
+      <h2>&ldquo;Design a chat assistant for our docs&rdquo; in four layers</h2>
+      <p class="lead">Watch the template adapt. The frame is identical &mdash; only the emphasis changes.</p>
+      <div class="stage-list">
+        <div class="stage-row"><div class="stage-number">L1</div><div><h3>Entry &amp; edge</h3><p>Thin. Client, CDN for the docs site, gateway with auth and per-user rate limits.</p></div><div><p>Nothing exotic &mdash; say so and move on.</p></div></div>
+        <div class="stage-row"><div class="stage-number">L2</div><div><h3>Application core</h3><p>A conversations service, a cache for recent threads, a database for messages, and a queue that kicks off document ingestion when docs change.</p></div><div><p>Ingestion is background work &mdash; dashed line to workers.</p></div></div>
+        <div class="stage-row"><div class="stage-number">L3</div><div><h3>AI-native inference</h3><p>The heart of this one. Context builder pulls from a vector DB of chunked docs, adds conversation memory, routes to a capable model, and streams tokens back.</p></div><div><p>Go deep here: chunking, retrieval quality, grounding, first-token latency, cost per answer.</p></div></div>
+        <div class="stage-row"><div class="stage-number">L4</div><div><h3>Data &amp; operations</h3><p>Log every question, evaluate answer quality and hallucination rate, and re-embed docs on change to keep retrieval fresh.</p></div><div><p>Evals are the difference between &ldquo;it demos&rdquo; and &ldquo;we can ship it.&rdquo;</p></div></div>
+      </div>
+      <p class="say"><b>The point</b>Same four boxes as a payments system or a URL shortener. You just spent your depth in Layer 3 because that is where this product's hard problems live.</p>
+    </section>
+
+    <section class="section">
+      <p class="label">Before you walk in</p>
+      <h2>What separates a strong answer</h2>
+      <div class="columns">
+        <div>
+          <h3>Do</h3>
+          <ul class="checklist">
+            <li>Clarify and estimate before drawing.</li>
+            <li>Draw the four layers first, then fill in.</li>
+            <li>Name a trade-off for every major box.</li>
+            <li>Describe failure and degraded behavior.</li>
+            <li>Stream and cache to protect latency.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Avoid</h3>
+          <ul class="checklist">
+            <li>Jumping to a database before the requirements.</li>
+            <li>Drawing every box whether it's needed or not.</li>
+            <li>Putting slow work on the request path.</li>
+            <li>Picking a model before designing retrieval.</li>
+            <li>Ignoring cost, security, and observability.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout">
+        <strong>The template is the floor, not the ceiling.</strong>
+        <p>It guarantees you never freeze and never leave a layer out. Your depth on the one box that matters &mdash; and your trade-off reasoning &mdash; is what actually earns the offer. And in AI-native rounds, the real skill is judging whether a design (or a model's generated code) will hold up under scale and failure, not just whether it runs.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-note">Built for <a href="https://hackproduct.com">HackProduct</a> by Raja Ashok. Learn the template, then learn to judge whether the design &mdash; human or machine &mdash; actually holds up.</div>
+  </footer>
+</body>
+</html>

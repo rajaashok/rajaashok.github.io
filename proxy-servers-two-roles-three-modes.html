@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Proxy Servers: Two Roles and Three Modes | Raja Ashok</title>
+  <meta name="description" content="A clear mental model for proxy servers: forward and reverse are architectural roles; open, transparent, and anonymity are operating modes. Deep dive with animated reels, a comparison table, and the Proxy vs VPN distinction.">
+  <meta property="og:title" content="Proxy Servers: Two Roles and Three Modes">
+  <meta property="og:description" content="Forward and reverse describe who the proxy represents. Open, transparent, and anonymity describe how it operates. One mental model, two animated reels.">
+  <meta property="og:image" content="https://rajaashok.github.io/assets/proxy-forward-reverse-final.png">
+  <meta property="og:url" content="https://rajaashok.github.io/proxy-servers-two-roles-three-modes">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://rajaashok.github.io/proxy-servers-two-roles-three-modes">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%231c261f'/%3E%3Cpath d='M4 4h8v2H6v2h5v2H6v2H4z' fill='%23f4ebdc'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/assets/roadmap-project.css">
+  <style>
+    .scope-note {
+      margin: 28px 0 0;
+      border-left: 5px solid var(--teal);
+      padding: 16px 20px;
+      background: rgba(255, 250, 241, 0.72);
+      color: var(--muted);
+      font-size: 15px;
+    }
+    .spec-table-wrap { margin-top: 28px; overflow-x: auto; border-top: 3px solid var(--ink); }
+    .spec-table { width: 100%; min-width: 720px; border-collapse: collapse; font-size: 15px; }
+    .spec-table th, .spec-table td { padding: 15px 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    .spec-table th { color: var(--ink); font-family: "JetBrains Mono", monospace; font-size: 11px; text-transform: uppercase; }
+    .spec-table td:first-child { color: var(--ink); font-weight: 700; }
+    .sequence { margin: 30px 0 0; padding: 0; list-style: none; border-top: 3px solid var(--ink); counter-reset: flow; }
+    .sequence li { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 20px; padding: 20px 0; border-bottom: 1px solid var(--line); color: var(--muted); counter-increment: flow; }
+    .sequence li::before { content: counter(flow, decimal-leading-zero); color: var(--orange); font-family: "JetBrains Mono", monospace; font-size: 19px; font-weight: 700; }
+    .sequence strong { color: var(--ink); }
+    .mini-heading { margin: 28px 0 8px; color: var(--ink); font-size: 21px; }
+    .role-badge {
+      display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 11px;
+      font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px;
+      border-radius: 999px; margin-bottom: 10px;
+    }
+    .role-badge.client { color: #1c5e46; background: #d6f0e4; }
+    .role-badge.server { color: #8a3410; background: #f6ddcc; }
+    .warn { border-left-color: #b23c17 !important; }
+    .warn strong { color: #b23c17; }
+    @media (max-width: 620px) { .sequence li { grid-template-columns: 42px minmax(0, 1fr); gap: 12px; } }
+  </style>
+</head>
+<body>
+  <header class="shell sitebar">
+    <a class="brand" href="/"><span>HackProduct</span> &middot; The Notebook</a>
+    <a class="back" href="/">Back to all projects</a>
+  </header>
+
+  <section class="shell hero">
+    <p class="eyebrow">Networking &middot; System Design &middot; Fundamentals</p>
+    <h1>Proxy Servers: Two Roles and Three Modes</h1>
+    <p class="dek">Ask ten engineers to explain a proxy and you will get ten diagrams that all look the same: a box in the middle with arrows on both sides. The box is real. The confusion is that most people mix up <em>what the proxy represents</em> with <em>how it operates</em> &mdash; and once you separate those two questions, every proxy on the internet snaps into place.</p>
+    <div class="meta">
+      <span>July 2026</span>
+      <span>Networking deep dive</span>
+      <span>Two animated reels</span>
+      <span>1080 x 1920 source</span>
+    </div>
+    <p class="scope-note"><strong>The one-line model:</strong> <strong>Forward</strong> and <strong>reverse</strong> are <em>roles</em> &mdash; they answer <em>whose side is the proxy on</em>. <strong>Open</strong>, <strong>transparent</strong>, and <strong>anonymity</strong> are <em>modes</em> &mdash; they answer <em>how does the proxy operate</em>. A single proxy has one role and can run in one or more modes at once.</p>
+  </section>
+
+  <section class="media-band" aria-label="Proxy server media">
+    <div class="shell media-grid">
+      <div class="media-panel">
+        <h2>Same middleman, opposite sides</h2>
+        <p>The forward proxy sits with the clients and hits the request first. The reverse proxy sits with the servers and receives the request last. Watch one request travel each path &mdash; requests flow down, responses return up.</p>
+        <video controls playsinline autoplay muted loop preload="metadata" poster="/assets/proxy-forward-reverse-final.png">
+          <source src="/assets/proxy-forward-reverse-reel.mp4" type="video/mp4">
+          Your browser does not support embedded video.
+        </video>
+        <div class="asset-actions">
+          <a class="asset-link" href="/assets/proxy-forward-reverse-reel.mp4">Open MP4</a>
+          <a class="asset-link" href="/assets/proxy-forward-reverse-final.png">Open frame</a>
+        </div>
+        <div class="asset-meta">H.264 &middot; 1080 x 1920 &middot; 14 seconds &middot; stereo AAC</div>
+      </div>
+      <div class="media-panel">
+        <h2>The five proxies you will meet</h2>
+        <p>Forward and reverse are the two roles. Open, transparent, and the anonymity spectrum are three ways a proxy can run. Each lights up with its own flow so you can see what actually changes.</p>
+        <video controls playsinline autoplay muted loop preload="metadata" poster="/assets/proxy-types-final.png">
+          <source src="/assets/proxy-types-reel.mp4" type="video/mp4">
+          Your browser does not support embedded video.
+        </video>
+        <div class="asset-actions">
+          <a class="asset-link" href="/assets/proxy-types-reel.mp4">Open MP4</a>
+          <a class="asset-link" href="/assets/proxy-types-final.png">Open frame</a>
+        </div>
+        <div class="asset-meta">Lossless PNG &middot; all five states &middot; no crop</div>
+      </div>
+    </div>
+  </section>
+
+  <main class="shell">
+    <section class="section intro-grid">
+      <div>
+        <p class="label">The core idea</p>
+        <h2>Stop mixing roles with modes</h2>
+        <p class="lead">A proxy is just an intermediary that receives a request, does something useful with it, and passes it along. The interesting questions are not <em>whether</em> there is a middleman, but two others: <strong>who does it stand in front of</strong>, and <strong>how visible and honest is it about being there</strong>.</p>
+        <p>The first question gives you the <strong>role</strong>. A forward proxy stands in front of the <em>clients</em> and represents them on the way out. A reverse proxy stands in front of the <em>servers</em> and represents them on the way in. That is the entire distinction, and it is architectural: it is decided by where the proxy sits in the topology, not by any feature it happens to run.</p>
+        <p>The second question gives you the <strong>mode</strong>. The same forward proxy can be open to the public or private, can intercept traffic transparently or require configuration, and can hide the client&rsquo;s identity to different degrees. Those are operating choices layered on top of the role &mdash; not separate species of proxy.</p>
+      </div>
+      <dl class="facts">
+        <div><dt>Role question</dt><dd>Whose side?</dd></div>
+        <div><dt>Forward role</dt><dd>Represents the client</dd></div>
+        <div><dt>Reverse role</dt><dd>Fronts the servers</dd></div>
+        <div><dt>Mode question</dt><dd>How does it operate?</dd></div>
+        <div><dt>Modes</dt><dd>Open, transparent, anonymity</dd></div>
+        <div><dt>Common trap</dt><dd>Proxy is not a VPN</dd></div>
+      </dl>
+    </section>
+
+    <section class="section">
+      <p class="label">The two roles</p>
+      <h2>Who does the proxy represent?</h2>
+      <p class="lead">Forward and reverse are mirror images. In both, a client, a proxy, an internet hop, and a set of servers appear. What changes is which end the proxy is bolted to &mdash; and that single fact flips almost everything else.</p>
+
+      <div class="columns">
+        <div>
+          <span class="role-badge client">Forward &middot; represents the client</span>
+          <h3>Forward proxy</h3>
+          <p>Sits between users and the wider internet, on the <strong>client side</strong> of the conversation. Outbound requests hit it first. Because it speaks on the client&rsquo;s behalf, it can control, filter, and cache what leaves the network, and it can hide who the original client was from the destination.</p>
+          <p><strong>Typical jobs:</strong> corporate access control and content filtering, egress logging and compliance, caching frequently fetched external resources, and web scraping through rotating egress addresses.</p>
+          <p><strong>Examples:</strong> Squid, Blue Coat ProxySG, and the outbound proxies baked into most corporate networks.</p>
+        </div>
+        <div>
+          <span class="role-badge server">Reverse &middot; fronts the servers</span>
+          <h3>Reverse proxy</h3>
+          <p>Sits between the internet and a fleet of backend servers, on the <strong>server side</strong>. Inbound requests reach it last, just before a server would. Because it speaks for the servers, it decides which backend handles each request and shields the fleet from the public.</p>
+          <p><strong>Typical jobs:</strong> load balancing across backends, TLS termination, response caching, rate limiting, DDoS absorption, canary and blue-green routing, and URL or content rewriting.</p>
+          <p><strong>Examples:</strong> NGINX, HAProxy, Envoy, and every CDN edge and API gateway you have ever used.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>The memory hook</strong>
+        <p>A forward proxy is grouped with the <em>clients</em>; a reverse proxy is grouped with the <em>servers</em>. Draw a dotted box around each and the boundary makes the role obvious: forward = client-side box, reverse = server-side box. If the proxy protects and represents the people making requests, it is forward. If it protects and represents the machines answering them, it is reverse.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Same picture, mirrored</p>
+      <h2>Trace one request through each role</h2>
+      <p class="lead">The clearest way to feel the difference is to follow a single request and notice <em>where the proxy sits in the path</em>. In the forward case it is the first hop; in the reverse case it is the last hop before a server.</p>
+
+      <ol class="sequence">
+        <li><div><strong>Forward &mdash; the client hits the proxy first.</strong> A user&rsquo;s request leaves their machine and immediately reaches the forward proxy, which applies access rules, caching, and identity control before the request ever touches the public internet.</div></li>
+        <li><div><strong>Forward &mdash; then it steps out to the world.</strong> The proxy makes the outbound call on the client&rsquo;s behalf, retrieves the resource from the destination server, and returns the response back down to the user. The destination mostly sees the proxy, not the client.</div></li>
+        <li><div><strong>Reverse &mdash; the request crosses the internet first.</strong> A user&rsquo;s request travels across the public network toward your service and arrives at the reverse proxy, which is the public face of the system. No backend is exposed directly.</div></li>
+        <li><div><strong>Reverse &mdash; it does its job, then picks a backend.</strong> The reverse proxy terminates TLS, enforces limits, checks its cache, then load-balances the request to a healthy server, and streams the response home. The client mostly sees the proxy, not the fleet.</div></li>
+      </ol>
+    </section>
+
+    <section class="section">
+      <p class="label">Side by side</p>
+      <h2>Forward versus reverse, across the dimensions that matter</h2>
+      <p class="lead">When the roles blur in an interview or a design review, this table is the fastest way to re-anchor. Read it as a mirror: nearly every row inverts.</p>
+
+      <div class="spec-table-wrap">
+        <table class="spec-table">
+          <thead>
+            <tr><th>Dimension</th><th>Forward proxy</th><th>Reverse proxy</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Sits with</td><td>The clients (egress edge)</td><td>The servers (ingress edge)</td></tr>
+            <tr><td>Represents</td><td>The client to the internet</td><td>The servers to the internet</td></tr>
+            <tr><td>Position in path</td><td>First hop out</td><td>Last hop in</td></tr>
+            <tr><td>Who it hides</td><td>The client&rsquo;s identity and origin</td><td>The backend topology and count</td></tr>
+            <tr><td>Configured by</td><td>The client or the client network</td><td>The service operator</td></tr>
+            <tr><td>Primary value</td><td>Control, filtering, privacy, caching egress</td><td>Load balancing, TLS, caching, protection</td></tr>
+            <tr><td>Common examples</td><td>Squid, ProxySG, corporate egress</td><td>NGINX, HAProxy, Envoy, CDNs</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">The three modes</p>
+      <h2>How a proxy operates, layered on top of its role</h2>
+      <p class="lead">Once the role is fixed, three operating choices describe the behavior. These are not new kinds of proxy &mdash; they are settings a forward proxy (usually) can be run in. Confusing them with roles is the single most common mistake.</p>
+
+      <div class="stage-list">
+        <article class="stage-row">
+          <div class="stage-number">01</div>
+          <div><h3>Open</h3><p>A forward proxy that anyone can use, with no private access required.</p></div>
+          <ul>
+            <li>Publicly reachable, which makes it convenient for quick tests and one-off access to the open web.</li>
+            <li>Operated by a stranger &mdash; so it can log, inspect, or modify the traffic that passes through it.</li>
+            <li>Treat it as hostile infrastructure. Never send credentials, tokens, or sensitive data through an open proxy.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">02</div>
+          <div><h3>Transparent</h3><p>Intercepts traffic without any configuration on the client.</p></div>
+          <ul>
+            <li>The client is not told to use a proxy; the network silently routes traffic through it &mdash; common on campus, office, and ISP networks.</li>
+            <li>Used for filtering, caching, and policy enforcement at the network boundary.</li>
+            <li>&ldquo;Transparent&rdquo; means <em>no client setup</em>, not <em>undetectable</em>. Its presence can usually still be observed by inspecting headers and behavior.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">03</div>
+          <div><h3>Anonymity spectrum</h3><p>Controls what the destination learns about your IP and about the proxy itself.</p></div>
+          <ul>
+            <li><strong>Anonymous:</strong> hides your real IP, but reveals that a proxy is in use.</li>
+            <li><strong>Distorting:</strong> reveals that a proxy is in use, and supplies a false client IP.</li>
+            <li><strong>High-anonymity (elite):</strong> hides your real IP and hides the obvious signals that a proxy is present at all.</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="callout warn">
+        <strong>Precision matters here</strong>
+        <p>A proxy usually changes the <em>apparent source IP</em> and may alter headers. It does not &ldquo;rewrite your identity,&rdquo; and anonymity is a spectrum, not a switch. What the destination learns depends entirely on which anonymity level the proxy runs at &mdash; and an open proxy in front of you may quietly downgrade all of it.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">The myth worth breaking</p>
+      <h2>A proxy is not a VPN</h2>
+      <p class="lead">This is the confusion that costs people the most, so it deserves its own line. A proxy and a VPN both put an intermediary between you and a destination, but they operate at different layers and make different promises.</p>
+
+      <div class="principles">
+        <article class="principle">
+          <h3>Scope</h3>
+          <p>A proxy typically routes a single application&rsquo;s traffic &mdash; often just your browser or one tool that is configured to use it. A VPN captures traffic for the whole device at the network layer.</p>
+        </article>
+        <article class="principle">
+          <h3>Encryption</h3>
+          <p>A proxy does not automatically encrypt all of your traffic. A VPN builds an encrypted tunnel from your device to the VPN server by design. Assuming a proxy encrypts everything is how sensitive data leaks.</p>
+        </article>
+        <article class="principle">
+          <h3>Intent</h3>
+          <p>Proxies are usually about control, caching, routing, and appearing to come from somewhere else. VPNs are usually about confidentiality and a trusted network boundary for the entire device.</p>
+        </article>
+      </div>
+
+      <div class="callout">
+        <strong>Say it plainly</strong>
+        <p>Proxy &ne; VPN. If your goal is &ldquo;encrypt everything my laptop sends,&rdquo; a proxy is the wrong tool. If your goal is &ldquo;route this one app through a controlled, cached, or different-looking path,&rdquo; a proxy is exactly right.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Choosing well</p>
+      <h2>Which one do you actually need?</h2>
+      <p class="lead">Roles and modes are not interchangeable, so the decision is really two decisions: pick the role from where you sit, then pick the mode from how you must behave.</p>
+
+      <div class="columns">
+        <div>
+          <h3>Reach for a forward proxy when</h3>
+          <ul class="checklist">
+            <li>You control the clients and need to govern what leaves the network.</li>
+            <li>You want egress logging, filtering, or compliance at the boundary.</li>
+            <li>You are caching external resources many clients fetch repeatedly.</li>
+            <li>You need requests to appear to originate from a controlled set of addresses.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Reach for a reverse proxy when</h3>
+          <ul class="checklist">
+            <li>You run the servers and need to hide and balance the fleet.</li>
+            <li>You want TLS termination, response caching, and rate limiting in one place.</li>
+            <li>You need DDoS absorption and a single hardened public surface.</li>
+            <li>You want safe rollout controls like canary, blue-green, and rewriting.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">The judgment layer</p>
+      <h2>Why this matters beyond the definition</h2>
+      <p class="lead">A model that answers &ldquo;whose side, and how honest&rdquo; is not just interview trivia. It is the lens you use to review a configuration &mdash; including one an assistant generated for you.</p>
+      <p>An AI coding assistant will happily write you an NGINX config, a Squid rule set, or a cloud load-balancer template in seconds. The question is whether it put the proxy on the right side of the topology, chose an operating mode that matches your privacy and security needs, and did not quietly promise encryption a proxy cannot provide. That judgment does not come from memorizing five proxy names. It comes from holding the two-question model in your head: whose side is this proxy on, and how is it allowed to behave?</p>
+
+      <div class="callout">
+        <strong>The takeaway</strong>
+        <p>Two roles &mdash; forward represents the client, reverse fronts the servers. Three modes &mdash; open, transparent, and the anonymity spectrum. One caveat &mdash; a proxy is not a VPN. Carry those three sentences and you will never draw the wrong box again.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-note">Built for <a href="https://hackproduct.com">HackProduct</a> by Raja Ashok. Learn the flow, then learn to judge whether the machine implemented it correctly.</div>
+  </footer>
+</body>
+</html>

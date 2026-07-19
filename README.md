@@ -8,6 +8,8 @@ Live at **[rajaashok.github.io](https://rajaashok.github.io)**
 
 | Post | URL | Published |
 |---|---|---|
+| The Master System Design Template | [/master-system-design-template](https://rajaashok.github.io/master-system-design-template) | July 2026 |
+| Proxy Servers: Two Roles and Three Modes | [/proxy-servers-two-roles-three-modes](https://rajaashok.github.io/proxy-servers-two-roles-three-modes) | July 2026 |
 | How an AI Chat Response Travels | [/ai-chat-system-design](https://rajaashok.github.io/ai-chat-system-design) | July 2026 |
 | The DNA of a Forward Deployed Engineer | [/forward-deployed-engineer-dna](https://rajaashok.github.io/forward-deployed-engineer-dna) | July 2026 |
 | Autonomous Chief Analytics Officer: An Agentic Org Idea | [/autonomous-cao-agentic-org](https://rajaashok.github.io/autonomous-cao-agentic-org) | July 2026 |
@@ -24,6 +26,7 @@ Plain HTML with zero build step. Long-form posts remain self-contained; the two 
 
 ```
 index.html                             → home / project and post index
+proxy-servers-two-roles-three-modes.html → forward vs reverse roles, three operating modes, and proxy vs VPN
 ai-chat-system-design.html             → AI chat request, inference, streaming, and operations architecture
 forward-deployed-engineer-dna.html     → Hatch's animated FDE visual guide
 autonomous-cao-agentic-org.html        → detailed autonomous CAO concept blueprint
@@ -34,6 +37,9 @@ chunking-best-practices.html           → post (served extensionless by GitHub 
 dont-memorize-300-problems.html        → post (served extensionless by GitHub Pages)
 three-pound-data-center.html           → post (served extensionless by GitHub Pages)
 assets/roadmap-project.css             → shared responsive styling for roadmap projects
+assets/proxy-forward-reverse-reel.mp4  → 14-second forward vs reverse proxy story reel
+assets/proxy-types-reel.mp4            → the five proxies (roles + modes) reel
+assets/proxy-*-final.png               → poster frames for the proxy reels
 assets/ai-chat-system-design-reel.mp4  → 8-second AI chat data-flow reel
 assets/ai-chat-system-design-final.png → lossless 1080 x 1920 portrait frame
 assets/ai-chat-system-design-storyboard.png → four-phase architecture storyboard
