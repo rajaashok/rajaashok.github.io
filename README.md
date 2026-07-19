@@ -8,6 +8,7 @@ Live at **[rajaashok.github.io](https://rajaashok.github.io)**
 
 | Post | URL | Published |
 |---|---|---|
+| Claude Code, Decoded: The Project Structure in 15 Seconds | [/claude-code-project-structure](https://rajaashok.github.io/claude-code-project-structure) | July 2026 |
 | The Master System Design Template | [/master-system-design-template](https://rajaashok.github.io/master-system-design-template) | July 2026 |
 | Proxy Servers: Two Roles and Three Modes | [/proxy-servers-two-roles-three-modes](https://rajaashok.github.io/proxy-servers-two-roles-three-modes) | July 2026 |
 | How an AI Chat Response Travels | [/ai-chat-system-design](https://rajaashok.github.io/ai-chat-system-design) | July 2026 |
@@ -26,6 +27,7 @@ Plain HTML with zero build step. Long-form posts remain self-contained; the two 
 
 ```
 index.html                             → home / project and post index
+claude-code-project-structure.html     → Claude Code repo structure visual guide
 proxy-servers-two-roles-three-modes.html → forward vs reverse roles, three operating modes, and proxy vs VPN
 ai-chat-system-design.html             → AI chat request, inference, streaming, and operations architecture
 forward-deployed-engineer-dna.html     → Hatch's animated FDE visual guide
@@ -40,6 +42,8 @@ assets/roadmap-project.css             → shared responsive styling for roadmap
 assets/proxy-forward-reverse-reel.mp4  → 14-second forward vs reverse proxy story reel
 assets/proxy-types-reel.mp4            → the five proxies (roles + modes) reel
 assets/proxy-*-final.png               → poster frames for the proxy reels
+assets/claude-code-project-structure-dark-reel.mp4 → 15-second Claude Code project structure reel
+assets/claude-code-project-structure-final.png     → final frame for the Claude Code structure reel
 assets/ai-chat-system-design-reel.mp4  → 8-second AI chat data-flow reel
 assets/ai-chat-system-design-final.png → lossless 1080 x 1920 portrait frame
 assets/ai-chat-system-design-storyboard.png → four-phase architecture storyboard

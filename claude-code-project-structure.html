@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Claude Code, Decoded: The Project Structure in 15 Seconds | Raja Ashok</title>
+  <meta name="description" content="A HackProduct visual guide to the Claude Code project structure: CLAUDE.md, .claude/rules, commands, skills, agents, and hooks.">
+  <meta property="og:title" content="Claude Code, Decoded">
+  <meta property="og:description" content="The clean, agent-ready repo structure behind better Claude Code projects.">
+  <meta property="og:image" content="https://rajaashok.github.io/assets/claude-code-project-structure-final.png">
+  <meta property="og:url" content="https://rajaashok.github.io/claude-code-project-structure">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://rajaashok.github.io/claude-code-project-structure">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%231c261f'/%3E%3Cpath d='M4 4h8v2H6v2h5v2H6v2H4z' fill='%23f4ebdc'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/assets/roadmap-project.css">
+  <style>
+    .note {
+      margin: 28px 0 0;
+      border-left: 5px solid var(--teal);
+      padding: 16px 20px;
+      background: rgba(255, 250, 241, 0.74);
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .structure-stage {
+      display: grid;
+      grid-template-columns: minmax(300px, 0.9fr) minmax(0, 1.1fr);
+      gap: 2px;
+      background: #242922;
+      border-top: 1px solid #252927;
+      border-bottom: 1px solid #252927;
+    }
+
+    .stage-panel {
+      min-width: 0;
+      background: #050606;
+      color: #f4f6f5;
+      padding: 30px;
+    }
+
+    .stage-panel h2 {
+      margin-bottom: 8px;
+      color: #f4f6f5;
+      font-family: "Inter", sans-serif;
+      font-size: 22px;
+      font-weight: 750;
+    }
+
+    .stage-panel p {
+      margin: 0 0 22px;
+      color: #aab1ad;
+      font-size: 14px;
+    }
+
+    .folder-map {
+      position: relative;
+      min-height: 650px;
+      border: 1px solid #252927;
+      border-radius: 8px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px) 0 0 / 36px 36px,
+        linear-gradient(rgba(255,255,255,0.032) 1px, transparent 1px) 0 0 / 36px 36px,
+        #0d0e12;
+      overflow: hidden;
+    }
+
+    .repo-root {
+      position: absolute;
+      top: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      min-width: 230px;
+      border: 1px solid rgba(61, 220, 151, 0.45);
+      border-radius: 8px;
+      padding: 18px 20px;
+      background: #16181e;
+      box-shadow: 0 18px 55px rgba(0, 0, 0, 0.22);
+      text-align: center;
+    }
+
+    .repo-root strong,
+    .node strong {
+      display: block;
+      color: #f4f6f5;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+
+    .repo-root span,
+    .node span {
+      display: block;
+      margin-top: 5px;
+      color: #8f9a97;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .trunk,
+    .branch {
+      position: absolute;
+      background: #3d4650;
+      opacity: 0.45;
+      transform-origin: top left;
+      transition: background 0.25s ease, opacity 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .trunk {
+      top: 121px;
+      left: 50%;
+      width: 3px;
+      height: 445px;
+    }
+
+    .branch {
+      left: 50%;
+      width: min(28vw, 260px);
+      height: 3px;
+    }
+
+    .branch.left {
+      transform: translateX(calc(-100% + 1px));
+    }
+
+    .branch.right {
+      transform: translateX(2px);
+    }
+
+    .branch[data-step="0"] { top: 168px; }
+    .branch[data-step="1"] { top: 238px; }
+    .branch[data-step="2"] { top: 308px; }
+    .branch[data-step="3"] { top: 378px; }
+    .branch[data-step="4"] { top: 448px; }
+    .branch[data-step="5"] { top: 518px; }
+
+    .node {
+      position: absolute;
+      width: min(38%, 250px);
+      border: 1px solid #303744;
+      border-radius: 8px;
+      padding: 14px 16px;
+      background: #16181e;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.18);
+      opacity: 0.42;
+      transform: translateY(10px) scale(0.98);
+      transition: opacity 0.25s ease, transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+    }
+
+    .node.left { left: 7%; }
+    .node.right { right: 7%; }
+    .node[data-step="0"] { top: 133px; }
+    .node[data-step="1"] { top: 203px; }
+    .node[data-step="2"] { top: 273px; }
+    .node[data-step="3"] { top: 343px; }
+    .node[data-step="4"] { top: 413px; }
+    .node[data-step="5"] { top: 483px; }
+
+    .node.active,
+    .repo-root.active {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      border-color: #3ddc97;
+      background: #1c2127;
+      box-shadow: 0 0 0 1px rgba(61, 220, 151, 0.16), 0 16px 46px rgba(0, 0, 0, 0.3);
+    }
+
+    .repo-root.active {
+      transform: translateX(-50%) scale(1);
+    }
+
+    .node.seen {
+      opacity: 0.78;
+      transform: translateY(0) scale(1);
+    }
+
+    .branch.active,
+    .trunk.active {
+      background: #3ddc97;
+      opacity: 1;
+      box-shadow: 0 0 18px rgba(61, 220, 151, 0.36);
+    }
+
+    .caption-strip {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: 24px;
+      min-height: 88px;
+      border: 1px solid #303744;
+      border-radius: 8px;
+      padding: 18px 20px;
+      background: rgba(22, 24, 30, 0.92);
+    }
+
+    .caption-strip b {
+      display: block;
+      margin-bottom: 4px;
+      color: #f5c542;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .caption-strip span {
+      color: #e8ebf0;
+      font-size: 16px;
+      line-height: 1.45;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .controls button,
+    .controls select {
+      min-height: 40px;
+      border: 1px solid #39423e;
+      border-radius: 6px;
+      background: #171b20;
+      color: #d8dfdb;
+      font: 650 13px/1 "Inter", sans-serif;
+      padding: 9px 13px;
+      cursor: pointer;
+    }
+
+    .controls button:hover,
+    .controls select:hover {
+      border-color: #43dca5;
+      color: #43dca5;
+    }
+
+    .tree-code {
+      margin: 0;
+      border: 1px solid #303744;
+      border-radius: 8px;
+      background: #0d0e12;
+      overflow: hidden;
+    }
+
+    .tree-code figcaption {
+      border-bottom: 1px solid #303744;
+      padding: 12px 16px;
+      color: #8f9a97;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .tree-code pre {
+      margin: 0;
+      overflow-x: auto;
+      padding: 18px 20px 20px;
+      color: #d8dfdb;
+      font: 14px/1.75 "JetBrains Mono", monospace;
+    }
+
+    .tree-code .hot {
+      color: #3ddc97;
+    }
+
+    .principle:nth-child(4) {
+      border-color: #f5c542;
+    }
+
+    .prompt-card {
+      margin-top: 28px;
+      border-left: 6px solid var(--teal);
+      background: var(--paper);
+      padding: 24px 28px;
+      box-shadow: 0 8px 26px rgba(69, 54, 36, 0.07);
+    }
+
+    .prompt-card p {
+      margin: 0;
+    }
+
+    .prompt-card p + p {
+      margin-top: 14px;
+    }
+
+    @media (max-width: 920px) {
+      .structure-stage {
+        grid-template-columns: 1fr;
+      }
+
+      .folder-map {
+        min-height: 700px;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .stage-panel {
+        padding: 24px 16px;
+      }
+
+      .folder-map {
+        min-height: 790px;
+      }
+
+      .repo-root {
+        top: 20px;
+        width: calc(100% - 38px);
+      }
+
+      .trunk,
+      .branch {
+        display: none;
+      }
+
+      .node {
+        left: 19px;
+        right: 19px;
+        width: auto;
+      }
+
+      .node.left,
+      .node.right {
+        left: 19px;
+        right: 19px;
+      }
+
+      .node[data-step="0"] { top: 124px; }
+      .node[data-step="1"] { top: 206px; }
+      .node[data-step="2"] { top: 288px; }
+      .node[data-step="3"] { top: 370px; }
+      .node[data-step="4"] { top: 452px; }
+      .node[data-step="5"] { top: 534px; }
+
+      .caption-strip {
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="shell sitebar">
+    <a class="brand" href="/"><span>HackProduct</span> &middot; The Notebook</a>
+    <a class="back" href="/">Back to all projects</a>
+  </header>
+
+  <section class="shell hero">
+    <p class="eyebrow">Claude Code &middot; AI Engineering &middot; Agent-Ready Repos</p>
+    <h1>Claude Code, decoded: the project structure in 15 seconds</h1>
+    <p class="dek">Most people start with one giant instruction file. The upgrade is learning to structure the repo so the agent has rules, workflows, specialists, and guardrails in the right places.</p>
+    <div class="meta">
+      <span>July 2026</span>
+      <span>15-second visual guide</span>
+      <span>Claude Code project structure</span>
+      <span>HackProduct</span>
+    </div>
+    <p class="note"><strong>The point:</strong> this is the move from prompting to directing. A better repo structure gives the model less to guess and gives you more ways to verify what it produces.</p>
+  </section>
+
+  <section class="media-band" aria-label="Claude Code project structure media">
+    <div class="shell media-grid">
+      <div class="media-panel">
+        <h2>Watch the repo unfold</h2>
+        <p>The reel starts at the project overview, opens the hidden Claude workspace, then reveals the folders that make the agent easier to steer and review.</p>
+        <video controls playsinline autoplay muted loop preload="metadata" poster="/assets/claude-code-project-structure-final.png">
+          <source src="/assets/claude-code-project-structure-dark-reel.mp4" type="video/mp4">
+          Your browser does not support embedded video.
+        </video>
+        <div class="asset-actions">
+          <a class="asset-link" href="/assets/claude-code-project-structure-dark-reel.mp4">Open MP4</a>
+        </div>
+        <div class="asset-meta">H.264 &middot; 1080 x 1920 &middot; ~15 seconds &middot; stereo AAC</div>
+      </div>
+      <div class="media-panel">
+        <h2>Save the final frame</h2>
+        <p>The structure at a glance: project context at the root, behavior engineering inside the Claude workspace.</p>
+        <a href="/assets/claude-code-project-structure-final.png" aria-label="Open the full Claude Code project structure frame">
+          <img class="final-frame" src="/assets/claude-code-project-structure-final.png" width="1080" height="1920" alt="Claude Code project structure with CLAUDE.md and .claude folders for rules, commands, skills, agents, and hooks">
+        </a>
+        <div class="asset-actions">
+          <a class="asset-link" href="/assets/claude-code-project-structure-final.png">Open PNG</a>
+        </div>
+        <div class="asset-meta">Lossless PNG &middot; 1080 x 1920 &middot; final reel frame</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="structure-stage" aria-label="Animated Claude Code folder map">
+    <div class="stage-panel">
+      <h2>Agent-ready structure</h2>
+      <p>The model behaves better when the repository tells it what to load, when to load it, and what risk boundaries it must respect.</p>
+      <div class="folder-map">
+        <div class="repo-root active" data-root>
+          <strong>repo/</strong>
+          <span>the project Claude Code is operating inside</span>
+        </div>
+        <div class="trunk active" data-trunk></div>
+        <div class="branch left active" data-step="0"></div>
+        <div class="branch right" data-step="1"></div>
+        <div class="branch left" data-step="2"></div>
+        <div class="branch right" data-step="3"></div>
+        <div class="branch left" data-step="4"></div>
+        <div class="branch right" data-step="5"></div>
+        <div class="node left active" data-step="0">
+          <strong>CLAUDE.md</strong>
+          <span>overview, config, project intent</span>
+        </div>
+        <div class="node right" data-step="1">
+          <strong>.claude/</strong>
+          <span>the behavior workspace</span>
+        </div>
+        <div class="node left" data-step="2">
+          <strong>rules/</strong>
+          <span>coding conventions the agent follows</span>
+        </div>
+        <div class="node right" data-step="3">
+          <strong>commands/</strong>
+          <span>repeatable slash workflows</span>
+        </div>
+        <div class="node left" data-step="4">
+          <strong>skills/ + agents/</strong>
+          <span>focused context and specialist workers</span>
+        </div>
+        <div class="node right" data-step="5">
+          <strong>hooks/</strong>
+          <span>event scripts that guard risky actions</span>
+        </div>
+        <div class="caption-strip" aria-live="polite">
+          <b id="captionKicker">Start</b>
+          <span id="captionText">Begin with CLAUDE.md: the repo's overview, defaults, and operating intent.</span>
+        </div>
+      </div>
+      <div class="controls" aria-label="Structure animation controls">
+        <button type="button" id="playBtn">Pause</button>
+        <button type="button" id="stepBtn">Step</button>
+        <select id="speedSelect" aria-label="Animation speed">
+          <option value="1">1x</option>
+          <option value="1.5">1.5x</option>
+          <option value="0.7">0.7x</option>
+        </select>
+        <button type="button" id="replayBtn">Replay</button>
+        <button type="button" id="muteBtn" aria-pressed="false">Sound on</button>
+      </div>
+    </div>
+    <div class="stage-panel">
+      <h2>The shape in code</h2>
+      <p>Use the root file for project context. Use the hidden workspace for behavior, workflows, and safety boundaries.</p>
+      <figure class="tree-code">
+        <figcaption>repo map</figcaption>
+        <pre><code>repo/
+|-- <span class="hot">CLAUDE.md</span>          project overview and config
+`-- <span class="hot">.claude/</span>           agent behavior workspace
+    |-- <span class="hot">rules/</span>          coding conventions
+    |-- <span class="hot">commands/</span>       custom slash workflows
+    |-- <span class="hot">skills/</span>         auto-loaded context
+    |-- <span class="hot">agents/</span>         specialized sub-agents
+    `-- <span class="hot">hooks/</span>          event-driven guardrails</code></pre>
+      </figure>
+    </div>
+  </section>
+
+  <main class="shell">
+    <section class="section intro-grid">
+      <div>
+        <p class="label">The core idea</p>
+        <h2>Stop hoping the model behaves. Engineer how it behaves.</h2>
+        <p class="lead">A giant instruction file turns every task into a context dump. A structured Claude Code repo turns behavior into a system: stable rules, reusable commands, specialized context, and automated checks.</p>
+        <p>That matters because the best AI engineers are not only good at prompting. They are good at shaping the environment around the model, then reading and verifying the output with a clear standard.</p>
+      </div>
+      <dl class="facts">
+        <div><dt>Root file</dt><dd>CLAUDE.md</dd></div>
+        <div><dt>Behavior home</dt><dd>.claude/</dd></div>
+        <div><dt>Conventions</dt><dd>rules/</dd></div>
+        <div><dt>Workflows</dt><dd>commands/</dd></div>
+        <div><dt>Light context</dt><dd>skills/</dd></div>
+        <div><dt>Specialists</dt><dd>agents/</dd></div>
+        <div><dt>Guardrails</dt><dd>hooks/</dd></div>
+      </dl>
+    </section>
+
+    <section class="section">
+      <p class="label">The folders</p>
+      <h2>What each piece is responsible for</h2>
+      <p class="lead">The clean split is simple: one file says what the project is; the folders say how the agent should operate inside it.</p>
+      <div class="stage-list">
+        <div class="stage-row"><div class="stage-number">01</div><div><h3>CLAUDE.md</h3><p>The project overview and default instructions.</p></div><div><p>Keep it stable: mission, stack, architecture notes, testing commands, style expectations, and anything Claude should know before touching code.</p></div></div>
+        <div class="stage-row"><div class="stage-number">02</div><div><h3>.claude/</h3><p>The hidden operating system for the repo.</p></div><div><p>This is where behavior becomes modular. Instead of stuffing every instruction into one file, you separate rules, commands, skills, agents, and hooks.</p></div></div>
+        <div class="stage-row"><div class="stage-number">03</div><div><h3>rules/</h3><p>Coding conventions the agent can actually follow.</p></div><div><p>Use rules for durable standards: how errors are handled, how components are styled, what tests must accompany a change, and what patterns are off-limits.</p></div></div>
+        <div class="stage-row"><div class="stage-number">04</div><div><h3>commands/</h3><p>Your repeatable slash workflows.</p></div><div><p>A good command turns a fuzzy request into a known sequence: inspect, edit, test, summarize. It saves the team from re-explaining the same workflow every time.</p></div></div>
+        <div class="stage-row"><div class="stage-number">05</div><div><h3>skills/</h3><p>Context that loads only when relevant.</p></div><div><p>This keeps the model sharper. A database task gets database context; a design task gets design context. The prompt stays lighter because the repo knows when to load the details.</p></div></div>
+        <div class="stage-row"><div class="stage-number">06</div><div><h3>agents/</h3><p>Specialized workers with their own focus.</p></div><div><p>Use agents when a task benefits from a narrow lens: reviewer, tester, migration planner, documentation pass, security check, or performance investigation.</p></div></div>
+        <div class="stage-row"><div class="stage-number">07</div><div><h3>hooks/</h3><p>Event-driven scripts that protect the repo.</p></div><div><p>Hooks are where trust becomes verification: block risky shell commands, require formatting, run targeted tests, or warn before a destructive change gets through.</p></div></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">AI-engineer angle</p>
+      <h2>The repo is part of the prompt</h2>
+      <p class="lead">When an AI assistant produces bad code, the failure is not always in the model. Sometimes the repo never told it what good looks like.</p>
+      <div class="principles">
+        <div class="principle"><h3>Read the structure</h3><p>Before trusting output, check which instructions, skills, commands, and guardrails were available to the agent.</p></div>
+        <div class="principle"><h3>Verify the workflow</h3><p>Make sure the model inspected the right files, used the right conventions, and ran the right tests for the change.</p></div>
+        <div class="principle"><h3>Constrain the blast radius</h3><p>Use hooks and clear rules for risky operations so the assistant cannot silently wander outside the task.</p></div>
+      </div>
+      <div class="callout">
+        <strong>The shift is subtle but big.</strong>
+        <p>You move from "I can prompt it" to "I can direct it." That is the same instinct you use in code review: define the standard, inspect the diff, and ask what would break.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Social caption</p>
+      <h2>Copy for the post</h2>
+      <div class="prompt-card">
+        <p><strong>Claude Code, decoded: the full project structure in 15 seconds.</strong></p>
+        <p>Most people open Claude Code and dump everything into one giant CLAUDE.md. But the real power is in the structure: CLAUDE.md for project overview, .claude/ for behavior, rules for conventions, commands for slash workflows, skills for relevant context, agents for specialists, and hooks for guardrails.</p>
+        <p>Once you get this, you stop hoping the model behaves and start engineering how it behaves. That is the jump from "I can prompt it" to "I can direct it."</p>
+        <p>#HackProduct #ClaudeCode #AIengineering #coding #devtools #AItools #softwareengineering #promptengineering #buildinpublic #codevisuals #anthropic #LLM #developertools #techreels #codetok</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-note">Built for <a href="https://hackproduct.com">HackProduct</a> by Raja Ashok. Structure the repo, then judge what the machine builds inside it.</div>
+  </footer>
+
+  <script>
+    const steps = [
+      ["Start", "Begin with CLAUDE.md: the repo's overview, defaults, and operating intent."],
+      ["Workspace", "Open .claude/: the hidden place where agent behavior becomes modular."],
+      ["Rules", "rules/ turns team conventions into instructions the agent can follow."],
+      ["Commands", "commands/ captures repeatable slash workflows so good process is reusable."],
+      ["Skills + agents", "skills/ loads context only when relevant; agents/ gives focused work to specialists."],
+      ["Hooks", "hooks/ runs event-driven checks before risky behavior slips through."],
+      ["Upgrade", "Now you are not just prompting. You are directing, constraining, and verifying."]
+    ];
+
+    const nodes = Array.from(document.querySelectorAll(".node"));
+    const branches = Array.from(document.querySelectorAll(".branch"));
+    const trunk = document.querySelector("[data-trunk]");
+    const captionKicker = document.getElementById("captionKicker");
+    const captionText = document.getElementById("captionText");
+    const playBtn = document.getElementById("playBtn");
+    const stepBtn = document.getElementById("stepBtn");
+    const replayBtn = document.getElementById("replayBtn");
+    const muteBtn = document.getElementById("muteBtn");
+    const speedSelect = document.getElementById("speedSelect");
+
+    let index = 0;
+    let playing = true;
+    let muted = false;
+    let timer = null;
+    let audioCtx = null;
+
+    function ensureAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) audioCtx = new AudioContext();
+      }
+      if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+    }
+
+    function blip(kind) {
+      if (muted || !audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(kind === "done" ? 680 : 360 + index * 34, now);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(kind === "done" ? 0.075 : 0.045, now + 0.018);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.18);
+    }
+
+    function renderStep(nextIndex, sound = true) {
+      index = nextIndex % steps.length;
+      captionKicker.textContent = steps[index][0];
+      captionText.textContent = steps[index][1];
+      trunk.classList.toggle("active", index >= 0);
+      nodes.forEach((node) => {
+        const step = Number(node.dataset.step);
+        node.classList.toggle("active", step === Math.min(index, 5));
+        node.classList.toggle("seen", step < index);
+      });
+      branches.forEach((branch) => {
+        const step = Number(branch.dataset.step);
+        branch.classList.toggle("active", step <= Math.min(index, 5));
+      });
+      if (sound) blip(index === steps.length - 1 ? "done" : "step");
+    }
+
+    function intervalMs() {
+      return 1500 / Number(speedSelect.value);
+    }
+
+    function stopTimer() {
+      if (timer) window.clearInterval(timer);
+      timer = null;
+    }
+
+    function startTimer() {
+      stopTimer();
+      timer = window.setInterval(() => {
+        renderStep(index + 1);
+      }, intervalMs());
+    }
+
+    playBtn.addEventListener("click", () => {
+      ensureAudio();
+      playing = !playing;
+      playBtn.textContent = playing ? "Pause" : "Play";
+      if (playing) startTimer();
+      else stopTimer();
+    });
+
+    stepBtn.addEventListener("click", () => {
+      ensureAudio();
+      playing = false;
+      playBtn.textContent = "Play";
+      stopTimer();
+      renderStep(index + 1);
+    });
+
+    replayBtn.addEventListener("click", () => {
+      ensureAudio();
+      renderStep(0);
+      playing = true;
+      playBtn.textContent = "Pause";
+      startTimer();
+    });
+
+    muteBtn.addEventListener("click", () => {
+      muted = !muted;
+      muteBtn.textContent = muted ? "Muted" : "Sound on";
+      muteBtn.setAttribute("aria-pressed", String(muted));
+      if (!muted) ensureAudio();
+    });
+
+    speedSelect.addEventListener("change", () => {
+      if (playing) startTimer();
+    });
+
+    renderStep(0, false);
+    startTimer();
+  </script>
+</body>
+</html>
