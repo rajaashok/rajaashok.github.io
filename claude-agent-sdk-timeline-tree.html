@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Claude Agent SDK: Put the Agent Loop Inside Your App | Raja Ashok</title>
+  <meta name="description" content="A detailed guide to the Claude Agent SDK: query(), ClaudeSDKClient, tools, permissions, hooks, MCP servers, session results, and the safety checks needed to ship agentic workflows inside your own application.">
+  <meta property="og:title" content="Claude Agent SDK: Put the Agent Loop Inside Your App">
+  <meta property="og:description" content="Model reasons. SDK executes. Your app enforces. A practical timeline-tree guide to building with the Claude Agent SDK.">
+  <meta property="og:image" content="https://rajaashok.github.io/assets/claude-agent-sdk-timeline-tree.png">
+  <meta property="og:url" content="https://rajaashok.github.io/claude-agent-sdk-timeline-tree">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://rajaashok.github.io/claude-agent-sdk-timeline-tree">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%231c261f'/%3E%3Cpath d='M4 4h8v2H6v2h5v2H6v2H4z' fill='%23f4ebdc'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/assets/roadmap-project.css">
+  <style>
+    .poster-first {
+      background: #050606;
+      border-top: 1px solid #242a27;
+      border-bottom: 1px solid #242a27;
+      color: var(--white);
+      padding: 36px 0 44px;
+    }
+
+    .poster-wrap {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.62fr) minmax(0, 1fr);
+      gap: 42px;
+      align-items: center;
+    }
+
+    .poster-card {
+      margin: 0;
+      border: 1px solid #303832;
+      border-radius: 10px;
+      background: #080a0c;
+      padding: 12px;
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.35);
+    }
+
+    .poster-card img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 7px;
+      background: #000;
+    }
+
+    .poster-note h2 {
+      color: #f4f0e8;
+      font-family: "Inter", sans-serif;
+      font-size: 28px;
+      line-height: 1.18;
+      font-weight: 800;
+    }
+
+    .poster-note p {
+      color: #adb6b1;
+      font-size: 16px;
+    }
+
+    .poster-note .asset-link {
+      border-color: #39423e;
+    }
+
+    .code-card {
+      margin: 28px 0 0;
+      border: 1px solid #2f3733;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #0d1210;
+      color: #dce3df;
+    }
+
+    .code-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px 18px;
+      border-bottom: 1px solid #29302d;
+      color: #43dca5;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      padding: 20px 22px 24px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13.5px;
+      line-height: 1.72;
+      white-space: pre;
+    }
+
+    code {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.94em;
+    }
+
+    .inline-code {
+      border: 1px solid rgba(28, 38, 31, 0.12);
+      border-radius: 5px;
+      background: rgba(255, 250, 241, 0.76);
+      padding: 1px 5px;
+      color: var(--ink);
+    }
+
+    .decision-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+      margin-top: 30px;
+    }
+
+    .decision {
+      border-top: 4px solid var(--teal);
+      background: var(--paper);
+      padding: 22px 24px;
+      box-shadow: 0 8px 26px rgba(69, 54, 36, 0.06);
+    }
+
+    .decision:nth-child(2) {
+      border-color: var(--orange);
+    }
+
+    .decision h3 {
+      margin-bottom: 8px;
+    }
+
+    .decision p {
+      margin: 0;
+    }
+
+    .option-table {
+      width: 100%;
+      margin-top: 26px;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+
+    .option-table th,
+    .option-table td {
+      border-bottom: 1px solid var(--line);
+      padding: 13px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .option-table th {
+      color: var(--ink);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    .option-table td:first-child {
+      color: var(--orange);
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .quote-strip {
+      margin-top: 30px;
+      border-left: 6px solid var(--teal);
+      background: rgba(21, 157, 118, 0.07);
+      padding: 20px 24px;
+      color: var(--ink);
+      font-size: 18px;
+    }
+
+    .source-list {
+      margin: 22px 0 0;
+      padding: 0;
+      list-style: none;
+      border-top: 3px solid var(--ink);
+    }
+
+    .source-list li {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .source-list a {
+      color: var(--orange);
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .source-list span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 860px) {
+      .poster-wrap,
+      .decision-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .poster-first {
+        padding-top: 24px;
+      }
+
+      pre {
+        font-size: 12px;
+        padding: 16px;
+      }
+
+      .option-table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="shell sitebar">
+    <a class="brand" href="/"><span>HackProduct</span> &middot; The Notebook</a>
+    <a class="back" href="/">Back to all projects</a>
+  </header>
+
+  <section class="shell hero">
+    <p class="eyebrow">HackProduct &middot; Python 101 &middot; Agent Engineering</p>
+    <h1>Claude Agent SDK: Put the Agent Loop Inside Your App</h1>
+    <p class="dek">The useful mental model is simple: the model reasons, the SDK executes, and your application enforces the boundary conditions.</p>
+    <div class="meta">
+      <span>July 2026</span>
+      <span>Claude Agent SDK</span>
+      <span>Timeline tree guide</span>
+      <span>12 min read</span>
+    </div>
+  </section>
+
+  <section class="poster-first" aria-label="Claude Agent SDK timeline tree diagram">
+    <div class="shell poster-wrap">
+      <figure class="poster-card">
+        <a href="/assets/claude-agent-sdk-timeline-tree.png" aria-label="Open full Claude Agent SDK timeline tree diagram">
+          <img src="/assets/claude-agent-sdk-timeline-tree.png" width="1080" height="1920" alt="Claude Agent SDK timeline tree showing prompt, Claude reasons, tools act, result, and implementation steps from start through ship safely">
+        </a>
+      </figure>
+      <div class="poster-note">
+        <h2>The whole SDK in one picture</h2>
+        <p>This diagram compresses the most important idea: Claude is not just returning text. It is running a loop. Your code starts the loop, supplies tools, controls permissions, receives messages, records the result, and decides what is safe enough to ship.</p>
+        <p>The article below expands every branch of the timeline tree into code and engineering decisions: when to use <code>query()</code>, when to use <code>ClaudeSDKClient</code>, how to scope tools, where hooks fit, what to capture from the result, and how to review AI-written agent code.</p>
+        <div class="asset-actions">
+          <a class="asset-link" href="/assets/claude-agent-sdk-timeline-tree.png">Open full-resolution PNG</a>
+        </div>
+        <div class="asset-meta">Portrait PNG &middot; 1080 x 1920 &middot; safe-zone checked</div>
+      </div>
+    </div>
+  </section>
+
+  <main class="shell">
+    <section class="section intro-grid">
+      <div>
+        <p class="label">The core idea</p>
+        <h2>The SDK is the Claude Code agent loop as a library</h2>
+        <p class="lead">Claude Code already knows how to read files, edit code, run commands, search, ask for permissions, call tools, and keep working until the task is complete. The Claude Agent SDK gives you that harness from Python or TypeScript.</p>
+        <p>That means you do not write the low-level loop yourself. Your application sends a prompt and configuration. The SDK streams messages while the agent reasons, requests tool calls, executes approved tools, receives tool results, and eventually emits a final result or a controlled stop condition.</p>
+        <p>The mistake is treating the SDK like a normal chat completion wrapper. A chat wrapper asks for an answer. An agent SDK gives the model a controlled operating environment. That is why the design work is less about clever prompt text and more about boundaries: which tools exist, which tools auto-approve, which actions need review, what gets logged, and when the run must stop.</p>
+      </div>
+      <dl class="facts">
+        <div><dt>Install</dt><dd>Python 3.10+ or TypeScript</dd></div>
+        <div><dt>Simple entry</dt><dd><code>query()</code></dd></div>
+        <div><dt>Session entry</dt><dd><code>ClaudeSDKClient</code></dd></div>
+        <div><dt>Extension</dt><dd>Built-ins, custom tools, MCP</dd></div>
+        <div><dt>Control</dt><dd>Permissions, hooks, limits</dd></div>
+        <div><dt>Evidence</dt><dd>Status, session, cost, usage</dd></div>
+      </dl>
+    </section>
+
+    <section class="section">
+      <p class="label">The loop</p>
+      <h2>Prompt &rarr; reason &rarr; act &rarr; result &rarr; new context</h2>
+      <p class="lead">The top row of the diagram is the feedback loop. Once you see that loop, the SDK API makes much more sense.</p>
+      <div class="stage-list">
+        <article class="stage-row">
+          <div class="stage-number">01</div>
+          <div><h3>Prompt</h3><p>Your application starts with a task, not a chat message alone.</p></div>
+          <div><p>The prompt should include the goal, constraints, and what a good finish looks like. For agentic work, the finish condition matters as much as the task description.</p></div>
+        </article>
+        <article class="stage-row">
+          <div class="stage-number">02</div>
+          <div><h3>Claude reasons</h3><p>The model decides what information or action is needed next.</p></div>
+          <div><p>It may answer directly, inspect files, run a command, call an MCP tool, or ask for permission. You should expect multi-step behavior, not one request and one response.</p></div>
+        </article>
+        <article class="stage-row">
+          <div class="stage-number">03</div>
+          <div><h3>Tools act</h3><p>The SDK and Claude Code runtime execute approved actions.</p></div>
+          <div><p>Built-in tools can read, edit, search, and run shell commands. Custom tools and MCP servers connect the loop to your actual application systems.</p></div>
+        </article>
+        <article class="stage-row">
+          <div class="stage-number">04</div>
+          <div><h3>Result becomes context</h3><p>Tool output comes back into the conversation.</p></div>
+          <div><p>The next model decision sees what happened. That is why tool outputs must be small, structured, and truthful. Messy tool results become messy agent reasoning.</p></div>
+        </article>
+      </div>
+      <p class="quote-strip">The useful split: Claude chooses the next move. The SDK executes the move. Your application decides what moves are allowed.</p>
+    </section>
+
+    <section class="section">
+      <p class="label">Start</p>
+      <h2>Install the SDK, then decide how much loop control you need</h2>
+      <p class="lead">For Python, the package is <code class="inline-code">claude-agent-sdk</code> and requires Python 3.10 or later. The current Python package bundles the Claude Code CLI, so a separate Claude Code install is not required for the default path.</p>
+      <div class="code-card">
+        <div class="code-title"><span>terminal</span><span>fresh environment</span></div>
+        <pre><code>python3 -m venv .venv
+source .venv/bin/activate
+pip install claude-agent-sdk
+
+export ANTHROPIC_API_KEY="sk-ant-..."</code></pre>
+      </div>
+      <p>That install step is the easy part. The real first decision is which interface your product needs:</p>
+      <div class="decision-grid">
+        <article class="decision">
+          <h3>Use <code>query()</code> for one-off tasks</h3>
+          <p><code>query()</code> is an async stream. Give it a prompt and optional configuration, then process messages until the run completes. It is the cleanest path for short, fresh-session jobs: fix this file, summarize this folder, generate this report, inspect this failing test.</p>
+        </article>
+        <article class="decision">
+          <h3>Use <code>ClaudeSDKClient</code> for interactive sessions</h3>
+          <p>The client is for bidirectional, longer-running workflows: multi-turn control, streaming input, custom in-process tools, hooks as Python functions, session control, and applications that need to interrupt, resume, or steer the run.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">A minimal working loop</p>
+      <h2>The code shape that matters</h2>
+      <p class="lead">Most SDK examples are short, but production code needs a little more structure: options, allowed tools, budgets, result handling, and logging.</p>
+      <div class="code-card">
+        <div class="code-title"><span>python</span><span>query() with explicit controls</span></div>
+        <pre><code>import asyncio
+from claude_agent_sdk import query, ClaudeAgentOptions, ResultMessage
+
+PROMPT = """
+Fix the failing auth tests.
+Verify the changed behavior with the existing test suite.
+Do not modify unrelated files.
+"""
+
+async def run_agent():
+    options = ClaudeAgentOptions(
+        cwd="/path/to/project",
+        allowed_tools=["Read", "Edit", "Bash", "Grep"],
+        permission_mode="acceptEdits",
+        max_turns=30,
+        max_budget_usd=5.00,
+    )
+
+    async for message in query(prompt=PROMPT, options=options):
+        if isinstance(message, ResultMessage):
+            log_result(
+                status=message.subtype,
+                session_id=message.session_id,
+                usage=message.usage,
+                cost=message.total_cost_usd,
+            )
+
+            if message.subtype == "success":
+                return message.result
+
+            raise RuntimeError(f"Agent stopped: {message.subtype}")
+
+asyncio.run(run_agent())</code></pre>
+      </div>
+      <p>Read that code like an engineer, not like a demo. The important part is not that Claude can edit code. The important part is that the application has scoped where it can work, what it may auto-use, how long it can run, how much it can spend, and what evidence gets recorded at the end.</p>
+    </section>
+
+    <section class="section">
+      <p class="label">Options</p>
+      <h2>The option object is your control surface</h2>
+      <p class="lead">When a model writes SDK code, inspect the options first. Most production bugs hide in missing boundaries, not in the prompt string.</p>
+      <table class="option-table">
+        <thead>
+          <tr><th>Option</th><th>What it controls</th><th>What to verify</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>cwd</td><td>The working directory for file and shell operations.</td><td>Make sure the agent is not operating from a parent folder that exposes too much.</td></tr>
+          <tr><td>system_prompt</td><td>The durable behavior instruction for this run.</td><td>Keep it specific to the workflow. Avoid generic personality soup.</td></tr>
+          <tr><td>allowed_tools</td><td>Tools that can be auto-approved.</td><td>Remember: this is an auto-approval list, not the full availability boundary. Use disallow/blocking controls where needed.</td></tr>
+          <tr><td>permission_mode</td><td>How permission prompts are handled.</td><td>Choose the narrowest mode that still lets the workflow complete.</td></tr>
+          <tr><td>mcp_servers</td><td>External or in-process tool servers.</td><td>Check credentials, data scope, timeout behavior, and whether tool names are allowlisted correctly.</td></tr>
+          <tr><td>hooks</td><td>App-side event handlers before or after tool activity.</td><td>Use hooks for deterministic checks: block risky commands, audit output, save checkpoints.</td></tr>
+          <tr><td>max_turns</td><td>The maximum number of agent round trips.</td><td>Set a cap so a confused agent cannot loop forever.</td></tr>
+          <tr><td>max_budget_usd</td><td>The spend ceiling for the run.</td><td>Use budgets on unattended or batch workflows.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <p class="label">Control the agent</p>
+      <h2>Tools define capability. Permissions define authority. Hooks define policy.</h2>
+      <p class="lead">Those three ideas are easy to blur together. Keep them separate and agent code becomes much easier to review.</p>
+      <div class="stage-list">
+        <article class="stage-row">
+          <div class="stage-number">01</div>
+          <div><h3>Tools</h3><p>What actions Claude can ask to perform.</p></div>
+          <div><p>Built-ins include file reads, edits, shell commands, search, and similar coding-agent actions. MCP and custom tools expose your application-specific capabilities.</p></div>
+        </article>
+        <article class="stage-row">
+          <div class="stage-number">02</div>
+          <div><h3>Permissions</h3><p>Which requested actions can proceed.</p></div>
+          <div><p>Permissions are where you decide whether an action is auto-approved, requires confirmation, or must be blocked. Auto-approval should be earned, not assumed.</p></div>
+        </article>
+        <article class="stage-row">
+          <div class="stage-number">03</div>
+          <div><h3>Hooks</h3><p>Deterministic application code around the loop.</p></div>
+          <div><p>Hooks can validate a tool request before it runs, audit outputs after it runs, or save state when the agent stops. They are not model judgment. They are your code.</p></div>
+        </article>
+        <article class="stage-row">
+          <div class="stage-number">04</div>
+          <div><h3>Limits</h3><p>Caps on turns, cost, runtime, and working scope.</p></div>
+          <div><p>Limits are the difference between a helpful autonomous worker and an unbounded background process. Every product workflow should have explicit stop conditions.</p></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Hooks</p>
+      <h2>Use hooks for the rules you cannot leave to vibes</h2>
+      <p class="lead">A good prompt can ask the model to avoid dangerous commands. A hook can actually block one. That is the safety difference.</p>
+      <div class="code-card">
+        <div class="code-title"><span>python</span><span>PreToolUse guardrail</span></div>
+        <pre><code>from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient, HookMatcher
+
+async def block_risky_bash(input_data, tool_use_id, context):
+    if input_data["tool_name"] != "Bash":
+        return {}
+
+    command = input_data["tool_input"].get("command", "")
+    risky = ["rm -rf", "git reset --hard", "curl | bash"]
+
+    if any(pattern in command for pattern in risky):
+        return {
+            "hookSpecificOutput": {
+                "hookEventName": "PreToolUse",
+                "permissionDecision": "deny",
+                "permissionDecisionReason": "Blocked risky shell command",
+            }
+        }
+
+    return {}
+
+options = ClaudeAgentOptions(
+    allowed_tools=["Read", "Edit", "Bash"],
+    hooks={
+        "PreToolUse": [
+            HookMatcher(matcher="Bash", hooks=[block_risky_bash])
+        ]
+    },
+)</code></pre>
+      </div>
+      <p>Notice the pattern: the model can still propose a Bash command, but the application owns the final enforcement. This is how agent products become reviewable. You can test the hook with known-bad commands, inspect the denial reason, and prove the boundary works.</p>
+    </section>
+
+    <section class="section">
+      <p class="label">Extend</p>
+      <h2>Custom tools are where your product enters the loop</h2>
+      <p class="lead">Reading files and running shell commands are useful for coding tasks. Product agents need business actions: fetch an order, look up a customer, create a ticket, schedule a job, update a record, run a calculation.</p>
+      <p>The SDK supports MCP servers, and the Python client can define custom tools as in-process SDK MCP servers. That keeps simple app-owned tools in the same Python process instead of launching a separate server just to expose one function.</p>
+      <div class="code-card">
+        <div class="code-title"><span>python</span><span>in-process custom tool</span></div>
+        <pre><code>from claude_agent_sdk import (
+    tool,
+    create_sdk_mcp_server,
+    ClaudeAgentOptions,
+    ClaudeSDKClient,
+)
+
+@tool("get_order_status", "Look up an order by id", {"order_id": str})
+async def get_order_status(args):
+    order = await orders_db.fetch(args["order_id"])
+    return {
+        "content": [
+            {"type": "text", "text": f"status={order.status}; eta={order.eta}"}
+        ]
+    }
+
+app_tools = create_sdk_mcp_server(
+    name="app",
+    version="1.0.0",
+    tools=[get_order_status],
+)
+
+options = ClaudeAgentOptions(
+    mcp_servers={"app": app_tools},
+    allowed_tools=["mcp__app__get_order_status"],
+)
+
+async with ClaudeSDKClient(options=options) as client:
+    await client.query("Check order A123 and explain the delay.")
+    async for message in client.receive_response():
+        print(message)</code></pre>
+      </div>
+      <p>Design custom tools like APIs you expect a stranger to call correctly: narrow names, typed inputs, explicit outputs, stable errors, short responses, idempotency when possible, and no hidden side effects unless the tool name makes the side effect obvious.</p>
+    </section>
+
+    <section class="section">
+      <p class="label">Capture the result</p>
+      <h2>The final answer is not the only output</h2>
+      <p class="lead">A serious agent run produces operational evidence. Capture it. You will need it for debugging, billing, analytics, evaluation, support, and compliance.</p>
+      <div class="columns">
+        <div>
+          <h3>Record every run</h3>
+          <ul class="checklist">
+            <li>Prompt or task identifier.</li>
+            <li>Session ID or run ID.</li>
+            <li>Status or stop subtype.</li>
+            <li>Model, options, and tool configuration version.</li>
+            <li>Token usage, cost, and duration.</li>
+            <li>Tool calls and permission decisions.</li>
+            <li>Final result or failure reason.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Watch for bad endings</h3>
+          <ul class="checklist">
+            <li>Turn limit hit before a result.</li>
+            <li>Budget limit hit mid-task.</li>
+            <li>Tool denied repeatedly.</li>
+            <li>Unstructured tool output confused the next step.</li>
+            <li>Agent changed unrelated files.</li>
+            <li>Final answer claims verification that never ran.</li>
+            <li>Session is not resumable or auditable.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Ship safely</p>
+      <h2>The production checklist is boring on purpose</h2>
+      <p class="lead">A demo agent optimizes for delight. A production agent optimizes for bounded autonomy.</p>
+      <div class="stage-list">
+        <article class="stage-row">
+          <div class="stage-number">01</div>
+          <div><h3>Least privilege</h3><p>Give the agent only the tools and data needed for the workflow.</p></div>
+          <ul>
+            <li>Prefer read-only tools until writes are necessary.</li>
+            <li>Separate high-impact write tools from low-risk lookup tools.</li>
+            <li>Use app-side authorization, not just prompt instructions.</li>
+          </ul>
+        </article>
+        <article class="stage-row">
+          <div class="stage-number">02</div>
+          <div><h3>Cap cost and turns</h3><p>Autonomy needs hard limits.</p></div>
+          <ul>
+            <li>Set turn caps for every unattended workflow.</li>
+            <li>Set budget caps for batch or background jobs.</li>
+            <li>Alert when retries or denials spike.</li>
+          </ul>
+        </article>
+        <article class="stage-row">
+          <div class="stage-number">03</div>
+          <div><h3>Verify outputs</h3><p>The agent should prove work, not just report confidence.</p></div>
+          <ul>
+            <li>Run tests for code changes.</li>
+            <li>Use structured outputs where downstream code depends on fields.</li>
+            <li>Check files, database writes, or tickets actually changed as expected.</li>
+          </ul>
+        </article>
+        <article class="stage-row">
+          <div class="stage-number">04</div>
+          <div><h3>Log every run</h3><p>If you cannot reconstruct it, you cannot debug it.</p></div>
+          <ul>
+            <li>Trace model messages, tool calls, hook decisions, and final status.</li>
+            <li>Scrub secrets and sensitive payloads before storage.</li>
+            <li>Keep enough evidence to reproduce failures.</li>
+          </ul>
+        </article>
+      </div>
+      <div class="callout">
+        <strong>The AI-engineer review question</strong>
+        <p>When a model writes Claude Agent SDK code for you, do not stop at "it imports correctly." Check whether it scoped tools, set limits, handled non-success results, logged usage, validated risky tool calls, and made verification observable.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Decision tree</p>
+      <h2>When should you use the Agent SDK?</h2>
+      <div class="principles">
+        <article class="principle">
+          <h3>Use the Client SDK</h3>
+          <p>When you want direct Claude API calls and you are comfortable managing prompts, tool calls, tool results, conversation history, and loop termination yourself.</p>
+        </article>
+        <article class="principle">
+          <h3>Use the Agent SDK</h3>
+          <p>When you want the Claude Code-style loop inside your own process, with built-in tool execution, context management, permissions, hooks, MCP, and sessions.</p>
+        </article>
+        <article class="principle">
+          <h3>Use Managed Agents</h3>
+          <p>When you want Anthropic-managed infrastructure and session storage instead of running the agent loop and environment in your own application process.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Sources</p>
+      <h2>Docs worth keeping open</h2>
+      <ul class="source-list">
+        <li><a href="https://code.claude.com/docs/en/agent-sdk/overview">Claude Agent SDK overview</a><span>The official overview: built-in tools, agent loop, installation, quick examples, and comparison with other Claude tools.</span></li>
+        <li><a href="https://github.com/anthropics/claude-agent-sdk-python">Anthropic Claude Agent SDK for Python</a><span>Python package README with installation, <code>query()</code>, <code>ClaudeSDKClient</code>, tools, hooks, errors, and release details.</span></li>
+        <li><a href="https://platform.claude.com/docs/en/cli-sdks-libraries/overview">Claude Platform: CLI, SDKs, and libraries</a><span>Where the Agent SDK fits relative to client SDKs, the CLI, Claude Code, and managed agents.</span></li>
+        <li><a href="https://claude.com/blog/building-agents-with-the-claude-agent-sdk">Building agents with the Claude Agent SDK</a><span>Anthropic's article on the harness, the feedback loop, tool access, and agent design principles.</span></li>
+        <li><a href="https://platform.claude.com/docs/en/managed-agents/migration">Managed Agents migration guide</a><span>A useful contrast for what changes when the agent loop moves from your process to managed infrastructure.</span></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-note">Built for <a href="https://hackproduct.com">HackProduct</a> by Raja Ashok. Model reasons. SDK executes. Your app enforces.</div>
+  </footer>
+</body>
+</html>
