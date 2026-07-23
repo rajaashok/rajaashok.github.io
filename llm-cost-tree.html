@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The LLM Cost Tree: 15 Levers to Lower Cost Without Lowering Quality | Raja Ashok</title>
+  <meta name="description" content="A practical guide to lowering LLM cost per successful task through model routing, context control, structured outputs, caching, bounded agent loops, and outcome measurement.">
+  <meta property="og:title" content="The LLM Cost Tree: 15 Levers to Lower Cost Without Lowering Quality">
+  <meta property="og:description" content="Optimize cost per successful task, not cost per token. A detailed engineering guide to model choice, context, output, reuse, and execution control.">
+  <meta property="og:image" content="https://rajaashok.github.io/assets/llm-cost-tree.png">
+  <meta property="og:url" content="https://rajaashok.github.io/llm-cost-tree">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://rajaashok.github.io/llm-cost-tree">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%231c261f'/%3E%3Cpath d='M4 4h8v2H6v2h5v2H6v2H4z' fill='%23f4ebdc'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/assets/roadmap-project.css">
+  <style>
+    .poster-first {
+      border-top: 1px solid #202b2a;
+      border-bottom: 1px solid #202b2a;
+      background: #02090c;
+      color: var(--white);
+      padding: 38px 0 46px;
+    }
+
+    .poster-wrap {
+      display: grid;
+      grid-template-columns: minmax(300px, 0.62fr) minmax(0, 1fr);
+      gap: 46px;
+      align-items: center;
+    }
+
+    .poster-card {
+      margin: 0;
+      border: 1px solid #263332;
+      border-radius: 8px;
+      background: #020608;
+      padding: 10px;
+      box-shadow: 0 30px 84px rgba(0, 0, 0, 0.36);
+    }
+
+    .poster-card img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 5px;
+      background: #000;
+    }
+
+    .poster-note h2 {
+      color: #f3f1eb;
+      font-family: "Inter", sans-serif;
+      font-size: 30px;
+      line-height: 1.17;
+      font-weight: 800;
+    }
+
+    .poster-note p {
+      color: #aeb8b4;
+      font-size: 16px;
+    }
+
+    .equation {
+      margin: 28px 0 0;
+      border: 1px solid #34433f;
+      border-left: 5px solid #55db8d;
+      border-radius: 7px;
+      background: #0d1515;
+      padding: 20px 22px;
+      color: #eff3f0;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .equation strong { color: #65e79a; }
+
+    .branch-index {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 1px;
+      margin-top: 30px;
+      border: 1px solid var(--line);
+      background: var(--line);
+    }
+
+    .branch-index a {
+      min-width: 0;
+      background: var(--paper);
+      padding: 18px 14px;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .branch-index a:hover { background: #fff4e6; }
+
+    .branch-index strong,
+    .branch-index span {
+      display: block;
+    }
+
+    .branch-index strong {
+      margin-bottom: 6px;
+      color: var(--orange);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px;
+    }
+
+    .branch-index span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .branch-head {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+      margin-bottom: 20px;
+    }
+
+    .branch-letter {
+      display: grid;
+      width: 62px;
+      height: 62px;
+      place-items: center;
+      border: 2px solid var(--teal);
+      color: var(--teal);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 27px;
+      font-weight: 700;
+    }
+
+    .branch-c .branch-letter { border-color: #d58a14; color: #c97e08; }
+    .branch-e .branch-letter { border-color: #d75c43; color: #c84f38; }
+
+    .lever-list {
+      margin-top: 28px;
+      border-top: 3px solid var(--ink);
+    }
+
+    .lever {
+      display: grid;
+      grid-template-columns: 78px minmax(190px, 0.7fr) minmax(0, 1.3fr);
+      gap: 24px;
+      padding: 25px 0 27px;
+      border-bottom: 1px solid var(--line);
+      align-items: start;
+    }
+
+    .lever-number {
+      color: var(--teal);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 31px;
+      line-height: 1;
+      font-weight: 700;
+    }
+
+    .branch-c .lever-number { color: #c97e08; }
+    .branch-e .lever-number { color: #c84f38; }
+
+    .lever h3 {
+      margin-bottom: 7px;
+      font-size: 18px;
+      text-transform: uppercase;
+    }
+
+    .lever p { margin: 0; }
+    .lever p + p { margin-top: 12px; }
+
+    .test-line {
+      color: var(--ink) !important;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .code-card {
+      margin-top: 28px;
+      border: 1px solid #303a36;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #0d1210;
+      color: #dce3df;
+    }
+
+    .code-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      border-bottom: 1px solid #29302d;
+      padding: 14px 18px;
+      color: #43dca5;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      padding: 21px 22px 25px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px;
+      line-height: 1.72;
+      white-space: pre;
+    }
+
+    code {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.94em;
+    }
+
+    .inline-code {
+      border: 1px solid rgba(28, 38, 31, 0.14);
+      border-radius: 4px;
+      background: rgba(255, 250, 241, 0.8);
+      padding: 1px 5px;
+      color: var(--ink);
+    }
+
+    .diagnostic-table {
+      width: 100%;
+      margin-top: 28px;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+
+    .diagnostic-table th,
+    .diagnostic-table td {
+      border-bottom: 1px solid var(--line);
+      padding: 14px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .diagnostic-table th {
+      color: var(--ink);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .diagnostic-table td:nth-child(2) {
+      color: var(--orange);
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .quote-strip {
+      margin-top: 30px;
+      border-left: 6px solid var(--teal);
+      background: rgba(21, 157, 118, 0.07);
+      padding: 20px 24px;
+      color: var(--ink);
+      font-size: 18px;
+    }
+
+    .rollout {
+      margin: 28px 0 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: rollout;
+      border-top: 3px solid var(--ink);
+    }
+
+    .rollout li {
+      display: grid;
+      grid-template-columns: 54px minmax(0, 1fr);
+      gap: 18px;
+      border-bottom: 1px solid var(--line);
+      padding: 20px 0;
+      color: var(--muted);
+    }
+
+    .rollout li::before {
+      counter-increment: rollout;
+      content: counter(rollout, decimal-leading-zero);
+      color: var(--orange);
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 700;
+    }
+
+    .source-list {
+      margin: 22px 0 0;
+      padding: 0;
+      list-style: none;
+      border-top: 3px solid var(--ink);
+    }
+
+    .source-list li {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .source-list a {
+      color: var(--orange);
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .source-list span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 900px) {
+      .poster-wrap { grid-template-columns: 1fr; }
+      .poster-card { width: min(100%, 590px); margin: 0 auto; }
+      .branch-index { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 680px) {
+      .lever { grid-template-columns: 58px minmax(0, 1fr); gap: 14px; }
+      .lever > div:last-child { grid-column: 2; }
+      .branch-head { grid-template-columns: 58px minmax(0, 1fr); gap: 16px; }
+      .branch-letter { width: 52px; height: 52px; }
+      .diagnostic-table { display: block; overflow-x: auto; }
+    }
+
+    @media (max-width: 500px) {
+      .poster-first { padding-top: 24px; }
+      .branch-index { grid-template-columns: 1fr; }
+      pre { padding: 16px; font-size: 11.5px; }
+      .poster-note h2 { font-size: 25px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="shell sitebar">
+    <a class="brand" href="/"><span>HackProduct</span> &middot; The Notebook</a>
+    <a class="back" href="/">Back to all projects</a>
+  </header>
+
+  <section class="shell hero">
+    <p class="eyebrow">HackProduct &middot; AI Engineering &middot; Cost Systems</p>
+    <h1>The LLM Cost Tree: 15 Levers to Lower Cost Without Lowering Quality</h1>
+    <p class="dek">The useful optimization target is not the cheapest token. It is the lowest cost for a task that actually succeeds.</p>
+    <div class="meta">
+      <span>July 2026</span>
+      <span>LLM economics</span>
+      <span>Production guide</span>
+      <span>18 min read</span>
+    </div>
+  </section>
+
+  <section class="poster-first" aria-label="LLM cost optimization tree diagram">
+    <div class="shell poster-wrap">
+      <figure class="poster-card">
+        <a href="/assets/llm-cost-tree.png" aria-label="Open the full LLM Cost Tree diagram">
+          <img src="/assets/llm-cost-tree.png" width="972" height="1619" alt="The LLM Cost Tree showing fifteen levers across model choice, context, output generation, reuse, and execution control">
+        </a>
+      </figure>
+      <div class="poster-note">
+        <h2>Cost is a system, not a price list</h2>
+        <p>A cheaper model can become more expensive when it retries, calls too many tools, produces unusable output, or needs a frontier model to repair the result. A more expensive model can be economical when it succeeds in one bounded pass.</p>
+        <p>The tree organizes the optimization problem into five surfaces: spend less per call, send fewer tokens, generate less, avoid repeated work, and control execution. The article below turns every leaf into an implementation decision and a test.</p>
+        <div class="equation"><strong>COST PER SUCCESS</strong><br>tokens &times; price &times; attempts &times; tool loops<br><br>Optimize the complete path, not one line item.</div>
+        <div class="asset-actions">
+          <a class="asset-link" href="/assets/llm-cost-tree.png">Open full-resolution diagram</a>
+        </div>
+        <div class="asset-meta">Portrait PNG &middot; 972 x 1619 &middot; HackProduct visual guide</div>
+      </div>
+    </div>
+  </section>
+
+  <main class="shell">
+    <section class="section intro-grid">
+      <div>
+        <p class="label">The operating metric</p>
+        <h2>Measure cost per successful task</h2>
+        <p class="lead">Token spend is an input metric. Successful work is the outcome.</p>
+        <p>If one workflow costs $0.03 per run but succeeds only half the time, its effective model cost is already $0.06 per successful result before support, review, and reprocessing. If a $0.05 workflow succeeds 95% of the time, it may be the better production choice.</p>
+        <p>This is why naive cost optimization is dangerous. Reducing context may lower input tokens while increasing hallucinations. Switching every request to a small model may lower the invoice per call while increasing retries. Aggressive semantic caching may create cheap answers that are stale or wrong.</p>
+        <p>The denominator forces discipline. Define success for the task, record the cost of every attempt, and optimize the full path until the successful outcome is cheaper.</p>
+      </div>
+      <dl class="facts">
+        <div><dt>Primary metric</dt><dd>Cost per successful task</dd></div>
+        <div><dt>Supporting metric</dt><dd>Success rate by task class</dd></div>
+        <div><dt>Efficiency</dt><dd>Input and output tokens</dd></div>
+        <div><dt>Reliability</dt><dd>Retries and repair passes</dd></div>
+        <div><dt>Agent control</dt><dd>Turns, tools, time, budget</dd></div>
+        <div><dt>User impact</dt><dd>Latency and quality</dd></div>
+      </dl>
+    </section>
+
+    <section class="section">
+      <p class="label">The map</p>
+      <h2>Five branches, fifteen levers</h2>
+      <p class="lead">Use the tree as a diagnostic sequence. Start with the branch that matches the waste you can observe.</p>
+      <nav class="branch-index" aria-label="Cost tree branches">
+        <a href="#branch-a"><strong>A</strong><span>Spend less per call</span></a>
+        <a href="#branch-b"><strong>B</strong><span>Send fewer tokens</span></a>
+        <a href="#branch-c"><strong>C</strong><span>Generate less</span></a>
+        <a href="#branch-d"><strong>D</strong><span>Avoid repeated work</span></a>
+        <a href="#branch-e"><strong>E</strong><span>Control execution</span></a>
+      </nav>
+      <p class="quote-strip">The order matters: remove waste before negotiating price. A discount on unnecessary work is still unnecessary work.</p>
+    </section>
+
+    <section class="section branch-a" id="branch-a">
+      <div class="branch-head">
+        <div class="branch-letter">A</div>
+        <div><p class="label">Model choice</p><h2>Spend less per call</h2><p class="lead">Match model capability to the task, then pay for escalation only when the evidence says you need it.</p></div>
+      </div>
+      <div class="lever-list">
+        <article class="lever">
+          <div class="lever-number">01</div>
+          <div><h3>Right-size the model</h3><p>Simple task &rarr; smaller model</p></div>
+          <div><p>Classify the work before selecting the model. Extraction, tagging, normalization, formatting, and narrow retrieval-grounded answers often need less reasoning than architecture review, ambiguous debugging, or multi-document synthesis.</p><p>Do not decide from model reputation. Build a representative evaluation set and compare success rate, latency, and total cost. The smallest model that clears the quality threshold is the right model for that task class.</p><p class="test-line">First test: replay 100 real tasks across two model tiers and compare cost per accepted result.</p></div>
+        </article>
+        <article class="lever">
+          <div class="lever-number">02</div>
+          <div><h3>Route by complexity</h3><p>Classify &rarr; small or frontier</p></div>
+          <div><p>A router can use task type, input length, domain, requested action, risk level, or a lightweight classifier. The router itself should be cheap, deterministic where possible, and observable.</p><p>Keep the policy understandable. If every routing decision depends on another unconstrained LLM call, you may simply move the cost. Start with explicit rules, then add learned routing only when the data shows a meaningful gain.</p><p class="test-line">First test: log the router decision and calculate success rate for each route, including misroutes.</p></div>
+        </article>
+        <article class="lever">
+          <div class="lever-number">03</div>
+          <div><h3>Escalate selectively</h3><p>Cheap first &rarr; frontier if needed</p></div>
+          <div><p>Escalation works when failure is detectable. Trigger it on schema failure, low retrieval confidence, missing citations, failed verification, conflicting evidence, policy-sensitive intent, or an explicit uncertainty signal backed by tests.</p><p>Avoid blind double inference. If every small-model response is automatically reviewed by a larger model, the system has not saved a call. Escalate only when a measurable gate fails.</p><p class="test-line">First test: measure how often escalation changes an incorrect result into a correct one.</p></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="branch-b">
+      <div class="branch-head">
+        <div class="branch-letter">B</div>
+        <div><p class="label">Context</p><h2>Send fewer tokens</h2><p class="lead">The model should see the evidence required for the current decision, not the entire history of the system.</p></div>
+      </div>
+      <div class="lever-list">
+        <article class="lever">
+          <div class="lever-number">04</div>
+          <div><h3>Trim context</h3><p>20K history &rarr; 2K relevant</p></div>
+          <div><p>Remove duplicated instructions, stale turns, boilerplate, navigation text, irrelevant tool output, and documents that cannot affect the answer. Preserve the current task, active constraints, evidence, and decisions that still matter.</p><p>Token trimming needs regression tests. A smaller prompt is only an improvement when task success holds. Track which removed context later causes repair calls; that is evidence your trimming policy is too aggressive.</p><p class="test-line">First test: compare full-history and trimmed-history outputs on long conversations with known answers.</p></div>
+        </article>
+        <article class="lever">
+          <div class="lever-number">05</div>
+          <div><h3>Summarize memory</h3><p>Long thread &rarr; compact state</p></div>
+          <div><p>Replace old conversational detail with durable state: goals, decisions, constraints, unresolved questions, entities, and source references. Keep the recent turns verbatim so the model can interpret the current exchange.</p><p>Summaries are lossy. Store provenance or links to the original events, version the summary, and regenerate it when contradictions appear. Never let a summary silently become the only copy of a critical fact.</p><p class="test-line">First test: ask factual questions from early in the thread after multiple summary updates.</p></div>
+        </article>
+        <article class="lever">
+          <div class="lever-number">06</div>
+          <div><h3>Retrieve, do not stuff</h3><p>Query &rarr; top-k evidence</p></div>
+          <div><p>Retrieve the smallest set of passages that can support the answer. Use metadata filters, hybrid search, reranking, and task-aware chunking so relevant evidence appears before the context budget is exhausted.</p><p>Do not optimize only for fewer chunks. Measure retrieval recall on a gold set. Missing the one decisive passage can create a cheap prompt and an expensive failure.</p><p class="test-line">First test: measure recall@k and answer success as k changes.</p></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section branch-c" id="branch-c">
+      <div class="branch-head">
+        <div class="branch-letter">C</div>
+        <div><p class="label">Output</p><h2>Generate less</h2><p class="lead">Output tokens are expensive, but the larger waste is output that downstream code cannot use.</p></div>
+      </div>
+      <div class="lever-list">
+        <article class="lever">
+          <div class="lever-number">07</div>
+          <div><h3>Cap output</h3><p>Schema + token ceiling</p></div>
+          <div><p>Set a maximum output budget that matches the product surface. A three-field classifier does not need an essay. A support response may need a few paragraphs. A code generator needs room for a complete artifact, but not unlimited narration.</p><p>Combine token ceilings with explicit length, field, and completion requirements. Watch for truncation: a low cap that produces incomplete JSON or half-written code simply converts token savings into retries.</p><p class="test-line">First test: chart output length, truncation rate, and accepted-result rate by task type.</p></div>
+        </article>
+        <article class="lever">
+          <div class="lever-number">08</div>
+          <div><h3>Use structured output</h3><p>Valid JSON &rarr; fewer retries</p></div>
+          <div><p>When software consumes the response, define the schema at the model boundary. Typed fields remove parsing ambiguity, make validation deterministic, and let the application distinguish a refusal or missing value from malformed prose.</p><p>A schema is not semantic verification. Validate ranges, identifiers, permissions, and business rules after parsing. Structured nonsense is still nonsense.</p><p class="test-line">First test: compare parser failures and repair calls before and after strict schema enforcement.</p></div>
+        </article>
+        <article class="lever">
+          <div class="lever-number">09</div>
+          <div><h3>Tool before model</h3><p>Lookup first; reason second</p></div>
+          <div><p>Use deterministic systems for arithmetic, database lookups, search, filtering, date calculations, policy retrieval, and state changes. Give the model the result and ask it to reason or communicate.</p><p>This reduces hallucination and often shrinks the prompt. It also creates an auditable boundary: the database supplied the balance; the model explained it. The model did not invent the balance.</p><p class="test-line">First test: list every fact the model currently computes that an authoritative tool could return.</p></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="branch-d">
+      <div class="branch-head">
+        <div class="branch-letter">D</div>
+        <div><p class="label">Reuse</p><h2>Avoid repeated work</h2><p class="lead">If the inputs and acceptable outcome have not changed, do not buy the same reasoning again.</p></div>
+      </div>
+      <div class="lever-list">
+        <article class="lever">
+          <div class="lever-number">10</div>
+          <div><h3>Cache exact responses</h3><p>Same input &rarr; instant hit</p></div>
+          <div><p>Exact caching is the safest reuse strategy. Build the key from normalized input, model, prompt version, tool version, relevant permissions, and data freshness. Include every field that can change the correct answer.</p><p>Use explicit expiration and invalidation. A cache without ownership becomes a silent source of stale answers.</p><p class="test-line">First test: calculate hit rate and inspect a sample of hits for false equivalence.</p></div>
+        </article>
+        <article class="lever">
+          <div class="lever-number">11</div>
+          <div><h3>Cache prompt prefixes</h3><p>Reuse stable instructions</p></div>
+          <div><p>Put stable system instructions, tool definitions, policies, and long reference material before the changing user content. Provider prompt caching can reuse this prefix when requests share the same beginning.</p><p>Keep the prefix genuinely stable. Timestamps, random IDs, reordered tools, or changing metadata near the front can break cache reuse. Track cached-token usage instead of assuming the cache is working.</p><p class="test-line">First test: inspect provider usage fields and verify cache hits after the first warm request.</p></div>
+        </article>
+        <article class="lever">
+          <div class="lever-number">12</div>
+          <div><h3>Cache semantically</h3><p>Similar intent &rarr; reuse</p></div>
+          <div><p>Semantic caching can reuse an answer for meaningfully equivalent inputs, but it changes the correctness model. Use it for tolerant, low-risk, slowly changing domains. Avoid it when identity, current state, exact numbers, or subtle wording changes the answer.</p><p>Store the matched query, similarity score, answer provenance, model version, and freshness window. Apply domain and permission filters before similarity search.</p><p class="test-line">First test: review false-positive hits near the similarity threshold before enabling automatic reuse.</p></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section branch-e" id="branch-e">
+      <div class="branch-head">
+        <div class="branch-letter">E</div>
+        <div><p class="label">Control</p><h2>Control execution</h2><p class="lead">Agent cost is not one model call. It is every turn, tool call, retry, wait, and repair inside the run.</p></div>
+      </div>
+      <div class="lever-list">
+        <article class="lever">
+          <div class="lever-number">13</div>
+          <div><h3>Batch async work</h3><p>Many jobs &rarr; one batch</p></div>
+          <div><p>Move non-interactive work such as nightly classification, embedding, evaluation, summarization, and document processing out of the request path. Queue it, deduplicate it, and use provider batch facilities where the latency window fits.</p><p>Batching also improves operational control: you can cap concurrency, group similar workloads, retry failed records, and reconcile outputs by request ID.</p><p class="test-line">First test: separate workloads by latency requirement and identify everything that does not need a live response.</p></div>
+        </article>
+        <article class="lever">
+          <div class="lever-number">14</div>
+          <div><h3>Bound agent loops</h3><p>Turns, tools, timeout</p></div>
+          <div><p>Set hard limits for turns, tool calls, wall-clock time, token usage, and spend. Add idempotency keys for writes. Detect repeated tool calls with unchanged arguments. Stop when progress stalls or the same verification fails repeatedly.</p><p>The stop condition should produce a useful state: partial result, reason for stopping, work completed, evidence collected, and what a human should do next.</p><p class="test-line">First test: run adversarial tasks that cannot be completed and verify the agent stops predictably.</p></div>
+        </article>
+        <article class="lever">
+          <div class="lever-number">15</div>
+          <div><h3>Measure the outcome</h3><p>Tokens, latency, success</p></div>
+          <div><p>Record cost and usage per run, but join them to the task result. Track accepted answer, completion status, verification result, human override, retry count, latency, model route, cache status, and tool activity.</p><p>Aggregate by task class and prompt version. Averages hide expensive tails, so inspect p95 cost, p95 latency, and the small number of runs that consume a disproportionate share of the budget.</p><p class="test-line">First test: produce a weekly table of cost per success by workflow, route, and failure reason.</p></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Reference implementation</p>
+      <h2>Put the budget in code</h2>
+      <p class="lead">A production request should carry explicit limits and produce an outcome record. The example is provider-neutral on purpose.</p>
+      <div class="code-card">
+        <div class="code-title"><span>python</span><span>route, budget, verify, measure</span></div>
+        <pre><code>from dataclasses import dataclass
+from time import monotonic
+
+@dataclass(frozen=True)
+class RunBudget:
+    max_input_tokens: int = 8_000
+    max_output_tokens: int = 800
+    max_turns: int = 6
+    max_tool_calls: int = 10
+    timeout_seconds: int = 45
+    max_cost_usd: float = 0.25
+
+def choose_model(task):
+    if task.risk == "high" or task.requires_deep_reasoning:
+        return "frontier"
+    return "small"
+
+def run_task(task, budget=RunBudget()):
+    started = monotonic()
+    model = choose_model(task)
+    context = retrieve_relevant_context(task, limit=6)
+    cache_key = exact_cache_key(task, model, context.version)
+
+    if cached := exact_cache.get(cache_key):
+        return record_outcome(task, cached, cache_hit=True)
+
+    state = AgentState()
+    while state.turns &lt; budget.max_turns:
+        enforce_budget(state, budget, started)
+        response = call_model(
+            model=model,
+            task=task,
+            context=context,
+            state=state.compact_memory(),
+            output_schema=ResultSchema,
+            max_output_tokens=budget.max_output_tokens,
+        )
+
+        if response.tool_request:
+            result = execute_approved_tool(response.tool_request)
+            state.add_tool_result(result)
+            continue
+
+        if verify(response, task):
+            exact_cache.put(cache_key, response)
+            return record_outcome(task, response, success=True)
+
+        if model == "small" and should_escalate(response, state):
+            model = "frontier"
+            state.note("escalated_after_failed_verification")
+            continue
+
+        state.note("verification_failed")
+
+    return record_outcome(task, state.partial_result, success=False)</code></pre>
+      </div>
+      <p>This shape makes the economics reviewable. Routing is explicit. Context has a limit. Caching is versioned. Tool calls are controlled. Output follows a schema. Escalation follows a failed gate. The loop has a stop condition. Every exit records an outcome.</p>
+    </section>
+
+    <section class="section">
+      <p class="label">Diagnosis</p>
+      <h2>Start from the symptom</h2>
+      <p class="lead">The fastest optimization is usually the one that explains a visible failure mode.</p>
+      <table class="diagnostic-table">
+        <thead><tr><th>Observed symptom</th><th>Start here</th><th>First investigation</th></tr></thead>
+        <tbody>
+          <tr><td>Low cost per call, high total bill</td><td>03, 14</td><td>Count retries, repair calls, agent turns, and repeated tool calls.</td></tr>
+          <tr><td>Long prompts grow every week</td><td>04, 05, 06</td><td>Break input tokens into history, instructions, retrieved evidence, and tool output.</td></tr>
+          <tr><td>Responses are correct but verbose</td><td>07, 08</td><td>Define the exact product schema and the maximum useful output length.</td></tr>
+          <tr><td>Many identical support or analysis requests</td><td>10, 12</td><td>Measure exact duplicates before introducing semantic similarity.</td></tr>
+          <tr><td>Large stable system prompt or tool catalog</td><td>11</td><td>Inspect cached input-token fields and stabilize the request prefix.</td></tr>
+          <tr><td>Small model is cheap but unreliable</td><td>01, 02, 03</td><td>Segment failures by task complexity and design a measurable escalation gate.</td></tr>
+          <tr><td>Agent occasionally consumes extreme spend</td><td>14, 15</td><td>Inspect p95 turns, tool calls, duration, and cost by stop reason.</td></tr>
+          <tr><td>Cost fell, but users complain more</td><td>15</td><td>Check whether the success definition and evaluation set match real user outcomes.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <p class="label">Rollout order</p>
+      <h2>A practical sequence for an existing product</h2>
+      <ol class="rollout">
+        <li><div><strong>Instrument before changing behavior.</strong> Record model, prompt version, tokens, latency, retries, tools, cache state, cost, and success for every run.</div></li>
+        <li><div><strong>Remove obvious waste.</strong> Delete duplicated prompt text, cap unreasonable outputs, stop repeated tool calls, and move non-live work to queues.</div></li>
+        <li><div><strong>Create task-level evaluations.</strong> Cost optimization without a stable quality test is guesswork. Use production examples and real acceptance criteria.</div></li>
+        <li><div><strong>Introduce routing and escalation.</strong> Start with explainable rules, then compare routes using cost per successful task.</div></li>
+        <li><div><strong>Add reuse in risk order.</strong> Exact response cache first, provider prefix cache second, semantic cache only after false-hit review.</div></li>
+        <li><div><strong>Review the expensive tail weekly.</strong> The top one percent of runs often reveals loops, retrieval failure, broken tools, and missing stop conditions.</div></li>
+      </ol>
+    </section>
+
+    <section class="section">
+      <p class="label">AI-engineer review</p>
+      <h2>How to review cost optimizations written by a model</h2>
+      <div class="columns">
+        <div>
+          <h3>Check the economics</h3>
+          <ul class="checklist">
+            <li>Does the code measure success, or only tokens?</li>
+            <li>Does routing include the cost of the router?</li>
+            <li>Does escalation happen selectively?</li>
+            <li>Are cache hits and misses observable?</li>
+            <li>Are batch savings worth the added latency?</li>
+            <li>Can one runaway agent exceed the budget?</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Check correctness</h3>
+          <ul class="checklist">
+            <li>Can trimmed context remove a critical constraint?</li>
+            <li>Can the memory summary drift from source events?</li>
+            <li>Does structured output still need semantic validation?</li>
+            <li>Does the cache key include permissions and freshness?</li>
+            <li>Can semantic similarity cross customer boundaries?</li>
+            <li>Does the stop condition return an auditable partial state?</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout">
+        <strong>The review question</strong>
+        <p>Did this change reduce the cost of successful work, or did it merely make one API call look cheaper?</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Sources</p>
+      <h2>Provider docs worth keeping open</h2>
+      <p>Pricing, caching behavior, model support, and batch rules change. Verify the current provider documentation before turning any example into a financial forecast.</p>
+      <ul class="source-list">
+        <li><a href="https://platform.openai.com/docs/guides/prompt-caching">OpenAI prompt caching</a><span>How repeated prompt prefixes are detected, reported, and billed.</span></li>
+        <li><a href="https://platform.openai.com/docs/guides/structured-outputs">OpenAI Structured Outputs</a><span>Schema-constrained responses and the distinction from older JSON mode.</span></li>
+        <li><a href="https://platform.openai.com/docs/guides/batch">OpenAI Batch API</a><span>Asynchronous request processing for workloads that do not require immediate responses.</span></li>
+        <li><a href="https://platform.openai.com/docs/api-reference/usage">OpenAI Usage API</a><span>Organization-level usage and cost reporting fields for measurement and reconciliation.</span></li>
+        <li><a href="https://docs.anthropic.com/en/docs/about-claude/pricing">Anthropic pricing and cost optimization</a><span>Model pricing, prompt-cache pricing, batch guidance, and agent cost considerations.</span></li>
+        <li><a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching">Anthropic prompt caching</a><span>Cache breakpoints, cache reads and writes, and prompt-prefix design.</span></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell">
+      <p class="footer-note">HackProduct &middot; AI engineering judgment through visual systems</p>
+      <p>Built by <a href="https://hackproduct.com">Raja Ashok</a>. Read the diagram, test the assumptions, and measure the outcome.</p>
+    </div>
+  </footer>
+</body>
+</html>
