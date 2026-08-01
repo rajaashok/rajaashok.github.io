@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hermes Content Factory: An End-to-End Agent Workflow | Raja Ashok</title>
+  <meta name="description" content="A practical guide to building a Hermes-powered workflow that receives one request, routes work by model strength and cost, verifies every result, and delivers a complete content pack.">
+  <meta property="og:title" content="Hermes Content Factory: One Request, a Team of Agents">
+  <meta property="og:description" content="Start with one atomic loop, route each task to the right model, and compose reliable workflows for research, creation, verification, and distribution.">
+  <meta property="og:image" content="/assets/hermes-content-engine-unbranded.gif">
+  <meta property="og:type" content="article">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%231c261f'/%3E%3Cpath d='M4 4h8v2H6v2h5v2H6v2H4z' fill='%23f4ebdc'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/assets/roadmap-project.css">
+  <style>
+    .workflow-media {
+      display: grid;
+      grid-template-columns: minmax(300px, 0.72fr) minmax(0, 1.28fr);
+      gap: 2px;
+      background: #202422;
+    }
+
+    .workflow-gif {
+      display: block;
+      width: min(100%, 540px);
+      height: auto;
+      margin: 0 auto;
+      background: #06070b;
+    }
+
+    .media-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .media-copy h2 {
+      max-width: 620px;
+      font-family: "Playfair Display", serif;
+      font-size: 38px;
+      line-height: 1.12;
+    }
+
+    .media-copy p {
+      max-width: 620px;
+      margin-top: 18px;
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    .loop {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .loop-step {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--paper);
+      padding: 22px 18px;
+    }
+
+    .loop-step:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      top: 50%;
+      right: -20px;
+      z-index: 2;
+      width: 28px;
+      transform: translateY(-50%);
+      border-radius: 999px;
+      background: var(--page);
+      color: var(--orange);
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .loop-icon {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 27px;
+    }
+
+    .loop-step h3 {
+      margin-bottom: 6px;
+    }
+
+    .loop-step p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .routing-table {
+      width: 100%;
+      margin-top: 30px;
+      border-collapse: collapse;
+      background: var(--paper);
+      box-shadow: 0 8px 26px rgba(69, 54, 36, 0.05);
+    }
+
+    .routing-table th,
+    .routing-table td {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .routing-table th {
+      background: var(--ink);
+      color: var(--white);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .routing-table td:first-child {
+      width: 23%;
+      color: var(--ink);
+      font-weight: 750;
+    }
+
+    .routing-table td:nth-child(2) {
+      width: 31%;
+    }
+
+    .routing-table td {
+      color: var(--muted);
+    }
+
+    .workflow-cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+      margin-top: 30px;
+    }
+
+    .workflow-card {
+      border-top: 5px solid var(--teal);
+      background: var(--paper);
+      padding: 28px;
+      box-shadow: 0 8px 24px rgba(69, 54, 36, 0.06);
+    }
+
+    .workflow-card:nth-child(2) { border-color: #7a4fc4; }
+    .workflow-card:nth-child(3) { border-color: var(--orange); }
+    .workflow-card:nth-child(4) { border-color: #3577b8; }
+
+    .workflow-card .emoji {
+      display: block;
+      margin-bottom: 12px;
+      font-size: 30px;
+    }
+
+    .workflow-card h3 {
+      margin-bottom: 10px;
+      font-size: 22px;
+    }
+
+    .workflow-card p {
+      margin: 0 0 14px;
+    }
+
+    .workflow-card ol {
+      margin: 0;
+      padding-left: 21px;
+      color: var(--muted);
+    }
+
+    .workflow-card li {
+      margin: 6px 0;
+      padding-left: 3px;
+    }
+
+    .code-card {
+      margin-top: 30px;
+      overflow-x: auto;
+      border-radius: 14px;
+      background: #101512;
+      padding: 26px;
+      color: #dce9e2;
+      box-shadow: 0 12px 34px rgba(6, 8, 7, 0.17);
+    }
+
+    .code-card pre {
+      margin: 0;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px;
+      line-height: 1.75;
+      white-space: pre;
+    }
+
+    .code-card .key { color: #f0c05c; }
+    .code-card .value { color: #76d6b6; }
+    .code-card .comment { color: #7d8b83; }
+
+    @media (max-width: 820px) {
+      .workflow-media,
+      .workflow-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .loop {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .loop-step::after {
+        display: none;
+      }
+
+      .routing-wrap {
+        overflow-x: auto;
+      }
+
+      .routing-table {
+        min-width: 760px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .loop {
+        grid-template-columns: 1fr;
+      }
+
+      .media-copy h2 {
+        font-size: 31px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="shell sitebar">
+    <a class="brand" href="/"><span>Raja Ashok</span> &middot; The Notebook</a>
+    <a class="back" href="/">Back to all projects</a>
+  </header>
+
+  <section class="shell hero">
+    <p class="eyebrow">AI Engineering &middot; Agentic Workflows &middot; Practical Blueprint</p>
+    <h1>The Hermes Content Factory</h1>
+    <p class="dek">One message enters. Hermes turns it into a goal, routes each task to the right model, verifies the work, and delivers a complete content pack.</p>
+    <div class="meta">
+      <span>August 2026</span>
+      <span>10 implementation steps</span>
+      <span>15.5 second visual</span>
+    </div>
+  </section>
+
+  <section class="media-band" aria-label="Hermes workflow animation">
+    <div class="shell workflow-media">
+      <div class="media-panel">
+        <img class="workflow-gif" src="/assets/hermes-content-engine-unbranded.gif" width="540" height="960" alt="Animated Hermes content factory workflow from chat request through local agent orchestration, research, creation, and distribution">
+        <div class="asset-actions">
+          <a class="asset-link" href="/assets/hermes-content-engine-unbranded.gif" download>Download the GIF</a>
+        </div>
+        <div class="asset-meta">540 x 960 &middot; 12 fps &middot; 15.5 seconds &middot; infinite loop</div>
+      </div>
+      <div class="media-panel media-copy">
+        <p class="label">The mental model</p>
+        <h2>Do not begin with ten agents. Begin with one dependable loop.</h2>
+        <p>The animation shows the eventual system: message channels, a local Hermes orchestrator, Claude and Codex workers, capability packs, parallel researchers, a synthesis agent, asset creators, and six publishing channels. The implementation path is smaller: make one atomic request travel from intent to verified delivery, then compose more loops around it.</p>
+      </div>
+    </div>
+  </section>
+
+  <main class="shell">
+    <section class="section intro-grid">
+      <div>
+        <p class="label">The core idea</p>
+        <h2>Route work by fitness, not by model loyalty.</h2>
+        <p class="lead">A model router should choose the smallest, fastest, least expensive model that can complete the task reliably&mdash;and escalate only when the evidence says it should.</p>
+        <p>Retrieval does not need the same reasoning budget as synthesis. Code generation needs different tools and verification than image creation. Publishing requires permissions and approvals that research does not. Hermes owns that control plane: decompose the goal, assign the work, preserve state, enforce budgets, and decide whether to continue, retry, escalate, or stop.</p>
+      </div>
+      <dl class="facts">
+        <div><dt>Input</dt><dd>One brief</dd></div>
+        <div><dt>Research lanes</dt><dd>Three</dd></div>
+        <div><dt>Creator lanes</dt><dd>Three</dd></div>
+        <div><dt>Model strategy</dt><dd>Route + escalate</dd></div>
+        <div><dt>Output</dt><dd>Verified content pack</dd></div>
+      </dl>
+    </section>
+
+    <section class="section">
+      <p class="label">TL;DR</p>
+      <h2>Make one atomic thing work end to end.</h2>
+      <p class="lead">The smallest useful workflow has four explicit stages. If any stage is vague, the automation is not ready to grow.</p>
+      <div class="loop" aria-label="Atomic agent workflow">
+        <article class="loop-step">
+          <span class="loop-icon" aria-hidden="true">📥</span>
+          <h3>Request</h3>
+          <p>Capture one outcome, its constraints, deadline, and approval boundary.</p>
+        </article>
+        <article class="loop-step">
+          <span class="loop-icon" aria-hidden="true">⚙️</span>
+          <h3>Execute</h3>
+          <p>Choose the worker, load only the needed context, and call bounded tools.</p>
+        </article>
+        <article class="loop-step">
+          <span class="loop-icon" aria-hidden="true">✅</span>
+          <h3>Verify</h3>
+          <p>Test the result against evidence, policy, format, and quality gates.</p>
+        </article>
+        <article class="loop-step">
+          <span class="loop-icon" aria-hidden="true">📦</span>
+          <h3>Deliver</h3>
+          <p>Return the artifact, record the run, and make the next action obvious.</p>
+        </article>
+      </div>
+      <div class="callout">
+        <strong>Composition is the scaling strategy.</strong>
+        <p>After one loop is reliable, add another: research before writing, human approval before publishing, distribution after verification, and reporting after delivery. Complex agentic systems are small dependable workflows composed together.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Model routing</p>
+      <h2>Give every task the right amount of intelligence.</h2>
+      <p class="lead">Evaluate quality, latency, cost, context window, tool support, privacy, and failure impact together. Cost per successful outcome matters more than cost per token.</p>
+      <div class="routing-wrap">
+        <table class="routing-table">
+          <thead>
+            <tr>
+              <th>Work</th>
+              <th>Default route</th>
+              <th>Why</th>
+              <th>Escalate when</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Search and extraction</td>
+              <td>Fast, low-cost model with web and parsing tools</td>
+              <td>High volume, structured outputs, easy source-level checks</td>
+              <td>Sources conflict, retrieval is sparse, or the query is ambiguous</td>
+            </tr>
+            <tr>
+              <td>Classification and ranking</td>
+              <td>Small model with a strict schema and confidence threshold</td>
+              <td>Repeatable decisions benefit from speed and deterministic validation</td>
+              <td>Confidence is low or the decision changes the campaign direction</td>
+            </tr>
+            <tr>
+              <td>Synthesis and narrative</td>
+              <td>Strong reasoning model such as Claude</td>
+              <td>Requires comparison, contradiction handling, judgment, and coherent framing</td>
+              <td>Claims remain unsupported or reviewers disagree on the conclusion</td>
+            </tr>
+            <tr>
+              <td>Code and technical assets</td>
+              <td>Codex with repository context, tests, and validation tools</td>
+              <td>The worker can build the artifact and prove that it runs</td>
+              <td>Tests fail, permissions expand, or production state may change</td>
+            </tr>
+            <tr>
+              <td>Images and video</td>
+              <td>Specialized generation model plus brand and reel skills</td>
+              <td>Visual quality depends on modality-specific models and review criteria</td>
+              <td>Text is incorrect, identity is inconsistent, or the asset misses the brief</td>
+            </tr>
+            <tr>
+              <td>Publishing</td>
+              <td>Deterministic adapters with explicit channel permissions</td>
+              <td>Posting is an action, not a reasoning problem</td>
+              <td>The destination, audience, timing, or content requires human approval</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">End-to-end implementation</p>
+      <h2>Build the workflow in ten explicit steps.</h2>
+      <p class="lead">Each row is a contract. Define its input, output, owner, timeout, evidence, retry behavior, and approval rule before adding another agent.</p>
+
+      <div class="stage-list">
+        <article class="stage-row">
+          <div class="stage-number">01</div>
+          <div><h3>Define one atomic outcome</h3><p>Start with a deliverable, not a broad assistant.</p></div>
+          <ul>
+            <li>Example: &ldquo;Every Monday by 9:00 AM, produce a cited brief comparing Kimi and Opus.&rdquo;</li>
+            <li>Specify audience, format, freshness window, quality bar, budget, and deadline.</li>
+            <li>State what the system may publish automatically and what requires approval.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">02</div>
+          <div><h3>Connect the request channels</h3><p>Let people use the interface they already live in.</p></div>
+          <ul>
+            <li>Accept a message from Telegram, WhatsApp, or Slack through a controlled gateway.</li>
+            <li>Normalize every message into the same brief schema with owner, goal, deadline, and attachments.</li>
+            <li>Add a scheduler for recurring briefs, but keep the same manual trigger for testing.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">03</div>
+          <div><h3>Give Hermes the control plane</h3><p>One orchestrator owns state and the stop condition.</p></div>
+          <ul>
+            <li>Translate the brief into a goal and a small dependency graph.</li>
+            <li>Set maximum model calls, retry budget, wall-clock deadline, and spending limit.</li>
+            <li>Persist task state so a failed run resumes rather than restarts blindly.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">04</div>
+          <div><h3>Load the capability pack</h3><p>Give workers only the context and actions they need.</p></div>
+          <ul>
+            <li>Load research, brand-voice, copy, image, reel, citation, and distribution skills.</li>
+            <li>Connect web search, extraction, file, code, image, video, and publishing tools.</li>
+            <li>Keep approved examples and rules versioned so outputs remain explainable.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">05</div>
+          <div><h3>Run research in parallel</h3><p>Separate evidence lanes before synthesis.</p></div>
+          <ul>
+            <li>Search primary sources and official documentation.</li>
+            <li>Search recent trends and news for current signals.</li>
+            <li>Search user questions and communities for language, confusion, and intent.</li>
+            <li>Return the top five results from each lane with dates, URLs, excerpts, and relevance scores.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">06</div>
+          <div><h3>Synthesize after the join</h3><p>No creator starts from raw search results.</p></div>
+          <ul>
+            <li>Wait for all research lanes or record which one timed out.</li>
+            <li>Deduplicate sources, rank evidence, surface contradictions, and verify dates.</li>
+            <li>Produce one cited campaign brief with thesis, audience, claims, exclusions, and creative angle.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">07</div>
+          <div><h3>Create assets from one brief</h3><p>Fan out only after the facts and angle are stable.</p></div>
+          <ul>
+            <li>Copy agent: article, social caption, hook variants, and channel adaptations.</li>
+            <li>Image agent: poster, carousel, diagrams, and social preview.</li>
+            <li>Video agent: reel storyboard, animation, audio, subtitles, MP4, and GIF.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">08</div>
+          <div><h3>Verify the content pack</h3><p>Creation is not completion.</p></div>
+          <ul>
+            <li>Check citations, factual claims, links, dates, names, spelling, and prohibited content.</li>
+            <li>Validate file dimensions, formats, duration, captions, safe zones, and mobile legibility.</li>
+            <li>Compare every asset against the approved brief and brand rules.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">09</div>
+          <div><h3>Apply the approval boundary</h3><p>Automation speed should not erase accountability.</p></div>
+          <ul>
+            <li>Auto-approve reversible drafts that pass deterministic checks.</li>
+            <li>Require human review for public claims, paid campaigns, sensitive topics, or identity use.</li>
+            <li>Send the reviewer the evidence, recommendation, diffs, and one clear decision.</li>
+          </ul>
+        </article>
+
+        <article class="stage-row">
+          <div class="stage-number">10</div>
+          <div><h3>Publish, observe, and improve</h3><p>The delivery evidence becomes the next input.</p></div>
+          <ul>
+            <li>Publish channel-specific assets through narrow adapters for LinkedIn, Instagram, Facebook, TikTok, Threads, and X.</li>
+            <li>Record the run, artifacts, sources, model choices, latency, cost, approvals, and failures.</li>
+            <li>Feed performance and reviewer corrections into routing rules, examples, and evaluations.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Minimal operating contract</p>
+      <h2>Make the routing rules visible.</h2>
+      <p class="lead">Whether the configuration lives in code, YAML, or a database, a reviewer should be able to see why a worker was chosen and when the workflow escalates.</p>
+      <div class="code-card" aria-label="Example workflow configuration">
+<pre><span class="key">goal:</span> <span class="value">"publish one cited AI trend brief every Monday"</span>
+<span class="key">budget:</span>
+  <span class="key">max_cost_usd:</span> <span class="value">8</span>
+  <span class="key">max_model_calls:</span> <span class="value">24</span>
+  <span class="key">deadline_minutes:</span> <span class="value">45</span>
+<span class="key">routes:</span>
+  <span class="key">research:</span> <span class="value">fast_model + web_search</span>
+  <span class="key">synthesis:</span> <span class="value">reasoning_model + citation_skill</span>
+  <span class="key">technical_assets:</span> <span class="value">codex + validation_tools</span>
+  <span class="key">visuals:</span> <span class="value">image_video_models + brand_skill</span>
+<span class="key">verify:</span>
+  <span class="key">require_citations:</span> <span class="value">true</span>
+  <span class="key">require_mobile_review:</span> <span class="value">true</span>
+  <span class="key">human_approval_before_publish:</span> <span class="value">true</span>
+<span class="comment"># Retry only the failed, idempotent step. Never restart the entire run blindly.</span></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Four workflows to build next</p>
+      <h2>Pick your niche and compose the loops.</h2>
+      <p class="lead">The architecture stays the same. What changes is the brief, data, tools, verification rules, and delivery channel.</p>
+
+      <div class="workflow-cards">
+        <article class="workflow-card">
+          <span class="emoji" aria-hidden="true">💼</span>
+          <h3>Job-search agent</h3>
+          <p>Create one project with your résumé, experience, preferences, target roles, work authorization, and approved claims.</p>
+          <ol>
+            <li>Find matching roles every morning.</li>
+            <li>Score fit and explain the gaps.</li>
+            <li>Prepare a tailored résumé and application draft.</li>
+            <li>Queue qualified applications for human approval and track the outcome.</li>
+          </ol>
+        </article>
+
+        <article class="workflow-card">
+          <span class="emoji" aria-hidden="true">📡</span>
+          <h3>Niche intelligence agent</h3>
+          <p>Follow selected hashtags, creators, communities, newsletters, and trusted news sources.</p>
+          <ol>
+            <li>Collect new signals throughout the day.</li>
+            <li>Cluster repeated topics and remove noise.</li>
+            <li>Verify the most important claims.</li>
+            <li>Deliver an end-of-day report with trends, questions, and opportunities.</li>
+          </ol>
+        </article>
+
+        <article class="workflow-card">
+          <span class="emoji" aria-hidden="true">🎙️</span>
+          <h3>Weekly podcast factory</h3>
+          <p>Give the workflow a topic on Monday and ask for a production-ready package before the weekend.</p>
+          <ol>
+            <li>Research authoritative sources and recent conversations.</li>
+            <li>Organize the source bundle in NotebookLM.</li>
+            <li>Prepare the thesis, outline, script, questions, and fact sheet.</li>
+            <li>Create clips, show notes, artwork, and promotional posts after approval.</li>
+          </ol>
+        </article>
+
+        <article class="workflow-card">
+          <span class="emoji" aria-hidden="true">📚</span>
+          <h3>Personal knowledge digest</h3>
+          <p>Turn your favorite podcasts, articles, and YouTube channels into a private research feed.</p>
+          <ol>
+            <li>Collect transcripts and source metadata.</li>
+            <li>Send the approved source bundle to NotebookLM.</li>
+            <li>Extract recurring ideas, disagreements, and unanswered questions.</li>
+            <li>Deliver a detailed weekly synthesis with links back to every source.</li>
+          </ol>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Production checklist</p>
+      <h2>Do not scale a workflow you cannot inspect.</h2>
+      <div class="columns">
+        <div>
+          <h3>Behavior and safety</h3>
+          <ul class="checklist">
+            <li>One owner and one measurable outcome per workflow</li>
+            <li>Typed tool inputs and explicit permission scopes</li>
+            <li>Idempotency rules for every retried action</li>
+            <li>Human approval for irreversible or public actions</li>
+            <li>Stop conditions for time, cost, retries, and uncertainty</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Quality and operations</h3>
+          <ul class="checklist">
+            <li>Versioned prompts, skills, examples, and routing policies</li>
+            <li>Source-level evidence for factual claims</li>
+            <li>Traces across model, tool, state, and approval steps</li>
+            <li>Task success measured with latency and total run cost</li>
+            <li>Failure recovery tested before scheduled execution</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>The practical starting point</strong>
+        <p>Choose one repetitive task you understand deeply. Build <strong>Request &rarr; Execute &rarr; Verify &rarr; Deliver</strong>. Run it manually until the evidence is trustworthy. Schedule it only after retries, approvals, and stop conditions behave correctly. Then add the next loop. The use cases are limitless&mdash;pick your niche and go nuts.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-note">Written by Raja Ashok. Build one dependable loop, then compose the system around it.</div>
+  </footer>
+</body>
+</html>
