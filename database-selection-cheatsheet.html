@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Database Selection Cheat Sheet: Pick the Right Store for the Workload | Raja Ashok</title>
+  <meta name="description" content="A production-first database selection cheat sheet for interviews: relational databases, NoSQL families, warehouses, lakehouses, time series, vector databases, and real-time analytics.">
+  <meta property="og:title" content="Database Selection Cheat Sheet: Pick the Right Store for the Workload">
+  <meta property="og:description" content="A quick interview reference for choosing relational, NoSQL, analytical, and emerging data systems from workload requirements.">
+  <meta property="og:image" content="https://rajaashok.github.io/assets/database-selection-cheatsheet.png">
+  <meta property="og:url" content="https://rajaashok.github.io/database-selection-cheatsheet">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://rajaashok.github.io/database-selection-cheatsheet">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%231c261f'/%3E%3Cpath d='M4 4h8v2H6v2h5v2H6v2H4z' fill='%23f4ebdc'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/assets/roadmap-project.css">
+  <style>
+    .poster-band {
+      border-top: 1px solid #202b2a;
+      border-bottom: 1px solid #202b2a;
+      background: #020506;
+      color: var(--white);
+      padding: 40px 0 48px;
+    }
+
+    .poster-grid {
+      display: grid;
+      grid-template-columns: minmax(360px, 680px) minmax(250px, 1fr);
+      gap: 48px;
+      align-items: center;
+    }
+
+    .poster {
+      margin: 0;
+      border: 1px solid #27312f;
+      border-radius: 8px;
+      background: #000;
+      padding: 10px;
+      box-shadow: 0 30px 86px rgba(0, 0, 0, 0.38);
+    }
+
+    .poster img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+
+    .poster-copy h2 {
+      color: #f3f1eb;
+      font-family: "Inter", sans-serif;
+      font-size: 30px;
+      line-height: 1.18;
+      font-weight: 800;
+    }
+
+    .poster-copy p {
+      color: #aeb8b4;
+      font-size: 16px;
+    }
+
+    .default-rule {
+      margin-top: 25px;
+      border: 1px solid #34433f;
+      border-left: 5px solid #55db8d;
+      border-radius: 7px;
+      background: #0d1515;
+      padding: 19px 21px;
+      color: #eef3f0;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .default-rule strong { color: #65e79a; }
+
+    .asset-link {
+      display: inline-flex;
+      min-height: 42px;
+      align-items: center;
+      margin-top: 18px;
+      border: 1px solid #39423e;
+      border-radius: 6px;
+      padding: 9px 13px;
+      color: #d8dfdb;
+      font-size: 13px;
+      font-weight: 650;
+      text-decoration: none;
+    }
+
+    .asset-link:hover { border-color: #43dca5; color: #43dca5; }
+
+    .asset-meta {
+      margin-top: 11px;
+      color: #707975;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+    }
+
+    .jump-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      margin-top: 30px;
+      border: 1px solid var(--line);
+      background: var(--line);
+    }
+
+    .jump-grid a {
+      min-width: 0;
+      background: var(--paper);
+      padding: 17px 15px;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .jump-grid a:hover { background: #fff4e6; }
+
+    .jump-grid strong,
+    .jump-grid span { display: block; }
+
+    .jump-grid strong {
+      margin-bottom: 5px;
+      color: var(--orange);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px;
+    }
+
+    .jump-grid span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .table-wrap {
+      margin-top: 28px;
+      overflow-x: auto;
+      border-top: 3px solid var(--ink);
+    }
+
+    .cheat-table {
+      width: 100%;
+      min-width: 820px;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .cheat-table th,
+    .cheat-table td {
+      border-bottom: 1px solid var(--line);
+      padding: 14px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .cheat-table th {
+      color: var(--ink);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10.5px;
+      text-transform: uppercase;
+    }
+
+    .cheat-table td:first-child {
+      color: var(--ink);
+      font-weight: 750;
+    }
+
+    .cheat-table td:nth-child(2) {
+      color: var(--orange);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .branch-head {
+      display: grid;
+      grid-template-columns: 62px minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+      margin-bottom: 25px;
+    }
+
+    .branch-number {
+      display: grid;
+      width: 54px;
+      height: 54px;
+      place-items: center;
+      border: 2px solid var(--teal);
+      color: var(--teal);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 19px;
+      font-weight: 700;
+    }
+
+    .branch-nosql .branch-number { border-color: #6f8fd7; color: #416dc3; }
+    .branch-analytics .branch-number { border-color: #8a5fd0; color: #7443c3; }
+    .branch-emerging .branch-number { border-color: #c8612c; color: #c8612c; }
+
+    .pick-list {
+      margin-top: 26px;
+      border-top: 3px solid var(--ink);
+    }
+
+    .pick {
+      display: grid;
+      grid-template-columns: minmax(170px, 0.44fr) minmax(0, 1.1fr) minmax(180px, 0.72fr);
+      gap: 28px;
+      padding: 23px 0;
+      border-bottom: 1px solid var(--line);
+      align-items: start;
+    }
+
+    .pick h3 { margin-bottom: 5px; }
+    .pick p { margin: 0; }
+    .pick .examples {
+      color: var(--orange);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .interview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1px;
+      margin-top: 30px;
+      border: 1px solid var(--line);
+      background: var(--line);
+    }
+
+    .interview-grid article {
+      background: var(--paper);
+      padding: 22px 20px;
+    }
+
+    .interview-grid strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--orange);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px;
+    }
+
+    .interview-grid p { margin: 0; font-size: 14px; }
+
+    .answer-template {
+      margin-top: 32px;
+      border-left: 6px solid var(--teal);
+      background: var(--paper);
+      padding: 25px 28px;
+      box-shadow: 0 8px 26px rgba(69, 54, 36, 0.07);
+    }
+
+    .answer-template strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--ink);
+      font-size: 18px;
+    }
+
+    .answer-template p { margin: 0; }
+
+    .source-list {
+      margin: 22px 0 0;
+      padding: 0;
+      list-style: none;
+      border-top: 3px solid var(--ink);
+    }
+
+    .source-list li {
+      padding: 13px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .source-list a {
+      color: var(--orange);
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .source-list span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 900px) {
+      .poster-grid { grid-template-columns: 1fr; }
+      .poster { width: min(100%, 680px); margin: 0 auto; }
+      .jump-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .pick { grid-template-columns: 150px minmax(0, 1fr); gap: 18px; }
+      .pick .examples { grid-column: 2; }
+      .interview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 560px) {
+      .poster-band { padding-top: 24px; }
+      .poster-grid { gap: 28px; }
+      .jump-grid,
+      .interview-grid { grid-template-columns: 1fr; }
+      .pick { grid-template-columns: 1fr; gap: 8px; }
+      .pick .examples { grid-column: 1; }
+      .branch-head { grid-template-columns: 48px minmax(0, 1fr); gap: 14px; }
+      .branch-number { width: 44px; height: 44px; font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="shell sitebar">
+    <a class="brand" href="/"><span>HackProduct</span> &middot; The Notebook</a>
+    <a class="back" href="/">Back to all projects</a>
+  </header>
+
+  <section class="shell hero">
+    <p class="eyebrow">HackProduct &middot; Data Systems &middot; Interview Prep</p>
+    <h1>Database Selection Cheat Sheet</h1>
+    <p class="dek">Start with the workload, consistency boundary, and access pattern. The product name comes last.</p>
+    <div class="meta">
+      <span>July 2026</span>
+      <span>Database architecture</span>
+      <span>Quick reference</span>
+      <span>8 min read</span>
+    </div>
+  </section>
+
+  <section class="poster-band" aria-label="Database selection cheat sheet diagram">
+    <div class="shell poster-grid">
+      <figure class="poster">
+        <a href="/assets/database-selection-cheatsheet.png" aria-label="Open the full database selection cheat sheet">
+          <img src="/assets/database-selection-cheatsheet.png" width="1024" height="1536" alt="Database selection tree covering production applications, NoSQL families, analytics platforms, time-series systems, and hybrid or emerging databases">
+        </a>
+      </figure>
+      <div class="poster-copy">
+        <h2>Default to the simplest system that preserves the invariant</h2>
+        <p>For a production application, that usually means relational first. Move to another model only when a measured requirement such as write scale, relationship traversal, text relevance, analytical scan volume, or latency makes the relational path a poor fit.</p>
+        <p>The diagram is a taxonomy, not a benchmark. Products can span multiple categories, and a production architecture often combines a primary store with a cache, search index, warehouse, or object-storage layer.</p>
+        <div class="default-rule"><strong>INTERVIEW DEFAULT</strong><br>Start with PostgreSQL.<br>Name the requirement that would make you switch.</div>
+        <a class="asset-link" href="/assets/database-selection-cheatsheet.png">Open full-resolution cheat sheet</a>
+        <div class="asset-meta">Original portrait PNG &middot; 1024 x 1536</div>
+      </div>
+    </div>
+  </section>
+
+  <main class="shell">
+    <section class="section">
+      <p class="label">The map</p>
+      <h2>Four branches, one selection method</h2>
+      <p class="lead">Read the diagram from top to bottom. Each branch answers a different workload question.</p>
+      <nav class="jump-grid" aria-label="Database selection sections">
+        <a href="#production"><strong>01</strong><span>Production applications</span></a>
+        <a href="#nosql"><strong>02</strong><span>NoSQL by access pattern</span></a>
+        <a href="#analytics"><strong>03</strong><span>Analytics and lakehouse</span></a>
+        <a href="#emerging"><strong>04</strong><span>Hybrid and emerging</span></a>
+      </nav>
+    </section>
+
+    <section class="section">
+      <p class="label">60-second reference</p>
+      <h2>Start here, then explain the switch condition</h2>
+      <div class="table-wrap">
+        <table class="cheat-table">
+          <thead>
+            <tr><th>Workload signal</th><th>Start with</th><th>Why it is a top pick</th><th>Switch or extend when</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Transactional application core</td><td>PostgreSQL</td><td>Transactions, constraints, joins, mature tooling, broad portability.</td><td>A proven scale, latency, topology, or operational requirement invalidates it.</td></tr>
+            <tr><td>Managed relational on one cloud</td><td>Aurora / Cloud SQL / Azure SQL</td><td>Relational guarantees with less backup, patching, and availability work.</td><td>Portability, engine control, or unusual topology matters more than managed operations.</td></tr>
+            <tr><td>Flexible JSON aggregates</td><td>MongoDB</td><td>Document-shaped data, evolving schemas, and aggregate-oriented reads.</td><td>Cross-entity joins and relational invariants dominate the workload.</td></tr>
+            <tr><td>Cache, sessions, counters, TTL</td><td>Redis</td><td>Fast key access, expiration, and useful in-memory data structures.</td><td>You need the durable source of truth or broad analytical scans.</td></tr>
+            <tr><td>Massive partitioned write volume</td><td>Cassandra / ScyllaDB</td><td>Predictable partition-key access and horizontal write scaling.</td><td>The application needs ad hoc joins, flexible querying, or multi-row transactions.</td></tr>
+            <tr><td>Deep relationship traversal</td><td>Neo4j</td><td>Relationships are first-class and multi-hop traversal is the core query.</td><td>Relationships are shallow enough for SQL or the workload is mostly analytical.</td></tr>
+            <tr><td>Full-text search and relevance</td><td>Elasticsearch / OpenSearch</td><td>Inverted indexes, ranking, filtering, and text-oriented retrieval.</td><td>Do not use it as the authoritative transactional database.</td></tr>
+            <tr><td>BI and large analytical scans</td><td>Snowflake / BigQuery / Redshift / Synapse</td><td>Columnar OLAP, workload isolation, and elastic analytical compute.</td><td>The requirement is low-latency transactions rather than analytical throughput.</td></tr>
+            <tr><td>Open lakehouse</td><td>Object storage + Delta / Iceberg</td><td>Low-cost files, open table metadata, and multiple processing engines.</td><td>A simple warehouse already meets the team, latency, and governance needs.</td></tr>
+            <tr><td>Metrics and time-ordered events</td><td>TimescaleDB / InfluxDB / Prometheus</td><td>Time-aware retention, aggregation, compression, or monitoring semantics.</td><td>The data model is mainly relational entities rather than measurements.</td></tr>
+            <tr><td>Vector similarity</td><td>Postgres + vector extension first</td><td>One system can be enough while scale, filtering, and recall needs are modest.</td><td>Vector-native scale or isolation justifies Pinecone, Weaviate, or Milvus.</td></tr>
+            <tr><td>Fresh subsecond analytics</td><td>ClickHouse / Druid / Materialize</td><td>Fast aggregations or continuously maintained views over recent data.</td><td>Normal warehouse refresh latency is already acceptable.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="production">
+      <div class="branch-head">
+        <div class="branch-number">01</div>
+        <div>
+          <p class="label">OLTP / operational</p>
+          <h2>Production apps: relational is the default</h2>
+          <p class="lead">Most application data has identities, constraints, updates, and relationships. SQL earns the first attempt.</p>
+        </div>
+      </div>
+      <div class="pick-list">
+        <article class="pick">
+          <div><h3>Relational core</h3><p class="examples">PostgreSQL<br>MySQL<br>SQL Server</p></div>
+          <p>Choose this for orders, payments, accounts, inventory, workflows, and other records where correctness spans multiple rows or entities.</p>
+          <p><strong>Top interview pick:</strong> PostgreSQL gives you the broadest defensible default without inventing a special requirement.</p>
+        </article>
+        <article class="pick">
+          <div><h3>Managed relational</h3><p class="examples">Aurora<br>Cloud SQL<br>Azure SQL</p></div>
+          <p>Choose a managed service when the team values automated backups, patching, failover, monitoring, and cloud integration more than direct infrastructure control.</p>
+          <p><strong>Call out:</strong> managed does not remove schema design, indexing, capacity planning, or recovery testing.</p>
+        </article>
+        <article class="pick">
+          <div><h3>Specialized sidecar</h3><p class="examples">MongoDB<br>Redis<br>Cassandra</p></div>
+          <p>Add a specialized store for one access pattern: documents, cache and ephemeral state, or partitioned high-volume writes.</p>
+          <p><strong>Call out:</strong> polyglot persistence adds replication, consistency, backup, ownership, and incident complexity.</p>
+        </article>
+      </div>
+      <div class="answer-template">
+        <strong>The strong interview move</strong>
+        <p>Say: “I will start with PostgreSQL for transactional correctness. I would add or switch stores only after we quantify the access pattern or scale constraint it cannot meet.”</p>
+      </div>
+    </section>
+
+    <section class="section branch-nosql" id="nosql">
+      <div class="branch-head">
+        <div class="branch-number">02</div>
+        <div>
+          <p class="label">Use-case based</p>
+          <h2>NoSQL: choose the data model from the query</h2>
+          <p class="lead">“NoSQL” is not one design. The partition key, traversal, document boundary, or search index is the design.</p>
+        </div>
+      </div>
+      <div class="pick-list">
+        <article class="pick"><div><h3>Document</h3><p class="examples">MongoDB<br>Couchbase<br>DocumentDB</p></div><p>Best when the application reads and writes self-contained aggregates with an evolving JSON-like shape.</p><p>Avoid forcing highly connected, frequently joined entities into duplicated documents.</p></article>
+        <article class="pick"><div><h3>Key-value</h3><p class="examples">Redis<br>DynamoDB<br>Aerospike</p></div><p>Best when the key is known and access must be predictable: sessions, carts, counters, idempotency records, and hot lookups.</p><p>The key design is the schema. A bad partition key becomes the bottleneck.</p></article>
+        <article class="pick"><div><h3>Wide-column</h3><p class="examples">Cassandra<br>ScyllaDB<br>HBase</p></div><p>Best for high write volume, large distributed datasets, and query-first denormalized tables.</p><p>Model from the read path. Do not promise ad hoc querying that the table layout does not support.</p></article>
+        <article class="pick"><div><h3>Graph</h3><p class="examples">Neo4j<br>ArangoDB<br>Neptune</p></div><p>Best when variable-depth relationship traversal is the product: fraud rings, identity links, network paths, or knowledge graphs.</p><p>Use SQL when traversals are shallow and the team benefits more from relational simplicity.</p></article>
+        <article class="pick"><div><h3>Search</h3><p class="examples">Elasticsearch<br>OpenSearch<br>Meilisearch</p></div><p>Best for full-text relevance, faceting, filtering, logs, and search-oriented retrieval.</p><p>Treat the index as a derived view. Keep an authoritative source and a reindexing path.</p></article>
+      </div>
+    </section>
+
+    <section class="section branch-analytics" id="analytics">
+      <div class="branch-head">
+        <div class="branch-number">03</div>
+        <div>
+          <p class="label">OLAP / warehouses</p>
+          <h2>Analytics: separate storage, format, and compute</h2>
+          <p class="lead">The diagram groups the ecosystem visually. In an interview, name the role each component plays.</p>
+        </div>
+      </div>
+      <div class="pick-list">
+        <article class="pick"><div><h3>Cloud warehouse</h3><p class="examples">Snowflake<br>BigQuery<br>Redshift<br>Synapse</p></div><p>Optimized for large scans, aggregations, BI concurrency, and analytical workload isolation.</p><p>Pick from existing cloud, governance, skills, workload shape, and pricing model rather than logo popularity.</p></article>
+        <article class="pick"><div><h3>Lakehouse stack</h3><p class="examples">S3<br>Delta Lake<br>Apache Iceberg</p></div><p>Object storage holds files. Delta Lake and Iceberg add table metadata and transaction semantics over those files. Engines such as Spark or Databricks process them.</p><p>This separation is the key interview distinction: storage is not the table format, and the format is not the compute engine.</p></article>
+        <article class="pick"><div><h3>Processing surface</h3><p class="examples">Databricks Notebooks<br>Jupyter<br>Apache Spark</p></div><p>Notebooks are development interfaces; Spark is a distributed processing engine. Neither replaces the need for durable storage and governed tables.</p><p>Explain the path from ingestion to storage to transformation to serving.</p></article>
+        <article class="pick"><div><h3>Time series</h3><p class="examples">InfluxDB<br>TimescaleDB<br>Prometheus</p></div><p>Choose based on whether you are storing product events, SQL-friendly time series, or operational metrics and alerting data.</p><p>Prometheus is a monitoring system with time-series storage, not a general-purpose application database.</p></article>
+      </div>
+    </section>
+
+    <section class="section branch-emerging" id="emerging">
+      <div class="branch-head">
+        <div class="branch-number">04</div>
+        <div>
+          <p class="label">Hybrid and emerging</p>
+          <h2>Use a specialist only when the requirement is real</h2>
+          <p class="lead">These systems can be excellent. They also create a new operational boundary, so the burden of proof is higher.</p>
+        </div>
+      </div>
+      <div class="pick-list">
+        <article class="pick"><div><h3>Distributed SQL</h3><p class="examples">CockroachDB<br>TiDB<br>YugabyteDB</p></div><p>Useful when SQL semantics must span regions or scale horizontally.</p><p>Be ready to discuss latency, consistency, failure domains, and operational cost.</p></article>
+        <article class="pick"><div><h3>Multi-model</h3><p class="examples">ArangoDB<br>OrientDB<br>Fauna</p></div><p>Useful when one operational system must support several data models with shared governance.</p><p>Convenience is not free; verify query quality, ecosystem depth, and lock-in.</p></article>
+        <article class="pick"><div><h3>Embedded / edge</h3><p class="examples">SQLite<br>DuckDB<br>Realm</p></div><p>SQLite is a strong local transactional store. DuckDB is excellent for embedded analytical queries. Edge-first choices reduce network dependence.</p><p>Explain synchronization and conflict handling when data later moves to a central system.</p></article>
+        <article class="pick"><div><h3>Vector databases</h3><p class="examples">Pinecone<br>Weaviate<br>Milvus</p></div><p>Useful for large-scale similarity search, metadata filtering, and retrieval workloads that exceed an existing relational extension.</p><p>Discuss recall, latency, filtering, index freshness, deletion, tenancy, and evaluation.</p></article>
+        <article class="pick"><div><h3>Real-time analytics</h3><p class="examples">ClickHouse<br>Druid<br>Materialize</p></div><p>Useful for fast aggregations over fresh events, operational dashboards, and continuously maintained analytical views.</p><p>First ask whether a normal warehouse plus acceptable refresh latency is simpler.</p></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Interview preparation</p>
+      <h2>Ask these before naming a database</h2>
+      <div class="interview-grid">
+        <article><strong>01 · INVARIANT</strong><p>What must never be wrong? Balance, uniqueness, ordering, inventory, or ownership?</p></article>
+        <article><strong>02 · ACCESS</strong><p>What are the dominant reads and writes? Which keys, joins, traversals, or scans?</p></article>
+        <article><strong>03 · SCALE</strong><p>Data size, write rate, read rate, growth, skew, and geographic distribution?</p></article>
+        <article><strong>04 · CONSISTENCY</strong><p>Where is strong consistency required, and where is eventual consistency acceptable?</p></article>
+        <article><strong>05 · OPERATIONS</strong><p>Who owns backups, upgrades, failover, reindexing, migrations, and incidents?</p></article>
+        <article><strong>06 · EVOLUTION</strong><p>How will the schema, query mix, retention, and compliance requirements change?</p></article>
+      </div>
+      <div class="answer-template">
+        <strong>A concise answer template</strong>
+        <p>“Given <em>this access pattern</em> and <em>this consistency requirement</em>, I would start with <em>this database</em> because of <em>these two properties</em>. The main trade-off is <em>this limitation</em>. If <em>this measured threshold</em> appears, I would add or migrate to <em>this specialist</em>.”</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="label">Primary references</p>
+      <h2>Docs behind the selection rules</h2>
+      <ul class="source-list">
+        <li><a href="https://www.postgresql.org/docs/current/transaction-iso.html">PostgreSQL transaction isolation</a><span>Transaction levels and the consistency behavior behind the relational default.</span></li>
+        <li><a href="https://www.mongodb.com/docs/manual/">MongoDB manual</a><span>Official documentation for the document data model and production operation.</span></li>
+        <li><a href="https://redis.io/docs/latest/develop/using-commands/keyspace/">Redis keys and values</a><span>Key-space design, expiration, clustering cautions, and operational behavior.</span></li>
+        <li><a href="https://docs.cloud.google.com/bigquery/docs/introduction">BigQuery overview</a><span>A modern analytical platform with separate compute and storage layers.</span></li>
+        <li><a href="https://docs.snowflake.com/en/user-guide/intro-key-concepts">Snowflake architecture</a><span>Storage, virtual warehouses, and cloud-services concepts.</span></li>
+        <li><a href="https://docs.databricks.com/aws/en/delta/">Delta Lake on Databricks</a><span>The storage layer and transaction log that underpin Delta tables.</span></li>
+        <li><a href="https://iceberg.apache.org/docs/latest/">Apache Iceberg documentation</a><span>An open table format for large analytical datasets.</span></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell">
+      <p class="footer-note">HackProduct &middot; System design judgment through visual systems</p>
+      <p>Built by <a href="https://hackproduct.com">Raja Ashok</a>. Start from the workload, state the trade-off, and keep the migration path visible.</p>
+    </div>
+  </footer>
+</body>
+</html>
